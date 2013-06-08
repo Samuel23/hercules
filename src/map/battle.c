@@ -3647,8 +3647,7 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 			flag.infdef = 1;
 	}
 
-	switch(skill_id)
-	{
+	switch(skill_id) {
 		case MG_FIREWALL:
 		case NJ_KAENSIN:
 			ad.dmotion = 0; //No flinch animation.
@@ -6222,8 +6221,12 @@ void do_final_battle(void) {
 /* initialize the interface */
 void battle_defaults(void) {
 	battle = &battle_s;
+	
+	battle->bc = &battle_config;
+	
 	battle->init = do_init_battle;
 	battle->final = do_final_battle;
+	
 	battle->calc_attack = battle_calc_attack;
 	battle->calc_damage = battle_calc_damage;
 	battle->calc_gvg_damage = battle_calc_gvg_damage;

@@ -4,9 +4,12 @@
 //-----------------------------------------
 //grf: C:\Program Files\Gravity\RO\rdata.grf
 //grf: C:\Program Files\Gravity\RO\data.grf
+grf: D:\KRO 2013\RO\data.grf
+grf: D:\KRO 2013\RO\rdata.grf
 
 //-----------------------------------------
 // Data Directory
 // Use the base folder, not the data\ path.
 //-----------------------------------------
 //data_dir: C:\Program Files\Gravity\RO\
+data_dir: D:\KRO 2013\RO\

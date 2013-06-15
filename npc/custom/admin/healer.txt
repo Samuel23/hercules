@@ -13,7 +13,7 @@
 -	script	Healer	-1,{
 	
 	set .@Price,0;	// Zeny required for heal
-	set .@Buffs,0;	// Also buff players? (1: yes / 0: no)
+	set .@Buffs,1;	// Also buff players? (1: yes / 0: no)
 	set .@Delay,0;	// Heal delay, in seconds
 
 	callfunc "F_ClearGarbage",0;
@@ -24,11 +24,25 @@
 		if(select("^0055FFHeal^000000:^777777Cancel^000000") == 2) close;
 		set Zeny, Zeny-.@Price;
 	}
+	/*Repair*/
+	while (getbrokenid(1)) {
+	repair(1);
+	set .@i, .@i +1;
+    }
+    if (.@i) dispbottom .@i + " items repaired.";
+	/*Heal*/
 	specialeffect2 313; percentheal 100,100;
 	if (.@Buffs) {
-		specialeffect2 EF_INCAGILITY; sc_start SC_INCREASEAGI,240000,10;
-		specialeffect2 EF_BLESSING; sc_start SC_BLESSING,240000,10;
+		skilleffect 34,0; sc_start SC_INC_AGI,240000,10;
+		skilleffect 29,0; sc_start SC_BLESSING,240000,10;
 	}
+	/*Identify*/
+	getinventorylist;
+    for(set @i, 0; @i < @inventorylist_count; set @i, @i + 1) {
+        if (@inventorylist_identify[@i] == 1) continue;
+        delitem2 @inventorylist_id[@i],1,0,0,0,0,0,0,0;
+        getitem @inventorylist_id[@i],1;
+		}
 	if (.@Delay) set @HD, gettimetick(2)+.@Delay;
 	end;
 }

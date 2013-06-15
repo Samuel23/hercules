@@ -10,6 +10,10 @@
 	#define packet(a,b,...)
 #endif
 
+#ifndef packetKeys
+	#define packetKeys(a,b,c)
+#endif
+
 /*
  * packet syntax
  * - packet(packet_id,length)
@@ -1964,7 +1968,11 @@ packet(0x020d,-1);
 	packet(0x0366,90,clif->pUseSkillToPosMoreInfo,2,4,6,8,10);
 	packet(0x0889,6,clif->pGetCharNameRequest,2);
 	packet(0x0884,6,clif->pSolveCharName,2);
+#ifndef PACKETVER_RE
+	packet(0x091D,18,clif->pPartyBookingRegisterReq,2,4,6);
+#else
 	packet(0x08E5,41,clif->pPartyBookingRegisterReq,2,4);
+#endif
 	packet(0x08E6,4);
 	packet(0x08E7,10,clif->pPartyBookingSearchReq,2);
 	packet(0x08E8,-1);
@@ -2017,6 +2025,14 @@ packet(0x020d,-1);
 	packet(0x08E5,41,clif->pPartyBookingRegisterReq,2,4);
 	packet(0x08d2,10);
 	packet(0x0916,26,clif->pGuildInvite2,2);
+	packetKeys(0x1540e48,0x13041224,0x31247924);
+
+#endif
+
+#ifndef PACKETVER_RE
+#if PACKETVER >= 20120604
+	packet(0x0861,18,clif->pPartyBookingRegisterReq,2,4,6);
+#endif
 #endif
 
 //2012-06-18aRagexeRE
@@ -2052,6 +2068,7 @@ packet(0x020d,-1);
 //2012-07-16aRagExe (special thanks to Yommy!)
 #if PACKETVER >= 20120716
 	packet(0x0364,8,clif->pMoveFromKafra,2,4);
+	packetKeys(0x76052205, 0x22052205, 0x22052205);
 #endif
 
 //2013-03-20Ragexe (Judas + Yommy)
@@ -2086,11 +2103,13 @@ packet(0x020d,-1);
 	packet(0x086F,26,clif->pFriendsListAdd,2);
 	packet(0x093F,5,clif->pHomMenu,2,4);
 	packet(0x0947,36,clif->pStoragePassword,0);
+	packetKeys(0x3F094C49, 0x55F86C1E, 0x58AA359A);
 	// Shuffle End
 
 	// New Packets
 	packet(0x0998,8,clif->pEquipItem,2,4);
 	packet(0x0447,2); // PACKET_CZ_BLOCKING_PLAY_CANCEL
+	packet(0x099f,24);
 	// New Packets End
 #endif
 
@@ -2228,6 +2247,10 @@ packet(0x020d,-1);
 	packet(0x023B,26,clif->pFriendsListAdd,2);
 	packet(0x0361,5,clif->pHomMenu,2,4);
 	packet(0x0883,36,clif->pStoragePassword,0);
+#endif
+
+#if PACKETVER >= 20130612
+	packetKeys(0x6D166F66, 0x3C000FCF, 0x295B0FCB); /* Thanks to Shakto */
 #endif
 
 #endif /* _PACKETS_H_ */

@@ -12,4 +12,4 @@
 //= 1.0 Duplicates for Monster Tamer
 //============================================================
 
-izlude_in,55,105,4	duplicate(Monster_Tamer#izu)	Monster Tamer#izlude	125
+//izlude_in,55,105,4	duplicate(Monster_Tamer#izu)	Monster Tamer#izlude	125

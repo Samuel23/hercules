@@ -21,7 +21,6 @@ OnHour00:
 OnHour06:
 OnHour12:
 OnHour18:
-OnMinute08:
 //-------------------
 	set .@brate,(getbattleflag("base_exp_rate")*2);
 	set .@jrate,(getbattleflag("job_exp_rate")*2);
@@ -49,7 +48,6 @@ OnHour01:
 OnHour07:
 OnHour13:
 OnHour19:
-OnMinute09:
 //-------------------
 	/*Original Rates*/
 	set .@brate,15000;

@@ -5239,12 +5239,14 @@ void map_hp_symbols(void) {
 	HPM->share(ircbot,"ircbot");
 	HPM->share(itemdb,"itemdb");
 	HPM->share(logs,"logs");
+	HPM->share(mail,"mail");
 	HPM->share(script,"script");
 	HPM->share(searchstore,"searchstore");
 	HPM->share(skill,"skill");
 	HPM->share(vending,"vending");
 	HPM->share(pc,"pc");
 	HPM->share(party,"party");
+	HPM->share(trade,"trade");
 	HPM->share(iMap,"iMap");
 	/* partial */
 	HPM->share(mapit,"mapit");
@@ -5269,6 +5271,7 @@ void load_defaults(void) {
 	ircbot_defaults();
 	itemdb_defaults();
 	log_defaults();
+	mail_defaults();
 	npc_defaults();
 	script_defaults();
 	searchstore_defaults();
@@ -5276,6 +5279,7 @@ void load_defaults(void) {
 	vending_defaults();
 	pc_defaults();
 	party_defaults();
+	trade_defaults();
 }
 int do_init(int argc, char *argv[])
 {

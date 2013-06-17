@@ -1,0 +1,279 @@
+Crystilia,59,88,5	script	PVP Warper	413,{
+mes "[PvP Warper]";
+mes "Do you want to warp to the PVP Arena and fight your enemies?";
+menu "Sure, Bring it on!",L_Yes,"Nah, I'm not ready yet.",L_No;
+
+L_Yes:
+next;
+mes "[PvP Warper]";
+mes "Which pvp Arena do you want to enter?";
+menu	"^0000FFNon-Donor PvP Arena 1 [" + getmapusers("pvpmap.gat") + " / 20]^000000",L1,	// Non Donor with Usable items
+		"^0000FFNon-Donor PvP Arena 2 [" + getmapusers("pvpmap2.gat") + " / 20]^000000",L2,	// Non Donor without Usable items
+		"^0000FFDonor PvP Arena 1 [" + getmapusers("pvpmap3.gat") + " / 20]^000000",LD1,	// Donor with Usable items
+		"^0000FFDonor PvP Arena 2 [" + getmapusers("pvpmap4.gat") + " / 20]^000000",LD2,	// Donor without Usable items
+		"^FF0000GvG Arena 1 [" + getmapusers("guild_vs1.gat") + " / 20]^000000",L3;
+		//"^FF0000GvG Arena 2 [" + getmapusers("prt_are01.gat") + " / 20]^000000",L4,
+		//"Baby PvP Arena  [" + getmapusers("guild_vs2.gat") + " / 20]",L5,
+		//"Novice Event Arena  [" + getmapusers("nov_nov01.gat") + " / 20]",L6;
+
+	L1:
+	if (getmapusers("pvpmap.gat") > 19) goto Lsorry;
+	else if ( Upper == 2 || Upper == 6 ) goto L_yesbaby;
+	callsub DetectDonate;
+	warp "pvpmap",0,0;
+	announce "[ "+strcharinfo(0)+" ] is warped into Non Donor PVP Arena 1.",0;
+	close;
+
+	L2:
+	if (getmapusers("pvpmap2.gat") > 19) goto Lsorry;
+	else if ( Upper == 2 || Upper == 6 ) goto L_yesbaby;
+	callsub DetectDonate;
+	warp "pvpmap2",0,0;
+	announce "[ "+strcharinfo(0)+" ] is warped into Non Donor PVP Arena 2.",0;
+	close;
+
+	LD1:
+	if (getmapusers("pvpmap3.gat") > 19) goto Lsorry;
+	else if ( Upper == 2 || Upper == 6 ) goto L_yesbaby;
+	warp "pvpmap3",0,0;
+	announce "[ "+strcharinfo(0)+" ] is warped into Donor PVP Arena 1.",0;
+	close;
+
+	LD2:
+	if (getmapusers("pvpmap4.gat") > 19) goto Lsorry;
+	else if ( Upper == 2 || Upper == 6 ) goto L_yesbaby;
+	warp "pvpmap4",0,0;
+	announce "[ "+strcharinfo(0)+" ] is warped into Donor PVP Arena 2.",0;
+	close;
+	
+	L3:
+	if (getmapusers("guild_vs1.gat") > 19) goto Lsorry2;
+	else if (getcharid(2) == 0) goto L_noguild;
+	warp "guild_vs1",0,0;
+	announce "[ "+strcharinfo(0)+" ] is warped into GVG Arena 1.",0;
+	close;
+	close;
+
+	L4:
+	if (getmapusers("prt_are01.gat") > 19) goto Lsorry2;
+	else if (getcharid(2) == 0) goto L_noguild;
+	warp "prt_are01",0,0;
+	announce "[ "+strcharinfo(0)+" ] is warped into GVG Arena 2.",0;
+	close;
+	close;
+
+	L5:
+	if (getmapusers("guild_vs2.gat") > 19) goto Lsorry;
+	else if ( Upper != 2 ) goto L_notbaby;
+	warp "guild_vs2",0,0;
+	announce "[ "+strcharinfo(0)+" ] is warped into Baby PVP Arena.",0;
+	close;
+	close;
+	
+	L6:
+	if (getmapusers("nov_zom01.gat") > 19) goto Lsorry;
+	else if (BaseLevel > 1) goto L_NO2;
+	else if (class == 0) goto L_event;
+	else if (class > 0) goto L_NO2;
+	close;
+	close;
+
+/*L_event:
+atcommand "@storeall";
+sc_end SC_ALL;
+sc_start SC_DECREASEAGI,1200000,10;
+percentheal 100,100;
+sc_start SC_STRIPSHIELD,1200000,5;
+sc_start SC_STRIPWEAPON,1200000,5;
+sc_start SC_STRIPARMOR,1200000,5;
+sc_start SC_STRIPHELM,1200000,5;
+statusup2 bStr,-999;
+statusup2 bAgi,-999;
+statusup2 bVit,-999;
+statusup2 bInt,-999;
+statusup2 bDex,-999;
+statusup2 bLuk,-999;
+announce "[ "+strcharinfo(0)+" ] is warped into Novice PVP Arena.",0;
+warp "nov_nov01",42,285;
+close;
+end;
+*/
+
+L_NO2:
+next;
+mes "[PvP Warper]";
+mes "You are not a Novice, level 1.";
+close;
+
+Lsorry:
+next;
+mes "[PvP Warper]";
+mes "Sorry but this PVP Arena is full, maybe you could try another one.";
+close;
+
+Lsorry2:
+next;
+mes "[PvP Warper]";
+mes "Sorry but this GVG Arena is full, maybe you could try another one.";
+close;
+
+L_notbaby:
+next;
+mes "[PvP Warper]";
+mes "Sorry but this PVP Arena is for baby jobs only!";
+close;
+
+L_yesbaby:
+next;
+mes "[PvP Warper]";
+mes "Sorry but baby jobs cannot enter this PVP Arena!";
+close;
+
+L_noguild:
+next;
+mes "[PvP Warper]";
+mes "Sorry but you don't have a guild!";
+close;
+
+L_No:
+close;
+
+DetectDonate:
+	for (set .@i,0; .@i < (getarraysize(.DonorUpper)); set .@i,.@i+1) {
+		if (countitem(.DonorUpper[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorUpper[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorLower)); set .@i,.@i+1) {
+		if	(countitem(.DonorLower[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorLower[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorMiddle)); set .@i,.@i+1) {
+		if	(countitem(.DonorMiddle[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorMiddle[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorArmor)); set .@i,.@i+1) {
+		if	(countitem(.DonorArmor[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorArmor[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorWeapon)); set .@i,.@i+1) {
+		if	(countitem(.DonorWeapon[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorWeapon[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorShield)); set .@i,.@i+1) {
+		if	(countitem(.DonorShield[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorShield[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorGarment)); set .@i,.@i+1) {
+		if	(countitem(.DonorGarment[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorGarment[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorShoes)); set .@i,.@i+1) {
+		if	(countitem(.DonorShoes[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorShoes[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorAccessories)); set .@i,.@i+1) {
+		if	(countitem(.DonorAccessories[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorAccessories[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	return;
+
+OnInit:
+setarray .DonorUpper[0],5467,5805,5518,5374,5495,5379,5013,5801,5137,5226,5375,5257,5451,5535,5312,5372,5492,5567,5564,5481,5340,5341,5342,5343,5344,5345,5269;
+setarray .DonorMiddle[0],18503,5800,5421,5389,5135,5326,5471,5325,5592,5664;
+setarray .DonorLower[0],5462,5596,5597,5532,5536,5463,5361,5377;
+setarray .DonorArmor[0],2383,2384,2369,2349,2351,2345,2347;
+setarray .DonorWeapon[0],1228,13017,13414,13412,13413,1579,16003;
+setarray .DonorShield[0],2127,2132,2136,2126,2128,2115;
+setarray .DonorGarment[0],2534,2554,2547,2533,2537,2542,2524;
+setarray .DonorShoes[0],2410,2428,2433,2421;
+setarray .DonorAccessories[0],2629,2767,2769,2630,2768,2771,2766,2770,2737;
+
+waitingroom "",0;
+OnTimer5000:
+setarray .@PVPDisplay$,"[PVP] Arena 1 [" +getmapusers("pvp_y_1-2")+"]","[PvP] Arena 2 [" +getmapusers("guild_vs3")+"]","[GvG] Arena 1 [" +getmapusers("guild_vs1")+"]","[GvG] Arena 2 [" +getmapusers("prt_are01")+"]","Baby PVP [" +getmapusers("guild_vs2")+"]";
+delwaitingroom;
+waitingroom .@PVPDisplay$[rand(0,getarraysize(.@PVPDisplay$) - 1)],0;
+initnpctimer;
+}
+
+morocc,152,97,4	duplicate(PVP Warper)	[PvP] Warper#2	413
+geffen,127,65,4	duplicate(PVP Warper)	[PvP] Warper#3	413
+alberta,26,240,4	duplicate(PVP Warper)	[PvP] Warper#4	413
+izlude,122,139,4	duplicate(PVP Warper)	[PvP] Warper#5	413
+aldebaran,147,119,4	duplicate(PVP Warper)	[PvP] Warper#6	413
+xmas,143,130,4	duplicate(PVP Warper)	[PvP] Warper#7	413
+comodo,184,158,4	duplicate(PVP Warper)	[PvP] Warper#8	413
+gonryun,166,117,4	duplicate(PVP Warper)	[PvP] Warper#9	413
+louyang,226,106,4	duplicate(PVP Warper)	[PvP] Warper#10	413
+ayothaya,157,108,4	duplicate(PVP Warper)	[PvP] Warper#11	413
+hugel,102,145,4	duplicate(PVP Warper)	[PvP] Warper#12	413
+moscovia,219,188,5	duplicate(PVP Warper)	[PvP] Warper#13	413
+yuno,167,122,4	duplicate(PVP Warper)	[PvP] Warper#14	413
+malaya,275,262,4	duplicate(PVP Warper)	[PvP] Warper#15	413
+
+/*nov_nov01	mapflag	pvp
+nov_nov01	mapflag	nocommand	60
+nov_nov01	mapflag	nowarp
+nov_nov01	mapflag	nowarpto
+nov_nov01	mapflag	noteleport
+nov_nov01	mapflag	nomemo
+nov_nov01	mapflag	nosave	SavePoint
+nov_nov01	mapflag	nobranch
+nov_nov01	mapflag	noicewall
+nov_nov01	mapflag	nopenalty
+nov_nov01	mapflag	nobranch
+nov_nov01	mapflag	noexp
+nov_nov01	mapflag	noreturn
+nov_nov01	mapflag	pvp_noparty
+
+nov_zom01	mapflag	nowarpto
+nov_zom01	mapflag	nowarp
+nov_zom01	mapflag	noteleport
+nov_zom01	mapflag	nomemo
+nov_zom01	mapflag	nosave	SavePoint
+nov_zom01	mapflag	nobranch
+nov_zom01	mapflag	noicewall
+nov_zom01	mapflag	nopenalty
+nov_zom01	mapflag	nobranch
+nov_zom01	mapflag	noexp
+nov_zom01	mapflag	noreturn
+nov_zom01	mapflag	pvp_noparty
+nov_zom01	mapflag	nocommand	60
+nov_zom01	mapflag	restricted	1
+*/

@@ -1,0 +1,62 @@
+// Non Donor PvP Room 1
+pvpmap	mapflag	nowarp	20
+pvpmap	mapflag	nowarpto	20
+pvpmap	mapflag	noreturn	20
+pvpmap	mapflag	nomemo	20
+pvpmap	mapflag	pvp
+pvpmap	mapflag	pvp_noparty
+pvpmap	mapflag	pvp_noguild
+pvpmap	mapflag	noteleport
+pvpmap	mapflag	novending
+pvpmap	mapflag	nosave	SavePoint
+pvpmap	mapflag	nocommand	20
+
+// Non Donor PvP Room 2
+pvpmap2	mapflag	nowarp	20
+pvpmap2	mapflag	nowarpto	20
+pvpmap2	mapflag	noreturn	20
+pvpmap2	mapflag	nomemo	20
+pvpmap2	mapflag	pvp
+pvpmap2	mapflag	pvp_noparty
+pvpmap2	mapflag	pvp_noguild
+pvpmap2	mapflag	noteleport
+pvpmap2	mapflag	novending
+pvpmap2	mapflag	nosave	SavePoint
+pvpmap2	mapflag	nocommand	20
+
+// Donor PvP Room 1
+pvpmap3	mapflag	nowarp	20
+pvpmap3	mapflag	nowarpto	20
+pvpmap3	mapflag	noreturn	20
+pvpmap3	mapflag	nomemo	20
+pvpmap3	mapflag	pvp
+pvpmap3	mapflag	pvp_noparty
+pvpmap3	mapflag	pvp_noguild
+pvpmap3	mapflag	noteleport
+pvpmap3	mapflag	novending
+pvpmap3	mapflag	nosave	SavePoint
+pvpmap3	mapflag	nocommand	20
+
+// Donor PvP Room 2
+pvpmap4	mapflag	nowarp	20
+pvpmap4	mapflag	nowarpto	20
+pvpmap4	mapflag	noreturn	20
+pvpmap4	mapflag	nomemo	20
+pvpmap4	mapflag	pvp
+pvpmap4	mapflag	pvp_noparty
+pvpmap4	mapflag	pvp_noguild
+pvpmap4	mapflag	noteleport
+pvpmap4	mapflag	novending
+pvpmap4	mapflag	nosave	SavePoint
+pvpmap4	mapflag	nocommand	20
+
+quiz_01	mapflag	noreturn	20
+quiz_01	mapflag	nomemo	20
+quiz_01	mapflag	noteleport
+quiz_01	mapflag	novending
+quiz_01	mapflag	nosave	SavePoint
+quiz_01	mapflag	nocommand	20
+
+Crystilia	mapflag	novending
+Crystilia	mapflag	nobranch
+Crystilia	mapflag	town

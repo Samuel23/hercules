@@ -327,9 +327,10 @@ C6: setarray @c[2],293,100,288,252,97,196,137,90,71,315;
 // --------------------------------------------------
 	Special:
 // --------------------------------------------------
-menu	"Auction Hall",S1, "Battlegrounds",S2, "Casino",S3, "Gonryun Arena",S4,
+menu	"Mall/Vending",MV,"Auction Hall",S1, "Battlegrounds",S2, "Casino",S3, "Gonryun Arena",S4,
 	"Izlude Arena",S5, "Monster Race Arena",S6, "Turbo Track",S7;
 
+MV: Go("mall",99,117);
 S1: Go("auction_01",22,68);
 S2: Go("bat_room",154,150);
 S3: Go("cmd_in02",179,129);
@@ -390,3 +391,4 @@ eclage,107,37,4	duplicate(Warper)	Warper#45	811
 malaya,210,205,4	duplicate(Warper)	Warper#46	811
 malangdo,220,188,6	duplicate(Warper)	Warper#47	811
 Crystilia,79,75,4	duplicate(Warper)	Warper#48	811
+mall,100,121,4	duplicate(Warper)	Warper#49	811

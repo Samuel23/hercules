@@ -295,7 +295,7 @@ function	script	refinenew	{
 		next;
 		input .@refinecnt;
 		set .@refinecheck,.@refinecnt + getequiprefinerycnt(.@part);
-		if (.@refinecnt < 1 || .@refinecheck > 10) {
+		if (.@refinecnt < 1 || .@refinecheck > 20) {
 			mes "[" + getarg(0) + "]";
 			mes "I can't refine this item that many times.";
 			close;

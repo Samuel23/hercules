@@ -1,0 +1,51 @@
+// ===========================================================
+// Warp Portal
+// ===========================================================
+cryst_in01,110,369,0	warp	refinerwarp#1	2,2,Crystilia,85,54
+Crystilia,85,57,0	warp	refinerwarp#2	2,2,cryst_in01,110,373
+
+cryst_in01,107,390,0	warp	refinerwarp#3	2,2,cryst_in01,111,322
+cryst_in01,113,322,0	warp	refinerwarp#4	2,2,cryst_in01,111,390
+// ===========================================================
+// Refiner
+// ===========================================================
+cryst_in01,94,390,4	script	Crystilia Refiner	869,{
+	callfunc "refinemain","Crystilia Refiner",1,0;
+	end;
+}
+
+cryst_in01,100,390,4	script	+11 Crystilia Refiner	869,{
+	callfunc "refinenew","Crystilia Refiner",1,0;
+	end;
+}
+
+// ===========================================================
+// Notice Board
+// ===========================================================
+Crystilia,81,54,4	script	Crystilia's Board#1	837,{
+end;
+OnInit:
+waitingroom "Refiner's Area",0;
+end;
+}
+
+// ===========================================================
+// Socket Enchants Duplicate
+// ===========================================================
+cryst_in01,90,384,5,	duplicate(SocketEnchant)	Seiyablem#cryst	84
+cryst_in01,90,380,5,	duplicate(SocketEnchant2)	Leablem#cryst	84
+
+// ===========================================================
+// Enchant Arm Duplicate
+// ===========================================================
+cryst_in01,103,385,3	duplicate(Apprentice Craftsman)	Apprentice Craftsman#cryst	73
+
+// ===========================================================
+// Malangdo Enchant Duplicate
+// ===========================================================
+cryst_in01,91,316,5	duplicate(Mayomayo#mal)	Mayomayo#cryst	555
+
+// ===========================================================
+// Mora Enchant Duplicate
+// ===========================================================
+cryst_in01,95,314,5	duplicate(Keeper of Secrets#pa082)	Keeper of Secrets#cryst	495

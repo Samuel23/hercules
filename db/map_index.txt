@@ -1005,6 +1005,7 @@ c_tower3_
 //mymap-2
 
 Crystilia
+cryst_in01
 pvpmap
 pvpmap2
 pvpmap3

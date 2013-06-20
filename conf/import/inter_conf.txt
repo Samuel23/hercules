@@ -1,0 +1,35 @@
+// Global SQL settings
+// overriden by local settings when the hostname is defined there
+// (currently only the login-server reads/obeys these settings)
+sql.db_hostname: 127.0.0.1
+sql.db_port: 3306
+sql.db_username: nameless
+sql.db_password: wakoko23
+sql.db_database: ragnarok
+sql.codepage:
+
+
+// MySQL Character SQL server
+char_server_ip: 127.0.0.1
+char_server_port: 3306
+char_server_id: nameless
+char_server_pw: wakoko23
+char_server_db: ragnarok
+
+
+// MySQL Map SQL Server
+map_server_ip: 127.0.0.1
+map_server_port: 3306
+map_server_id: nameless
+map_server_pw: wakoko23
+map_server_db: ragnarok
+
+
+// MySQL Log SQL Database
+log_db_ip: 127.0.0.1
+log_db_port: 3306
+log_db_id: nameless
+log_db_pw: wakoko23
+log_db_db: log
+log_codepage:
+log_login_db: loginlog

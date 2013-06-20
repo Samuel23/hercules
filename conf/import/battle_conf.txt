@@ -1,0 +1,208 @@
+/* client.conf */
+// Valid range of dyes and styles on the client.
+min_hair_style: 1
+max_hair_style: 27
+min_hair_color: 0
+max_hair_color: 251
+min_cloth_color: 0 
+max_cloth_color: 553
+
+// When set to yes, the damage field in packets sent from woe maps will be set
+// to -1, making it impossible for GMs, Bots and Hexed clients to know the
+// actual damage caused by attacks. (Note 1)
+hide_woe_damage: yes
+
+// Maximum allowed 'level' value that can be sent in unit packets.
+// Use together with the aura_lv setting to tell when exactly to show the aura.
+// NOTE: You also need to adjust the client if you want this to work.
+// NOTE: Default is 99. Values above 127 will probably behave incorrectly.
+// NOTE: If you don't know what this does, don't change it!!!
+max_lv: 150
+
+// Level required to display an aura.
+// NOTE: This assumes that sending max_lv to the client will display the aura.
+// NOTE: aura_lv must not be less than max_lv.
+// Example: If max_lv is 99 and aura_lv is 150, characters with level 99~149
+//          will be sent as being all level 98, and only characters with level
+//          150 or more will be reported as having level 99 and show an aura.
+aura_lv: 150
+
+// When affected with the "Hallucination" status effect, send the effect to client? (Note 1)
+// Note: Set to 'no' if the client lags due to the "Wavy" screen effect.
+display_hallucination: no
+
+/* drops.conf */
+// Item drop rates (Note 2)
+
+// The rate the common items are dropped (Items that are in the ETC tab, besides card)
+item_rate_common: 2500
+item_rate_common_boss: 2500
+item_drop_common_min: 1
+item_drop_common_max: 10000
+
+// The rate healing items are dropped (items that restore HP or SP)
+item_rate_heal: 2500
+item_rate_heal_boss: 2500
+item_drop_heal_min: 1
+item_drop_heal_max: 10000
+
+// The rate at which usable items (in the item tab) other then healing items are dropped.
+item_rate_use: 2500
+item_rate_use_boss: 2500
+item_drop_use_min: 1
+item_drop_use_max: 10000
+
+// The rate at which equipment is dropped.
+item_rate_equip: 5000
+item_rate_equip_boss: 1000
+item_drop_equip_min: 1
+item_drop_equip_max: 10000
+
+// The rate at which cards are dropped
+item_rate_card: 7500
+item_rate_card_boss: 1000
+item_drop_card_min: 1
+item_drop_card_max: 10000
+
+// The rate adjustment for the MVP items that the MVP gets directly in their inventory
+item_rate_mvp: 100
+item_drop_mvp_min: 1
+item_drop_mvp_max: 10000
+
+// The rate adjustment for card-granted item drops.
+item_rate_adddrop: 100
+item_drop_add_min: 1
+item_drop_add_max: 10000
+
+// Rate adjustment for Treasure Box drops (these override all other modifiers)
+item_rate_treasure: 100
+item_drop_treasure_min: 1
+item_drop_treasure_max: 10000
+
+// Make broadcast ** Player1 won Pupa's Pupa Card (chance 0.01%) ***
+// This can be set to any value between 0~10000.
+// Note: It also announces STEAL skill usage with rare items
+// 0 = don't show announces at all
+// 1 = show announces for 0.01% drop chance items
+// 333 = show announces for 3.33% or lower drop chance items
+// 10000 = show announces for all items
+rare_drop_announce: 1
+
+/* exp.conf */
+
+// Rate at which exp. is given. (Note 2)
+base_exp_rate: 15000
+
+// Rate at which job exp. is given. (Note 2)
+job_exp_rate: 10000
+
+// Turn this on to allow a player to level up more than once from a kill. (Note 1)
+multi_level_up: yes
+
+// MVP bonus exp rate. (Note 2)
+mvp_exp_rate: 1000
+
+// Rate of base/job exp given by NPCs. (Note 2)
+quest_exp_rate: 1000
+
+// Will display experience gained from killing a monster. (Note 1)
+disp_experience: yes
+
+// Will display zeny earned (from mobs, trades, etc) (Note 1)
+disp_zeny: yes
+
+/* gm.conf */
+
+// Ignore warpable area configuration.
+// Set the minimum group id to ignore invalid cells when warping.
+// Default group is 2. Use 100 to disable this setting.
+gm_ignore_warpable_area: 50
+
+/* guild.conf */
+
+// Limit Guild alliances. Value is 0 to 3.
+// If you want to change this value, clear the guild alliance table.
+// Default is 3
+max_guild_alliance: 0
+
+/* items.conf */
+
+// Whether to allow buying from vending chars that are at their max. zeny limit.
+// If set to yes, the rest of the zeny above the char's capacity will disappear.
+vending_over_max: no
+
+// Can any player equip any item regardless of the gender restrictions
+// NOTE: Wedding Rings and Whips/Musical Instruments will check gender regardless of setting.
+ignore_items_gender: no
+
+/* misc.conf */
+
+// Define duration in msec of the day (default: 7200000 = 2 hours)
+// Set to 0 to disable day cycle (but not @day GM command).
+// Except 0, minimum is 60000 (1 minute)
+day_duration: 7200000
+
+// Define duration in msec of the night (default: 1800000 = 30 min)
+// Set to 0 to disable night cycle (but not @night GM command).
+// Except 0, minimum is 60000 (1 minute)
+night_duration: 7200000
+
+// Delay between using @duel in minutes
+duel_time_interval: 0
+
+// Restrict duel usage to same map
+duel_only_on_same_map: yes
+
+// Whether or not gaining and loosing of cash points is displayed (Note 1).
+// Default: no
+cashshop_show_points: yes
+
+/* monster.conf */
+
+// Looting monster actions.
+// 0 = Monster will consume the item.
+// 1 = Monster will not consume the item.
+monster_loot_type: 1
+
+// Display some mob info next to their name? (add as needed)
+// (does not works on guardian or emperium)
+// 1: Display mob HP (Hp/MaxHp format)
+// 2: Display mob HP (Percent of full life format)
+// 4: Display mob's level
+show_mob_info: 2
+
+/* party.conf */
+
+// Method used to update party-mate hp-bars:
+// 0: Aegis - bar is updated every time HP changes (bandwidth intensive)
+// 1: Hercules - bar is updated with the party map dots (up to 1 second delay)
+party_hp_mode: 1
+
+// Give additional experience bonus per party-member involved on even-share parties (excluding youself)?
+// ex. If set to 10, an even-share party of 5 people will receive +40% exp (4 members * 10% exp):
+//     140% party experience in total, so each member receives 140%/5 = 28% exp (instead of 20%).
+party_even_share_bonus: 10
+
+/* pet.conf */
+
+// When the master attacks a monster, whether or not the pet will also attack. (Note 1)
+pet_attack_support: yes
+
+// When the master receives damage from the monster, whether or not the pet attacks back. (Note 1)
+pet_damage_support: yes
+
+// Whether or not the pet's will use skills. (Note 1)
+// Note: Offensive pet skills need at least pet_attack_support or 
+// pet_damage_support to work (they trigger while the pet is attacking).
+pet_status_support: yes
+
+/* player.conf */
+
+// Maximum atk speed. (Default 190, Highest allowed 199)
+max_aspd: 196
+
+// Same as max_aspd, but for 3rd classes. (Default 193, Highest allowed 199)
+max_third_aspd: 196
+
+// Display the drained hp/sp values from normal attacks? (Ie: Hunter Fly card)
+show_hp_sp_drain: yes

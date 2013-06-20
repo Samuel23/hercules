@@ -1,0 +1,9 @@
+//--------------------------------------------------------------
+//                     Configuration Info
+//--------------------------------------------------------------
+// Interserver communication passwords, set in account.txt (or equiv.)
+userid: yusam
+passwd: wakoko23
+
+char_ip: 127.0.0.1
+map_ip: 127.0.0.1

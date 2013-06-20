@@ -5970,7 +5970,7 @@ void clif_wis_message(int fd, const char* nick, const char* mes, int mes_len)
 	WFIFOW(fd,0) = 0x97;
 	WFIFOW(fd,2) = mes_len + NAME_LENGTH + 8;
 	safestrncpy((char*)WFIFOP(fd,4), nick, NAME_LENGTH);
-	WFIFOL(fd,28) = (pc->get_group_level(ssd) == 99) ? 1 : 0; // isAdmin; if nonzero, also displays text above char
+	WFIFOL(fd,28) = (ssd && pc->get_group_level(ssd) == 99) ? 1 : 0; // isAdmin; if nonzero, also displays text above char
 	safestrncpy((char*)WFIFOP(fd,32), mes, mes_len);
 	WFIFOSET(fd,WFIFOW(fd,2));
 #endif
@@ -17400,8 +17400,14 @@ void clif_parse_bgqueue_revoke_req(int fd, struct map_session_data *sd) {
 }
 
 void clif_parse_bgqueue_battlebegin_ack(int fd, struct map_session_data *sd) {
-	//struct packet_bgqueue_battlebegin_ack *p = P2PTR(fd, bgqueue_checkstateType);
-	return;
+	struct packet_bgqueue_battlebegin_ack *p = P2PTR(fd, bgqueue_checkstateType);
+	struct bg_arena *arena;
+	if( !bg->queue_on ) return; /* temp, until feature is complete */
+	if( ( arena = bg->name2arena(p->bg_name) ) ) {
+		bg->queue_ready_ack(arena,sd, ( p->result == 1 ) ? true : false);
+	} else {
+		clif->bgqueue_ack(sd,BGQA_FAIL_BGNAME_INVALID, 0);
+	}
 	//if ( p->result == 1 )
 	//	bg->queue_pc_ready(sd);
 	//else

@@ -2539,3 +2539,11 @@
 60353,0,0,0,0,0,0,0,"Bathroom Ghost"
 60354,0,0,0,0,0,0,0,"Bathroom Ghost"
 60355,0,0,0,0,0,0,0,"Bathroom Ghost"
+
+// Custom Quests
+30000,0,0,0,0,0,0,0,"Your first quest!"
+30001,0,0,0,0,0,0,0,"Novice Training"
+30002,0,0,0,0,0,0,0,"Novice Training"
+30003,0,0,0,0,0,0,0,"Novice Training"
+30004,0,0,0,0,0,0,0,"Novice Training"
+30005,0,1002,1,0,0,0,0,"First battle - Poring Hunt"

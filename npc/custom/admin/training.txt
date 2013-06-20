@@ -1,0 +1,949 @@
+train,20,108,4	script	ExhilarateRO Welcomer	75,{
+		mes "[ExhilarateRO Welcomer]";
+		mes "Hi! Welcome to ExhilarateRO!";
+		mes "I know you're a new player, do you want to do some tutorials?";
+		switch(select("Yes:No")) {
+		case 1:
+			callsub L_Tutorial;
+		case 2:
+			mes "[ExhilarateRO Welcomer]";
+			mes "Alright, I'll send you to the real world now.";
+			getitem 2352,1;	// Novice_Plate
+			getitem 2510,1;	// Novice_Hood
+			getitem 2414,1;	// Novice_Boots
+			getitem 5055,1;	// Novice_Egg_Cap
+			getitem 1243,1;	// Novice_Knife
+			getitem 2112,1;	// Novice_Guard
+			getitem 569,300;	// Novice_Potion
+			getitem 12323,50;	// N_Fly_Wing
+			getitem 12324,20;	// N_Butterfly_Wing
+			getitem 2393,1;	// N_Adventurer's_Suit
+			skill "NV_FIRSTAID",1,0;	// NV_FIRSTAID
+			getitem 7059,20;	// Cargo_Free_Ticket
+			getitem 7060,30;	// Warp_Free_Ticket
+			announce "Please welcome "+strcharinfo(0)+"  to our server!",bc_all,0x0099FF;
+			close2;
+			savepoint "Crystilia",70,68;
+			warp "Crystilia",70,68;
+			end;
+		}
+
+L_Tutorial:
+		mes "[ExhilarateRO Welcomer]";
+		mes "Hello there! Welcome to the World of ExhilarateRO. I'm in charge of giving you basic gameplay tips.";
+		mes "Click on the [Next] button or press [Enter] to continue.";
+		next;
+		mes "[ExhilarateRO Welcomer]";
+		mes "First you need to learn the very basics of controlling your character.";
+		mes "All the basic ^4A4AFFmoves, selection of items, and attacks^000000 use the ^4A4AFFleft click of the mouse^000000.";
+		next;
+		cutin "tutorial01",3;
+		mes "-! Info !-";
+		mes "Click on the ground to move the character.";
+		mes "Attacking monsters and conversations with the people of this world can be done by simply clicking on them.";
+		next;
+		cutin "",255;
+		mes "[ExhilarateRO Welcomer]";
+		mes "First off, try moving around.";
+		mes "Do you see that portal to the right?";
+		next;
+		warpportal 28,111,"train",139,168;
+		setquest 30000;
+		mes "[ExhilarateRO Welcomer]";
+		mes "Walk over that portal.";
+		mes "I will be waiting for you at the end of that portal.";
+		next;
+		cutin "tutorial02",3;
+		mes "-! Info !-";
+		mes "You've received a quest from ExhilarateRO Welcomer.";
+		mes "You can check the contents of the quest in the Quest Info Window.";
+		next;
+		mes "[ExhilarateRO Welcomer]";
+		mes "I will wait inside the Training Center across the bridge.";
+		next;
+		mes "-! Info !-";
+		mes "You can open the Quest Info Window by pressing the ^4A4AFFALT + U^000000 keys at the same time.";
+		next;
+		cutin "",255;
+		mes "[ExhilarateRO Welcomer]";
+		mes "Have you checked the Quest Info Window?";
+		mes "I'll be waiting in the castle across the bridge.";
+		close;
+
+OnInit:
+waitingroom "ExhilarateRO Welcomer",0;
+end;
+}
+
+// ExhilarateRO Welcomer (Inside Castle)
+//============================================================
+train,139,179,4	script	ExhilarateRO Welcomer#2	90,{
+	if(job_novice_q < 1) {
+	callsub L_Tutorial;
+	}
+	if(job_novice_q == 1) {
+	callsub L_Questcom;
+	}
+
+L_Tutorial:
+		mes "[ExhilarateRO Welcomer]";
+		mes "Hello there! Welcome to the World of Ragnarok Online. My name is ExhilarateRO Welcomer and I'm in charge of giving you basic gameplay tips.";
+		mes "Click on the [Next] button or press [Enter] to continue.";
+		next;
+		mes "[ExhilarateRO Welcomer]";
+		mes "First you need to learn the very basics of controlling your character.";
+		mes "All the basic ^4A4AFFmoves, selection of items, and attacks^000000 use the ^4A4AFFleft click of the mouse^000000.";
+		next;
+		cutin "tutorial01",3;
+		mes "-! Info !-";
+		mes "Click on the ground to move the character.";
+		mes "Attacking monsters and conversations with the people of this world can be done by simply clicking on them.";
+		next;
+		cutin "",255;
+		setquest 30000;
+		set job_novice_q,1;
+		mes "[ExhilarateRO Welcomer]";
+		mes "Well then, I will give you a quest to talk to me.";
+		mes "After the conversation is over, talk to me again by left-clicking on me.";
+		next;
+		cutin "tutorial02",3;
+		mes "-! Info !-";
+		mes "You've received a quest from ExhilarateRO Welcomer.";
+		mes "You can check the contents of the quest in the Quest Info Window by pressing the ^4A4AFFAlt + U^000000 keys at the same time.";
+		next;
+		cutin "",255;
+		mes "[ExhilarateRO Welcomer]";
+		mes "Have you checked the Quest Info Window?";
+		mes "Well, talk to me again.";
+		close;
+
+L_Questcom:
+		getexp 300,0;
+		getexp 300,5;
+		completequest 30000;
+		set job_novice_q,2;
+		mes "[ExhilarateRO Welcomer]";
+		mes "Great!";
+		mes "Now you know how to move and talk to others, right?";
+		next;
+		mes "[ExhilarateRO Welcomer]";
+		mes "The training Center is prepared for novices just like you.";
+		mes "You are going to be trained to get used to the basics of the Game.";
+		next;
+		select("Begin Training.");
+		mes "[ExhilarateRO Welcomer]";
+		mes "I will guide you to the Novice Training Center.";
+		mes "Inside, Instructor 'Brade' will be waiting to speak to you.";
+		next;
+		setquest 30001;
+		set job_novice_q,3;
+		mes "[ExhilarateRO Welcomer]";
+		mes "Instructor 'Brade' will help you afterwards.";
+		mes "Please, Go see him.";
+		next;
+		mes "^4A4AFF- You received a quest 'Novice Training Ground-1' from ExhilarateRO Welcomer.^000000";
+		mes "^4A4AFFPlease check the Quest Info Window.-^000000";
+		close2;
+		savepoint "train",139,176;
+		warp "train",140,101;
+		end;
+}
+
+// Instructor Brade
+//============================================================
+train,140,108,4	script	Brade#1	733,{
+	if(job_novice_q < 3) {
+		mes "[Instructor Brade]";
+		mes "How did you get here?";
+		close2;
+		warp "train",139,176;
+		end;
+	}
+	else if(job_novice_q == 3) {
+		getexp 300,0;
+		getexp 300,0;
+		getexp 300,10;
+		completequest 30001;
+		set job_novice_q,4;
+		mes "[Instructor Brade]";
+		mes "Great.";
+		mes "You've completed the given quest successfully, so I will reward you with experience points.";
+		next;
+		mes "[Instructor Brade]";
+		mes "Experience Points you've earned from hunting or finishing quests can be checked by tracking the EXP Bar, located at the upper-left side of the display.";
+		next;
+		mes "[Instructor Brade]";
+		mes "Sigh... I will just talk roughly.";
+		mes "...I just can't get used to";
+		mes "'politeness' you know.";
+		mes "Don't look at me like that!";
+		next;
+		mes "[Instructor Brade]";
+		mes "Ok look alive you maggot.";
+		mes "Next up is items and equipment.";
+		next;
+		mes "[Instructor Brade]";
+		mes "First, take these.";
+		mes "These are very basic equipments and recovery potions.";
+		getitem 2352,1;	// Novice_Plate
+		getitem 2510,1;	// Novice_Hood
+		getitem 2414,1;	// Novice_Boots
+		getitem 5055,1;	// Novice_Egg_Cap
+		getitem 1243,1;	// Novice_Knife
+		getitem 2112,1;	// Novice_Guard
+		getitem 569,300;	// Novice_Potion
+		setquest 30002;
+		set job_novice_q,5;
+		next;
+		mes "[Instructor Brade]";
+		mes "In the upper left Basic Info Window, press the 'Item' icon to open the Item Window.";
+		mes "The item window has 3 sections...";
+		next;
+		mes "[Instructor Brade]";
+		mes "Consumable items, equipment, and other items.";
+		mes "If you want to use or equip items, double-click on the item or drag them into the Equipment Window.";
+		next;
+		mes "[Instructor Brade]";
+		mes "You can see detailed info of each item by right-clicking on the item.";
+		mes "Do that and the info will pop-up in a separate window.";
+		next;
+		cutin "tutorial04",3;
+		mes "!- Info -!";
+		mes "Double-click on the item to see the detailed information.";
+		next;
+		mes "!- Info -!";
+		mes "Right-click on other players to show the Community Menu and you can join a party, request trades, etc.";
+		next;
+		cutin "",255;
+		mes "[Instructor Brade]";
+		mes "Why don't you equip the items I gave you earlier?";
+		mes "^4A4AFFDouble-Click^000000 on the item you want to equip. Let us continue after you are done gearing up.";
+		next;
+		cutin "tutorial03",3;
+		mes "!- Info -!";
+		mes "Items can be easily equipped or used by simply clicking on them.";
+		mes "The Hot Key to open the Item Window is Alt + E.";
+		next;
+		mes "!- Info -!";
+		mes "To check on the items that are currently equipped, use the hot key Alt + Q.";
+		mes "Or, drag the item on to the item slot you want the item to be equipped.";
+		next;
+		mes "!- Info -!";
+		mes "Equip all of the equipment given by Instructor Brade.";
+		close2;
+		cutin "",255;
+		end;
+	}
+	else if(job_novice_q == 4) {
+		mes "[Instructor Brade]";
+		mes "Uh... Where were we? Oh right, let's continue.";
+		mes "It's about items and equipments.";
+		next;
+		mes "[Instructor Brade]";
+		mes "Take these.";
+		mes "Basic equipments and recovery potions.";
+		getitem 2352,1;	// Novice_Plate
+		getitem 2510,1;	// Novice_Hood
+		getitem 2414,1;	// Novice_Boots
+		getitem 5055,1;	// Novice_Egg_Cap
+		getitem 1243,1;	// Novice_Knife
+		getitem 2112,1;	// Novice_Guard
+		getitem 569,300;	// Novice_Potion
+		setquest 30002;
+		set job_novice_q,5;
+		next;
+		mes "[Instructor Brade]";
+		mes "In the upper left Basic Info Window, press the 'Item' icon to open the Item Window.";
+		mes "The item window is divided into...";
+		next;
+		mes "[Instructor Brade]";
+		mes "3 sections: consumable items, equipment and other items.";
+		mes "If you want to use or equip items, double-click on the item or drag them into the Equipment Window.";
+		next;
+		mes "[Instructor Brade]";
+		mes "You can see detailed info of each item by right-clicking on the item.";
+		mes "Do that and the info will pop-up in a separate window.";
+		next;
+		cutin "tutorial04",3;
+		mes "!- Info -!";
+		mes "Double-click on the item to see the detailed information.";
+		next;
+		mes "!- Info -!";
+		mes "Right-click on other players to show the Community Menu and you can join a party, request trades, etc.";
+		next;
+		cutin "",255;
+		mes "[Instructor Brade]";
+		mes "Why don't you equip the items I gave you earlier?";
+		mes "^4A4AFFDouble-Click^000000 on the item you want to equip. Let us continue after you are done gearing up.";
+		next;
+		cutin "tutorial03",3;
+		mes "!- Info -!";
+		mes "Items can be easily equipped or used by simply clicking on them.";
+		mes "The Hot Key to open the Item Window is Alt + E.";
+		next;
+		mes "!- Info -!";
+		mes "To check on the items that are currently equipped, use the hot key Alt + Q.";
+		mes "Or, drag the item on to the item slot you want the item to be equipped.";
+		next;
+		mes "!- Info -!";
+		mes "Equip all of the equipment given by Instructor Brade.";
+		close2;
+		cutin "",255;
+		end;
+	}
+	else if(job_novice_q == 5 || job_novice_q == 6) {
+		for(set .@i,1; .@i<7; set .@i,.@i+1)
+			if (getequipisequiped(.@i)) set .@EquipCheck, .@EquipCheck+1;
+		if(.@EquipCheck >= 4) {
+			if(job_novice_q == 5) {
+				mes "[Instructor Brade]";
+				mes "You are all set.";
+				mes "You are coming along just fine.";
+				getexp 300,0;
+				getexp 300,0;
+				getexp 300,0;
+				getexp 300,15;
+				getitem 12323,50;	// N_Fly_Wing
+				getitem 12324,20;	// N_Butterfly_Wing
+				completequest 30002;
+				set job_novice_q,6;
+				next;
+				mes "[Instructor Brade]";
+				mes "Here's some Fly Wings and Butterfly Wings as a reward.";
+				mes "You don't need these in the Training Ground, but they will come in handy later.";
+				next;
+			}
+			mes "[Instructor Brade]";
+			mes "Next, are Hot Keys.";
+			mes "Press the ^4A4AFF12 key^000000 on your keyboard.";
+			mes "A box with 9 slots will pop up.";
+			next;
+			mes "[Instructor Brade]";
+			mes "Drag on the right corner of the Hot Key Window and you will be able to see the other pages of the Hot Key.";
+			next;
+			mes "[Instructor Brade]";
+			mes "The F1 to F9 keys are the designated hotkeys.";
+			mes "Just drag a skill or an item onto the Hot Key Window and press a corresponding key to use them right away.";
+			next;
+			cutin "tutorial05",3;
+			mes "!- Info -!";
+			mes "You can register a skill or an item to the Hot Key Window by just dragging them onto the Hot Key Slot.";
+			next;
+			mes "!- Info -!";
+			mes "Registered Skills or Items can be used/equipped by just pressing the corresponding key.";
+			next;
+			mes "!- Info -!";
+			mes "You can customize the Hot Key to use any keys you please as the Hot Key by changing the Shortcut configuration in the options menu.";
+			next;
+			mes "!- Info -!";
+			mes "Register skills and items that you use often so that you can use them easily";
+			next;
+			cutin "",255;
+			mes "[Instructor Brade]";
+			mes "The last part is how to use Skills.";
+			mes "But before that, you need to learn something first.";
+			next;
+			setquest 30003;
+			set job_novice_q,7;
+			mes "[Instructor Brade]";
+			mes "Somewhere in this room, there's someone named ^4A4AFFJinha^000000.";
+			mes "Find Jinha and learn the ^4A4AFF[First Aid]^000000 skill from him.";
+			next;
+			mes "[Instructor Brade]";
+			mes "Your lesson is after that.";
+			mes "Go find Jinha and learn the [First Aid] Skill. Then come back to me.";
+			close;
+		}
+		mes "[Instructor Brade]";
+		mes "Try to put on at least 4 of the equipment I gave you.";
+		mes "Put those shoes on, wear those clothes, and arm yourself with that weapon you maggot.";
+		close;
+	}
+	else if(job_novice_q == 7) {
+		mes "[Instructor Brade]";
+		mes "Somewhere in this room, there's someone named ^4A4AFFJinha^000000.";
+		mes "Find Jinha and learn the ^4A4AFF[First Aid]^000000 skill from him.";
+		close;
+	}
+	else if(job_novice_q == 8) {
+		mes "[Instructor Brade]";
+		mes "Now you've learned the [First Aid] Skill.";
+		mes "Just as I told you before, by registering the First Aid Skill onto the Hot Key Window, you can use the skill fast and easy.";
+		next;
+		mes "[Instructor Brade]";
+		mes "And that's it, that's all I can teach you.";
+		mes "You see that exit to the west?";
+		mes "Move on to the next room and there will be another instructor waiting for you.";
+		next;
+		mes "[Instructor Brade]";
+		mes "We will be seeing each other soon enough.";
+		mes "But for now, go to the room to the west and get more information.";
+		next;
+		mes "[Instructor Brade]";
+		mes "You've come along fine this far.";
+		mes "This is not much, but that this as a reward.";
+		getitem 2393,1;	// N_Adventurer's_Suit
+		completequest 30003;
+		set job_novice_q,9;
+		close;
+	}
+	else if(job_novice_q > 8) {
+		mes "[Instructor Brade]";
+		mes "Next step of the Training is done in the room west of here.";
+		mes "I'll send you there.";
+		close2;
+		warp "train",99,103;
+		end;
+	}
+	mes "[Instructor Brade]";
+	mes "Why are you still here?";
+	close2;
+	savepoint "Crystilia",70,68;
+	warp "Crystilia",70,68;
+	end;
+}
+
+// Instructor Jinha
+//============================================================
+train,151,104,4	script	Jinha#1	59,{
+	if(job_novice_q < 7) {
+		mes "[Jinha]";
+		mes "What can I help you with?";
+		mes "Hmm? You haven't followed the curriculum correctly.";
+		next;
+		mes "[Jinha]";
+		mes "You have to see Instructor Brade first before me. I will send you to Instructor Brade.";
+		close2;
+		warp "train",140,101;
+		end;
+	}
+	else if(job_novice_q == 7) {
+		mes "[Jinha]";
+		mes "Hello!";
+		mes "How can I help you?";
+		next;
+		select("I want to learn the use the [First Aid] Skill.");
+		mes "[Jinha]";
+		mes "That's right.";
+		mes "First Aid is the skill used to convert SP into HP when you are in danger.";
+		next;
+		specialeffect2 58;
+		specialeffect2 234;
+		mes "[Jinha]";
+		mes "It's recovery amount is small.";
+		mes "Still, it will help you not to faint from a critical hit.";
+		next;
+		skill "NV_FIRSTAID",1,0;	// NV_FIRSTAID
+		set job_novice_q,8;
+		mes "[Jinha]";
+		mes "You can open the Skill Window by pressing the ^4A4AFFskill^000000 button in the Basic Window.";
+		mes "Hot Key is ^4A4AFFALT + S^000000.";
+		mes "Why don't you try the skill?";
+		next;
+		mes "[Jinha]";
+		mes "Good, now you know how to use the First Aid Skill, you have to move on to the next step.";
+		mes "Go back to Instructor Brade and show him what you've learned here.";
+		close;
+	}
+	else if(job_novice_q == 8) {
+		mes "[Jinha]";
+		mes "Didn't you learn the First Aid Skill already?";
+		mes "Have it checked by Instructor Brade.";
+		mes "If you don't know how to get to him, I will send you to him.";
+		next;
+		if(select("I'm good by myself.:Please, send me to him.") == 2) {
+			mes "[Jinha]";
+			mes "I will send you to Instructor Brade.";
+			close2;
+			warp "train",140,101;
+			end;
+		}
+		mes "[Jinha]";
+		mes "Very Good!";
+		mes "That's the right attitude!";
+		mes "You will be a great adventurer in the future.";
+		close;
+	}
+	else if(job_novice_q > 8) {
+		mes "[Jinha]";
+		mes "What can I do for you?";
+		mes "Next course will be continued in the West Room.";
+		mes "Go on to the west room.";
+		close;
+	}
+	mes "[Jinha]";
+	mes "Why are you still here?";
+	close2;
+	savepoint "Crystilia",70,68;
+	warp "Crystilia",70,68;
+	end;
+}
+
+// People/Services in Ragnarok
+//============================================================
+// ---------- Chocolat ----------
+train,100,109,4	script	Chocolat#1	96,{
+	if(job_novice_q < 9) {
+		mes "[Chocolat]";
+		mes "Hmm? Strange.";
+		mes "Let me see that Trainee ID for a sec.";
+		next;
+		mes "[Chocolat]";
+		mes "You were still on the basic course.";
+		mes "You should go back to Instructor Brade or Jinha.";
+		next;
+		mes "[Chocolat]";
+		mes "If you don't know how to find them, I can send you to Instructor Brade.";
+		close2;
+		warp "train",140,101;
+		end;
+	}
+	else if(job_novice_q == 9) {
+		mes "[Chocolat]";
+		mes "I will tell you about the people you will be seeing in Town.";
+		mes "There are many kinds of people in town and some of them will be helpful to know.";
+		next;
+		mes "[Chocolat]";
+		mes "There are a lot of people in town, but among them, these people are the most important to know.";
+		next;
+		mes "[Chocolat]";
+		mes "They are [Kafra] Agents standing right behind me and their rival company the [Cool Event].";
+		mes "When you visit a town for the first time, you should talk to Information [Soldier].";
+		next;
+		mes "[Chocolat]";
+		mes "Well then, let's hear from each of them.";
+		mes "Start by talking to the [Kafra] agent.";
+		setquest 30004;
+		set job_novice_q,10;
+		close;
+	}
+	else if(job_novice_q == 10) {
+		mes "[Chocolat]";
+		mes "Here, talk to these guys standing behind me.";
+		mes "Start with the [Kafra] gal behind me.";
+		close;
+	}
+	else if(job_novice_q == 11) {
+		mes "[Chocolat]";
+		mes "You've learned a lot about Kafra service huh?";
+		mes "From now on, you can use the Kafra Server.";
+		next;
+		mes "[Chocolat]";
+		mes "Next is Kafra's rival, [Cool Event] Staff!";
+		mes "[Cool Event] Staff specialize in events.";
+		mes "Well, why don't you talk to him yourself?";
+		close;
+	}
+	else if(job_novice_q == 12) {
+		mes "[Chocolat]";
+		mes "After [Kafra] and [Cool Event], are the Information [Soldier]s.";
+		mes "They can seem insignificant but they can help you greatly when the time comes.";
+		next;
+		mes "[Chocolat]";
+		mes "I've brought the Information Soldier from the City of Prontera.";
+		mes "Ask him what he actually does in town.";
+		close;
+	}
+	else if(job_novice_q == 13) {
+		mes "[Chocolat]";
+		mes "How was the guide of the Information [Soldier]?";
+		mes "Last is about using [Inn]s.";
+		mes "There's an Inn located in each town.";
+		next;
+		mes "[Chocolat]";
+		mes "You can rest at Inns or Hotels for a small fee.";
+		mes "Your HP and SP will be recovered completely by resting there.";
+		mes "Can't hurt to use one, eh?";
+		next;
+		mes "[Chocolat]";
+		mes "Besides these guys, there's many merchants selling various kind of items, so go check them out.";
+		completequest 30004;
+		getexp 300,0;
+		getexp 300,0;
+		getexp 300,0;
+		getexp 300,0;
+		getexp 300,0;
+		getexp 300,20;
+		getitem 7059,20;	// Cargo_Free_Ticket
+		getitem 7060,30;	// Warp_Free_Ticket
+		set job_novice_q,14;
+		next;
+		mes "[Chocolat]";
+		mes "You've completed all the quests I gave you.";
+		mes "As the reward, I will give you Free Tickets for Kafra Storage and Teleport Service.";
+		mes "They will come in handy.";
+		next;
+		mes "[Chocolat]";
+		mes "That's all for me.";
+		mes "Now, it's time for real combat!";
+		next;
+		mes "[Chocolat]";
+		mes "Real Combat Training will be given by Instructor Brade. You met him earlier.";
+		mes "I will send you to the Real Combat Training Field.";
+		close2;
+		savepoint "new_1-3",96,21;
+		warp "new_1-3",96,21;
+		end;
+	}
+	else if(job_novice_q > 13) {
+		mes "[Chocolat]";
+		mes "What can I do for you?";
+		next;
+		select("");
+		mes "[Chocolat]";
+		mes "I will send you to the Real Combat Training Field right away.";
+		close2;
+		savepoint "new_1-3",96,21;
+		warp "new_1-3",96,21;
+		end;
+	}
+	mes "[Chocolat]";
+	mes "Why are you still here?";
+	close2;
+	savepoint "Crystilia",70,68;
+	warp "Crystilia",70,68;
+	end;
+}
+
+// ---------- Kafra ----------
+train,111,107,4	script	Kafra#1	117,{
+	if(job_novice_q < 10) {
+		mes "[Kafra Agent]";
+		mes "Hello.";
+		mes "I don't think it's my turn yet.";
+		mes "Please talk to 'Chocolat' first.";
+		close;
+	}
+	else if(job_novice_q == 10) {
+		mes "[Kafra Agent]";
+		mes "Hello.";
+		mes "I've been dispatched by the Kafra Head Office to help Trainees.";
+		mes "The Kafra Corporation is the world's largest company with a long and distinguished history on the Rune Midgard continent.";
+		mes "It's important for you adventurers to be close with us.";
+		next;
+		mes "[Kafra Agent]";
+		mes "I will inform you about the Kafra Services which you will be using most frequently, [Save], [Storage], and [Teleport] Services.";
+		next;
+		mes "[Kafra Agent]";
+		mes "When you talk to a Kafra Agent and ask for the Save Service, the location of where you will revive, after being defeated in battle, will be changed.";
+		next;
+		mes "[Kafra Agent]";
+		mes "Your Respawn Point is always the last place where you have saved.";
+		mes "Using a Butterfly Wing will return you to the place where you last saved.";
+		mes "This service is free to use, so feel free to use the Save Service anytime you like.";
+		next;
+		mes "[Kafra Agent]";
+		mes "Next is the Storage Service.";
+		mes "You can store and retrieve your items in any town at your convenience.";
+		next;
+		mes "[Kafra Agent]";
+		mes "It's unreasonable to carry all of your items with you when you don't need them right away.";
+		mes "Please use our Storage and keep your items safe and secure.";
+		next;
+		mes "[Kafra Agent]";
+		mes "Our convenient Storage Service is provided to our customers for a small fee which is different from town to town.";
+		mes "However, you must be at least ^4A4AFFBasic Skill Level 6^000000 to use the Storage.";
+		next;
+		mes "[Kafra Agent]";
+		mes "There are 7 different item sections of the Storage into which items are organized: Consumable, Kafra (Item Mall), Armor, Weapons, Ammo, Cards, and Etc items.";
+		next;
+		mes "[Kafra Agent]";
+		mes "There are a maximum of 600 Inventory Slots in Kafra Storage, meaning you can have up to 600 different kinds of total items in Storage.";
+		next;
+		mes "[Kafra Agent]";
+		mes "If you have a Premium Subscription, the maximum Inventory Slots in Kafra Storage is 600!";
+		mes "Remember though, that in the case of Equipment, each item takes up one Inventory Slot.";
+		mes "The maximum number of items that can be placed in Kafra Storage is 30,000.";
+		next;
+		mes "[Kafra Agent]";
+		mes "Storage is shared by everyone character on one account.";
+		mes "Storage Fees can vary for each Town.";
+		mes "So please keep that in mind when you are using our storage service.";
+		next;
+		mes "[Kafra Agent]";
+		mes "We also provide you with a Teleport Service to make your trips easier when you are trying to move a long distance.";
+		next;
+		mes "[Kafra Agent]";
+		mes "With our veteran teleporter's skill, your trip will be safer and more comfortable.";
+		mes "Oh and remember that the places you can teleport to vary from town to town.";
+		next;
+		mes "[Kafra Agent]";
+		mes "This is all for your never ending support. We are working hard to repay our debt to our customers.";
+		next;
+		mes "[Kafra Agent]";
+		mes "Do you want to hear another explanation?";
+		set job_novice_q,11;
+		next;
+	}
+	else {
+		mes "[Kafra Agent]";
+		mes "Kafra Service at your service";
+		mes "What can I do for you?";
+		next;
+		select("About Kafra Service");
+		mes "[Kafra Agent]";
+		mes "I will explain about the Kafra Service.";
+		mes "Which service do you want to be informed about?";
+		next;
+	}
+	
+	while(1) {
+		switch(select("About Save:About Storage:About Teleport:About Cart:No More.")) {
+			case 1:
+				mes "[Kafra Agent]";
+				mes "When you are killed in battle, you can revive in the location you saved with this service.";
+				mes "If you save at a Kafra in a village, you can revive in the village you saved.";
+				next;
+				mes "[Kafra Agent]";
+				mes "Saved location is always where you saved last, and by using a Butterfly Wing, you can teleport directly to your saved point.";
+				mes "So feel free to use this service.";
+				next;
+				break;
+			case 2:
+				mes "[Kafra Agent]";
+				mes "Next is the Storage Service.";
+				mes "You can store and retrieve your items in any town at your convenience.";
+				next;
+				mes "[Kafra Agent]";
+				mes "It's unreasonable to carry all of your items with you when you don't need them right away.";
+				mes "Please use our Storage and keep your items safe and secure.";
+				next;
+				mes "[Kafra Agent]";
+				mes "Our convenient Storage Service is provided to our customers for a small fee which is different from town to town.";
+				mes "However, you must be at least ^4A4AFFBasic Skill Level 6^000000 to use the Storage.";
+				next;
+				mes "[Kafra Agent]";
+				mes "There are 7 different item sections of the Storage into which items are organized: Consumable, Kafra (Item Mall), Armor, Weapons, Ammo, Cards, and Etc items.";
+				next;
+				mes "[Kafra Agent]";
+				mes "There are a maximum of 600 Inventory Slots in Kafra Storage, meaning you can have up to 600 different kinds of total items in Storage.";
+				next;
+				mes "[Kafra Agent]";
+				mes "If you have a Premium Subscription, the maximum Inventory Slots in Kafra Storage is 600!";
+				mes "Remember though, that in the case of Equipment, each item takes up one Inventory Slot.";
+				mes "The maximum number of items that can be placed in Kafra Storage is 30,000.";
+				next;
+				mes "[Kafra Agent]";
+				mes "Storage is shared by everyone character on one account.";
+				mes "Storage Fees can vary for each Town.";
+				mes "So please keep that in mind when you are using our storage service.";
+				next;
+				break;
+			case 3:
+				mes "[Kafra Agent]";
+				mes "We also provide you with a Teleport Service to make your trips easier when you are trying to move a long distance.";
+				next;
+				mes "[Kafra Agent]";
+				mes "With our veteran teleporter's skill, your trip will be safer and more comfortable.";
+				mes "Oh and remember that the places you can teleport to vary from town to town.";
+				next;
+				mes "[Kafra Agent]";
+				mes "This is all for your never ending support. We are working hard to repay our debt to our customers.";
+				next;
+				break;
+			case 4:
+				mes "[Kafra Agent]";
+				mes "The Kafra corporation provides Cart rental services to customers engaged in commercial business.";
+				mes "Originally this cart rental service had been only provided by the merchant guild in Alberta.";
+				next;
+				mes "[Kafra Agent]";
+				mes "However, since we took over this service, our merchant customers have been able to rent carts from almost anywhere.";
+				mes "The cart rental service is available only for job classes engaged in commercial business such as ^4A4AFFMerchants, Blacksmiths, Alchemists, and Super Novices^000000.";
+				next;
+				mes "[Kafra Agent]";
+				mes "Of course you should learn the 'Pushcart' skill beforehand, otherwise you will not be able to rent a cart from us.";
+				mes "The rental fee varies by town, please keep that in mind.";
+				next;
+				break;
+			case 5:
+				mes "[Kafra Agent]";
+				mes "I hope you are satisfied with my explanation about the Kafra Service.";
+				close;
+		}
+	}
+}
+
+// ---------- Cool Event Staff ----------
+train,111,104,4	script	Cool Event Staff#1	874,{
+	if(job_novice_q < 11) {
+		mes "[Cool Event Staff]";
+		mes "This is not my turn.";
+		mes "You finished talking to Kafra yet?";
+		close;
+	}
+	else if(job_novice_q == 11) {
+		mes "[Cool Event Staff]";
+		mes "Hello.";
+		mes "We are working hard to provide events on Rune Midgard similar to the Kafra service.";
+		next;
+		mes "[Cool Event Staff]";
+		mes "Our staff is here to support you with [storage], [save], and [teleport] services.";
+		next;
+		mes "[Cool Event Staff]";
+		mes "If there's no Kafra around you, we're around to help you.";
+		next;
+		mes "[Cool Event Staff]";
+		mes "We are working hard on a network of Events to make your life better.";
+		mes "I hope that you can meet our staff in Alberta.";
+		next;
+		mes "[Cool Event Staff]";
+		mes "Who knows, we might meet outside of this academy.";
+		next;
+		mes "[Cool Event Staff]";
+		mes "Mostly all of us wear red coats in the places that the Kafra Staff don't work for.";
+		set job_novice_q,12;
+		close;
+	}
+	mes "[Cool Event Staff]";
+	mes "Most of our services are similar to those of Kafra.";
+	close;
+}
+
+// ---------- Soldier ----------
+train,111,101,4	script	Soldier#nv	105,{
+	if(job_novice_q < 12) {
+		mes "[Soldier]";
+		mes "It isn't my turn yet.";
+		mes "Listen to Chocolat.";
+		close;
+	}
+	else if(job_novice_q == 12) {
+		mes "[Soldier]";
+		mes "Soldiers are in each town to guide you to useful places.";
+		mes "Ask us where you want to go and we'll mark your mini maps with a ^4A4AFF+^000000.";
+		mes "Don't hesitate to ask us questions.";
+		next;
+		mes "[Soldier]";
+		mes "We all don't look the same in every town but our roles are the same.";
+		mes "Take note of this whenever you go to a new town.";
+		next;
+		mes "[Soldier]";
+		mes "If you want to go to your first town, you can do so once you have reached Base Level 11 in the training grounds.";
+		set job_novice_q,13;
+		close;
+	}
+	mes "[Soldier]";
+	mes "What can I help you with?";
+	mes "Need me to explain what I do again?";
+	next;
+	if(select("Yes, I need an explanation.:Nope") == 2) {
+		mes "[Soldier]";
+		mes "Ok well talk to Chocolat if you're done talking with us.";
+		close;
+	}
+	mes "[Soldier]";
+	mes "Soldiers are in each town to guide you to useful places.";
+	mes "Ask us where you want to go and we'll mark your mini maps with a ^4A4AFF+^000000.";
+	mes "Don't hesitate to ask us questions.";
+	next;
+	mes "[Soldier]";
+	mes "We all don't look the same in every town but our roles are the same.";
+	mes "Take note of this whenever you go to a new town.";
+	next;
+	mes "[Soldier]";
+	mes "If you want to go to your first town, you can do so once you have reached Base Level 11 in the training grounds.";
+	close;
+}
+
+// Instructor Brade (Real Combat Training)
+//============================================================
+-	script	Brade#nv::NvBrade	733,{
+	if(job_novice_q < 14) {
+		mes "[Brade]";
+		mes "How did you get here?";
+		close2;
+		warp "train",100,102;
+		end;
+	}
+	else if(job_novice_q == 14) {
+		mes "[Brade]";
+		mes "Welcome.";
+		mes "Now this is real practice.";
+		mes "We can practice real battle here.";
+		next;
+		mes "[Brade]";
+		mes "As I explained the first time, we can click on the monsters.";
+		mes "One attack per click.";
+		next;
+		mes "[Brade]";
+		mes "For convenience,";
+		mes "^4A4AFFIf you hold down the Ctrl key,^000000";
+		mes "while attacking, you will automatically attack.";
+		next;
+		mes "[Brade]";
+		mes "You can also set this mode before battle by typing ^4A4AFF[ /nc ]^000000.";
+		next;
+		mes "[Brade]";
+		mes "Then, let's go Poring hunting.";
+		mes "Please hunt Poring's on Level 1 of the training grounds.";
+		setquest 30005;
+		set job_novice_q,15;
+		getitem 569,100;	// Novice_Potion
+		next;
+		mes "^4A4AFF- You've received a quest from Instructor Brade.^000000";
+		mes "^4A4AFFPlease check the quest information window. -^000000";
+		close;
+	}
+	else if(job_novice_q == 15) {
+		if(checkquest(30005,HUNTING) == 2) {
+			mes "[Brade]";
+			mes "You can see it is not so hard, right?";
+			mes "Nice job.";
+			getitem 13040,1;	// N_Cutter
+			getexp 1000,0;
+			getexp 1000,0;
+			getexp 1000,30;
+			completequest 30005;
+			set job_novice_q,16;
+			next;
+			mes "[Brade]";
+			mes "Now all of the courses are almost done.";
+			mes "You are a Novice, and you can't get any jobs yet.";
+			next;
+			mes "[Brade]";
+			mes "If you acquire all of basic skills with Job Level 10, you can change your job.";
+			next;
+			mes "[Brade]";
+			mes "The first job classes are defined into 6 classes.";
+			next;
+			mes "[Brade]";
+			mes "The 6 basic jobs are";
+			mes "Swordman, Thief,";
+			mes "Acolyte, Mage,";
+			mes "Archer and Merchant.";
+			next;
+			mes "[Brade]";
+			mes "Alright, I'll send you now to Crystilia where you can talk to ExhilarateRO Master to change your job.";
+			close2;
+			if (#new == 1) {	// Already have new player gift
+			callfunc "Welcomer",strcharinfo(0),2;
+			}
+			else {
+			callfunc "Welcomer",strcharinfo(0),1;
+			}
+			savepoint "Crystilia",70,68;
+			warp "Crystilia",70,68;
+			end;
+		}
+		mes "[Brade]";
+		mes "Kill enough Porings.";
+		mes "Porings are easy to deal with, so cheer up.";
+		mes "Try again.";
+		npcskill "AL_HEAL",10,99,60;
+		close;
+	}
+	mes "[Brade]";
+	mes "Train until you want.";
+	npcskill "AL_HEAL",10,99,60;
+	close;
+}
+
+new_1-3,96,30,4	duplicate(NvBrade)	Brade#nv1	733
+
+// Real Combat Training Mobs
+//============================================================
+new_1-3,0,0,0,0	monster	ChonChon	1011,10,0,0,0
+new_1-3,0,0,0,0	monster	Drops	1113,10,0,0,0
+new_1-3,0,0,0,0	monster	Fabre	1184,5,0,0,0
+new_1-3,0,0,0,0	monster	Lunatic	1063,10,0,0,0
+new_1-3,0,0,0,0	monster	Poring	1002,10,0,0,0

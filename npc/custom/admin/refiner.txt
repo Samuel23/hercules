@@ -29,6 +29,13 @@ waitingroom "Refiner's Area",0;
 end;
 }
 
+cryst_in01,113,383,4	script	Enchanters Upstairs	837,{
+end;
+OnInit:
+waitingroom "More Enchanters Upstairs",0;
+end;
+}
+
 // ===========================================================
 // Socket Enchants Duplicate
 // ===========================================================
@@ -38,7 +45,7 @@ cryst_in01,90,380,5,	duplicate(SocketEnchant2)	Leablem#cryst	84
 // ===========================================================
 // Enchant Arm Duplicate
 // ===========================================================
-cryst_in01,103,385,3	duplicate(Apprentice Craftsman)	Apprentice Craftsman#cryst	73
+cryst_in01,103,385,3	duplicate(Apprentice Craftsman)	Craftsman#cryst	73
 
 // ===========================================================
 // Malangdo Enchant Duplicate

@@ -74,12 +74,12 @@ OnHour19:
 	announce "Current ExhilarateRO rates are: "+(.@brate/100)+"x / "+(.@jrate/100)+"x / "+(.@drate)+"x",bc_all,0xFF6060;
 	end;
 	
-/*OnInit:
+OnInit:
 	//Original Rates
 	set .@brate,15000;
 	set .@jrate,10000;
 	set .@drate,1;
 	announce "Current ExhilarateRO rates are: "+(.@brate/100)+"x / "+(.@jrate/100)+"x / "+(.@drate)+"x",bc_all,0xFF6060;
 	end;
-*/
+
 }

@@ -1,22 +1,22 @@
-Crystilia,75,80,4	script	VeniaRO Master	108,{
-	mes "[^0000FFVeniaRO Master^000000]";
+Crystilia,75,80,4	script	ExhilarateRO Master	108,{
+	mes "[^0000FFExhilarateRO Master^000000]";
 	mes "Hello ^FF0000"+strcharinfo(0)+"^000000! What can I do for you?";
 	next;
 	switch (select(.menu$ + ":Cancel")) {
 	case 1:
-		mes "[^0000FFVeniaRO Master^000000]";
+		mes "[^0000FFExhilarateRO Master^000000]";
 		mes "So which topic should we go first?";
 		next;
 		switch (select(.faqmenu$ + ":Cancel")) {
 		case 1:
-			mes "[^0000FFVeniaRO Master^000000]";
+			mes "[^0000FFExhilarateRO Master^000000]";
 			mes "The server has 10k/10k/custom drop rates.";
 			mes "MVP Cards Drop Rate: 10%";
 			mes "Normal Cards Drop Rate: 20%";
 			mes "All Equipments Drop Rate: 20%";
 			close;
 		case 2:
-			mes "[^0000FFVeniaRO Master^000000]";
+			mes "[^0000FFExhilarateRO Master^000000]";
 			mes "You can check your inventory for the Job Change Scroll.";
 			mes "It is used for instant job changing with max level.";
 			mes "Remember that you can only have 1 scroll per account.";
@@ -26,7 +26,7 @@ Crystilia,75,80,4	script	VeniaRO Master	108,{
 		}
 	// Special Rooms
 	case 2:
-		mes "[^0000FFVeniaRO Master^000000]";
+		mes "[^0000FFExhilarateRO Master^000000]";
 		mes "Where do you want to go?";
 		next;
 		switch(select("Mall:Refiner's Area:Custom Shops Area:Vending Area:Cancel")) {
@@ -522,7 +522,7 @@ Get_Platinum:
 	// Save
 	case 10:
 		save "Crystilia",68,77;
-		mes "[^0000FFVeniaRO Master^000000]";
+		mes "[^0000FFExhilarateRO Master^000000]";
 		mes "You're save point was now changed to Crystilia..";
 		close;
 		end;
@@ -546,6 +546,6 @@ OnInit:
 	set .Platinum,1;		// Get platinum skills automatically? (1: yes / 0: no)
 
 
-waitingroom "VeniaRO Master",0;
+waitingroom "ExhilarateRO Master",0;
 end;
 }

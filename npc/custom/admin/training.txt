@@ -915,12 +915,6 @@ train,111,101,4	script	Soldier#nv	105,{
 			mes "[Brade]";
 			mes "Alright, I'll send you now to Crystilia where you can talk to ExhilarateRO Master to change your job.";
 			close2;
-			if (#new == 1) {	// Already have new player gift
-			callfunc "Welcomer",strcharinfo(0),2;
-			}
-			else {
-			callfunc "Welcomer",strcharinfo(0),1;
-			}
 			savepoint "Crystilia",70,68;
 			warp "Crystilia",70,68;
 			end;

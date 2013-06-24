@@ -1,0 +1,60 @@
+-	script	MVPranker	-1,{
+
+// MVP Ranking:
+OnNPCKillEvent:
+	if (getgmlevel() < 20) {
+		if(getmonsterinfo(killedrid,22)) {
+			callfunc "MVPRankChar",getcharid(0),strcharinfo(0),1; // MVP.
+	}
+}
+}
+
+function	script	MVPRankChar	{
+
+	query_sql "CREATE TABLE IF NOT EXISTS `char_ranking` (`char_id` int(11) unsigned NOT NULL,`name` varchar(30) NOT NULL default '',`mvp_kills` smallint(6) unsigned NOT NULL default '0',`emp_kills` smallint(6) unsigned NOT NULL default '0',PRIMARY KEY (`char_id`)) ENGINE=MyISAM";
+
+	query_sql "SELECT `char_id`,`mvp_kills` FROM `char_ranking` WHERE `char_id`='"+getarg(0)+"'",.@char, .@mvpkills;
+
+	query_sql "SELECT MAX(mvp_kills) FROM `char_ranking`",.@top1;
+	query_sql "SELECT `mvp_kills` FROM `char_ranking` ORDER BY `char_ranking`.`mvp_kills` DESC LIMIT 1,1",.@top2;
+	set .@mvpkills,.@mvpkills + getarg(2);
+
+	if (.@char == 0) {
+	query_sql "INSERT INTO `char_ranking` (`char_id`,`name`,`mvp_kills`) VALUES ('"+getarg(0)+"','"+getarg(1)+"','"+getarg(2)+"')";
+	}
+	else {
+	query_sql "UPDATE `char_ranking` SET `mvp_kills`='"+.@mvpkills+"' WHERE `char_id`='"+getarg(0)+"'";
+	announce "You have now ["+.@mvpkills+"] MVP Kills!",bc_self;
+		if (.@mvpkills > .@top1) {
+			announce ""+strcharinfo(0)+" is now the top 1 MVP KILLER with ["+.@mvpkills+"] MVP Kills!",bc_all;
+			end;
+		}
+	}
+}
+
+function	script	EMPRankChar	{
+
+	query_sql "CREATE TABLE IF NOT EXISTS `char_ranking` (`char_id` int(11) unsigned NOT NULL,`name` varchar(30) NOT NULL default '',`mvp_kills` smallint(6) unsigned NOT NULL default '0',`emp_kills` smallint(6) unsigned NOT NULL default '0',PRIMARY KEY (`char_id`)) ENGINE=MyISAM";
+
+	query_sql "SELECT `char_id`,`emp_kills` FROM `char_ranking` WHERE `char_id`='"+getarg(0)+"'",.@char, .@empkills;
+
+	query_sql "SELECT MAX(emp_kills) FROM `char_ranking`",.@top1;
+	query_sql "SELECT `emp_kills` FROM `char_ranking` ORDER BY `char_ranking`.`emp_kills` DESC LIMIT 1,1",.@top2;
+	set .@empkills,.@empkills + getarg(2);
+
+	if (.@char == 0) {
+	query_sql "INSERT INTO `char_ranking` (`char_id`,`name`,`emp_kills`) VALUES ('"+getarg(0)+"','"+getarg(1)+"','"+getarg(2)+"')";
+	}
+	else {
+	query_sql "UPDATE `char_ranking` SET `emp_kills`='"+.@empkills+"' WHERE `char_id`='"+getarg(0)+"'";
+	announce "You have now ["+.@empkills+"] Emperium Break points!",bc_self;
+		if (.@empkills > .@top1) {
+			announce ""+strcharinfo(0)+" is now the top 1 Emperium Breaker with ["+.@empkills+"] Emperium Kills!",bc_all;
+			end;
+		}
+		else if (.@empkills > .@top2) &&  (.@empkills < .@top1){
+			announce ""+strcharinfo(0)+" is now the top 2 Emperium Breaker with ["+.@empkills+"] Emperium Kills!",bc_all;
+			end;
+		}
+	}
+}

@@ -1,0 +1,84 @@
+-	script	gobind	-1,{
+// Script-Based @go Alternative by jTynne
+// Version: 2.0 - January 2013
+// Feel free to edit this script or simply use it as a base.
+// Please give credit if you re-release this script with your own modifications.
+// Want to show your thanks via Paypal? Shoot me a buck or two : decadenthearts06@gmail.com - Thanks!
+
+	OnInit:
+		bindatcmd("go","gobind::OnAtcommand",0,10);
+		end;
+	
+
+	OnAtcommand:
+		set @warp$,.@atcmd_parameters$[0];
+		set @warp,@warp$;
+
+if(@warp$ == "list") { dispbottom "Usage: @go #"; 
+	dispbottom "0=Prontera         1=Morroc        2=Geffen      3=Payon      4=Alberta";
+	dispbottom "5=Izlude           6=Al De Baran   7=Lutie       8=Comodo     9=Yuno";
+	dispbottom "10=Amatsu          11=Gonryun      12=Umbala     13=Niflheim  14=Louyang";
+	dispbottom "15=Novice Grounds  16=Prison       17=Jawaii     18=Ayothaya  19=Einbroch";
+	dispbottom "20=Lighthalzen     21=Einbech      22=Hugel      23=Rachel    24=Veins";
+	dispbottom "25=Moscovia        26=Midgard Camp 27=Manuk      28=Splendide 29=Brasilis";
+	dispbottom "30=El Dicastes     31=Mora         32=Dewata     33=Malangdo  34=Port Malaya";
+	dispbottom "35=Eclage          36=Crystilia    37=Mall";
+	end;
+}
+
+// map name,x,y,level requirement, group id minimum requirement
+if(compare (@warp$,"prontera") || @warp$ == "0") { callsub	Process,"prontera",156,191,0,0; }
+if(compare (@warp$,"morocc") || @warp$ == "1") { callsub	Process,"morocc",156,93,0,0; }
+if(compare (@warp$,"geffen") || @warp$ == "2") { callsub	Process,"geffen",119,59,0,0; }
+if(compare (@warp$,"payon") || @warp$ == "3") { callsub	Process,"payon",177,101,0,0; }
+if(compare (@warp$,"alberta") || @warp$ == "4") { callsub	Process,"alberta",192,147,0,0; }
+if(compare (@warp$,"izlude") || @warp$ == "5") { callsub	Process,"izlude",128,114,0,0; }
+if(compare (@warp$,"aldebaran") || @warp$ == "6") { callsub	Process,"aldebaran",140,131,0,0; }
+if(compare (@warp$,"lutie") || @warp$ == "7" ) { callsub	Process,"xmas",147,134,0,0; }
+if(compare (@warp$,"comodo") || @warp$ == "8" ) { callsub	Process,"comodo",209,143,0,0; }
+if(compare (@warp$,"yuno") || @warp$ == "9") { callsub	Process,"yuno",157,51,0,0; }
+if(compare (@warp$,"amatsu") || @warp$ == "10") { callsub	Process,"amatsu",198,84,0,0; }
+if(compare (@warp$,"gonryun") || @warp$ == "11") { callsub	Process,"gonryun",160,120,0,0; }
+if(compare (@warp$,"umbala") || @warp$ == "12") { callsub	Process,"umbala",89,157,0,0; }
+if(compare (@warp$,"niflheim") || @warp$ == "13") { callsub	Process,"niflheim",21,153,0,0; }
+if(compare (@warp$,"louyang") || @warp$ == "14") { callsub	Process,"louyang",217,40,0,0; }
+if(@warp$ == "15") { callsub	Process,"new_1-1",53,111,0,10; }	// Novice Grounds : GM Group 10 or higher only.
+if(@warp$ == "16") { callsub	Process,"sec_pri",23,61,0,10;}		// Prison: GM Group 10 or higher only.
+if(compare (@warp$,"jawaii") || @warp$ == "17") { callsub	Process,"jawaii",249,127,0,0; }
+if(compare (@warp$,"ayothaya") || @warp$ == "18") { callsub	Process,"ayothaya",151,117,0,0; }
+if(compare (@warp$,"einbroch") || @warp$ == "19") { callsub	Process,"einbroch",64,200,0,0; }
+if(compare (@warp$,"lighthalzen") || @warp$ == "20") { callsub	Process,"lighthalzen",158,92,0,0; }
+if(compare (@warp$,"einbech") || @warp$ == "21") { callsub	Process,"einbech",70,95,0,0; }
+if(compare (@warp$,"hugel") || @warp$ == "22") { callsub	Process,"hugel",96,145,0,0; }
+if(compare (@warp$,"rachel") || @warp$ == "23") { callsub	Process,"rachel",130,110,0,0; }
+if(compare (@warp$,"veins") || @warp$ == "24") { callsub	Process,"veins",216,123,0,0; }
+if(compare (@warp$,"moscovia") || @warp$ == "25") { callsub	Process,"moscovia",223,184,0,0; }
+if(compare (@warp$,"midgard") || @warp$ == "26") { callsub	Process,"mid_camp",180,240,0,0; }
+if(compare (@warp$,"manuk") || @warp$ == "27") { callsub	Process,"manuk",282,138,0,0; }
+if(compare (@warp$,"splendide") || @warp$ == "28") { callsub	Process,"splendide",197,176,0,0; }
+if(compare (@warp$,"brasilis") || @warp$ == "29") { callsub	Process,"brasilis",182,239,0,0; }
+if(compare (@warp$,"el dicastes") || @warp$ == "30") { callsub	Process,"dicastes01",198,187,0,0; }
+if(compare (@warp$,"mora") || @warp$ == "31") { callsub	Process,"mora",44,151,0,0; }
+if(compare (@warp$,"dewata") || @warp$ == "32") { callsub	Process,"dewata",200,180,0,0; }
+if(compare (@warp$,"malangdo") || @warp$ == "33") { callsub	Process,"malangdo",140,114,0,0; }
+if(compare (@warp$,"malaya") || @warp$ == "34") { callsub	Process,"malaya",242,211,0,0; }
+if(compare (@warp$,"eclage") || @warp$ == "35") { callsub	Process,"eclage",110,39,0,0; }
+if(compare (@warp$,"crystilia") || @warp$ == "36") { callsub	Process,"Crystilia",70,65,0,0; }
+if(compare (@warp$,"mall") || @warp$ == "37") { callsub	Process,"mall",83,129,0,0; }
+// Custom @go locations below. Also edit them in or out of the master list found towards the top of this script file.
+else {
+	dispbottom "[Server] : To use @go, enter a number 0 or greater. For a full list of available warps, type '@go list'.";
+	end;
+}
+	Process:
+		set @group,getarg(4);
+		set @lvl,getarg(3);
+		set @mapname$,getarg(0);
+		set @x,getarg(1);
+		set @y,getarg(2);
+		if(@lvl > 0) { if(BaseLevel < @lvl) { dispbottom "[Server] : You need to be at least base level "+@lvl+" or higher to teleport to this location."; end;} }
+		if(@group > 0) { if(getgroupid() < @group) { dispbottom "[Server] : This map cannot be accessed by your group/account level."; end;} }
+		
+		warp @mapname$,@x,@y;
+		end;
+}

@@ -1,0 +1,17 @@
+-	script	News	-1,{
+OnInit:
+set .Time,10;		// Announce every x Minute.
+
+setarray .News$[0],	// Random Message to be Announced
+		"Welcome to ExhilarateRO's Server Alpha Test! Enjoy playing!",
+		"Please Report any Bugs on the Forums. Any Suggestions? Tell us!",
+		"Rates: 150x/100x/custom drop rate. You can use @rates to check it out.",
+		"Max Lvl 150, Max Job Lvl 50, Max Stats 120. With 3rd Jobs.",
+		"Welcome to ExhilarateRO's Server Alpha Test! Tell us how you feel!",
+		"Welcome to ExhilarateRO's Server Alpha Test! Invite more players!",
+while( 1 ){
+	announce .News$[ rand( getarraysize( .News$ ) ) ],0;
+	sleep ( .Time * 60000 );
+	}
+end;
+}

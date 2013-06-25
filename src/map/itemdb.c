@@ -199,7 +199,7 @@ void itemdb_package_item(struct map_session_data *sd, struct item_package *packa
 		
 		entry = &package->random_list[rnd()%package->random_qty];
 		
-		for( i = 0; i < package->random_qty; i++ ) {
+		while( 1 ) {
 			if( rnd()%10000 >= entry->rate ) {
 				entry = entry->next;
 				continue;
@@ -625,7 +625,7 @@ void itemdb_read_groups(void) {
 	const char *itname;
 	int i = 0, count = 0, c;
 	unsigned int *gsize = NULL;
-	
+
 	if (conf_read_file(&item_group_conf, config_filename)) {
 		ShowError("can't read %s\n", config_filename);
 		return;
@@ -811,12 +811,18 @@ void itemdb_read_packages(void) {
 			} else {
 				if( prev )
 					prev->next = &itemdb->packages[count].random_list[r];
+				
 				itemdb->packages[count].random_list[r].id = data ? data->nameid : 0;
 				itemdb->packages[count].random_list[r].qty = icount;
+				if( (itemdb->packages[count].random_list[r].rate = rate) == 10000 ) {
+					ShowWarning("itemdb_read_packages: item '%s' in '%s' has 100% drop rate!! set this item as 'Random: false' or other items won't drop!!!\n",itname,config_setting_name(itg));
+				}
 				itemdb->packages[count].random_list[r].hours = expire;
 				itemdb->packages[count].random_list[r].announce = announce == true ? 1 : 0;
 				itemdb->packages[count].random_list[r].named = named == true ? 1 : 0;
+								
 				prev = &itemdb->packages[count].random_list[r];
+				
 				r++;
 			}
 			
@@ -824,6 +830,12 @@ void itemdb_read_packages(void) {
 		
 		if( prev )
 			prev->next = &itemdb->packages[count].random_list[0];
+		
+		if( itemdb->packages[count].random_qty == 1 ) {
+			//item packages dont stop looping until something comes out of them, so if you have only one item in it the drop is guaranteed.
+			ShowWarning("itemdb_read_packages: '%s' has only 1 random option, drop rate will be 100%!\n",itemdb_name(itemdb->packages[count].id));
+			itemdb->packages[count].random_list[0].rate = 10000;
+		}
 		
 		count++;
 	}
@@ -1625,7 +1637,6 @@ int itemdb_uid_load() {
  * read all item-related databases
  *------------------------------------*/
 static void itemdb_read(void) {
-	
 	if (iMap->db_use_sqldbs)
 		itemdb_read_sqldb();
 	else
@@ -1635,6 +1646,7 @@ static void itemdb_read(void) {
 	itemdb->read_groups();
 	itemdb->read_chains();
 	itemdb->read_packages();
+
 	sv->readdb(iMap->db_path, "item_avail.txt",         ',', 2, 2, -1, &itemdb_read_itemavail);
 	sv->readdb(iMap->db_path, DBPATH"item_trade.txt",   ',', 3, 3, -1, &itemdb_read_itemtrade);
 	sv->readdb(iMap->db_path, "item_delay.txt",         ',', 2, 2, -1, &itemdb_read_itemdelay);

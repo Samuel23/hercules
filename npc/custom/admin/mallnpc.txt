@@ -67,3 +67,6 @@ end;
 
 mall,99,62,0	warp	mallwarp#1	2,2,Crystilia,67,87
 Crystilia,67,91,0	warp	mallwarp#2	2,2,mall,100,66
+
+/*Tool Dealer*/
+Crystilia,74,92,4	shop	Tool Dealer#CustomPront	891,12221:100000,601:60,602:300,662:1500,678:30000,14509:5000,14510:7000,14511:10000

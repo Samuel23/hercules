@@ -11,7 +11,7 @@
 	
 
 	OnAtcommand:
-		set @warp$,.@atcmd_parameters$[0];
+		set @warp$,@atcmd_parameters$[0];
 		set @warp,@warp$;
 
 if(@warp$ == "list") { dispbottom "Usage: @go #"; 

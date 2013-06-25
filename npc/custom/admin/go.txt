@@ -10,7 +10,7 @@
 		end;
 	
 	OnAtcommand:
-		set ..@warp$,.@atcmd_parameters$[0];
+		set .@warp$,.@atcmd_parameters$[0];
 
 if(compare (.@warp$,"list")) { dispbottom "Usage: @go #"; 
 	dispbottom "0=Prontera         1=Morroc        2=Geffen      3=Payon      4=Alberta";

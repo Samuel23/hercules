@@ -1,0 +1,306 @@
+/*====================================================================================*/
+/*==============================Monster Invasion Event================================*/
+/*====================================================================================*/
+/*==============================By:Night Terror=======================================*/
+/*====================================================================================*/
+/*===Inspired by: Automated MVP Event by xMachina / Acetito and Emistry===============*/
+/*====================================================================================*/
+/*=== v0.9 ================================================English Version============*/
+
+
+function	script	F_IsMapValid	{ 				//Check if Map is set
+	if(getarg(0)!="")
+		return "["+getarg(0)+"]";
+	else
+		return "";
+}
+
+function	script	F_IsItemValid	{				//Check if Item is set
+	if(getarg(0)!=0)
+		return "["+getitemname(getarg(0))+" x "+$@Amount+"]";
+	else
+		return "";
+}
+
+function	script	F_IsMobValid	{				//Check if Monster is set
+	if(getarg(0)!=0)
+		return "["+getmonsterinfo(getarg(0),0) + " x " +getarg(1)+"]";
+	else
+		return "";
+}
+
+function	script	F_ChooseMob	{					//Monster & Monster amount list 
+
+	
+	switch(select("Weaker Monsters:Stronger Monsters")){
+	
+		Case 1:
+		
+		set $@Monsters[getarg(0)],$@Monsteridstrong[select("Arclouse:Baba Yaga:Baby Leopard:Baphomet Jr.:Bloody Butterfly:Dark Frame:Dragon Tail:Evil Cloud Hermit:Giant Whisper:Grand Peco:Greatest General:High Orc:Hill Wind:Hyegun:Hylozoist:Li Me Mang Ryang / Jing Guai:Live Peach Tree / Enchanted Peach Tree:Marine Sphere:Miyabi Ningyo / Miyabi Doll:Myst Case:Nereid:Orc Archer:Orc Baby:Raydric Archer:Remover:Sea Otter:Side Winder:Stone Shooter:Wanderer:Wind Ghost:Wooden Golem")]; 
+
+		break;
+			
+		
+		Case 2:	
+		
+		set $@Monsters[getarg(0)],$@Monsteridweak[select("Am Mut:Ancient Mummy:Firelock Soldier:Armeyer Dinze:Bloody Knight:Bloody Murderer:Bow Guardian:Cat o' Nine Tails:Dark Illusion:Eremes Guile:Errende Ebecee:Howard Alt-Eisen:Ice Titan:Imp:Kavach Icarus:Knight of Abyss:Loli Ruri:Margaretha Sorin:Mutant Dragonoid:Observation:Owl Duke:Ragged Zombie:Laurell Weinder:Retribution:Sword Guardian:The Paper:Tirfing/Ogretooth:Wickebine Tres:Wicked Nymph:Zealotus:Zombie Prisoner")]; 
+
+		break;
+	}	
+	for (set $@i,0; $@i < 7; set $@i,$@i+1)	{			//Check if Monster is already chosen
+		if ($@Monsters[getarg(0)]==$@Monsters[$@i] && $@i!=getarg(0)){ 			//Clean Monster from list if Monster is already chosen
+			set $@Monsters[getarg(0)],0;
+		}
+	}
+	
+	input $@MobAmount[getarg(0)],20,300;
+
+	return 0;
+
+
+}
+
+function	script	F_ClearGarbagez	{				//Clean previous inputs
+
+	cleararray $@Monsters,0,7;
+	cleararray $@MobAmount,0,7;
+	set $@itemID,0;
+	set $@Map$,"prontera";
+	return 0;
+}
+
+
+prontera,139,173,5	script	Monster Invasion Helper	402,{ 
+
+
+	//define monsterlist and itemlist
+	setarray $@Monsteridweak[1],1301,1297,1403,1654,1268,1507,1830,1307,1302,1635,1655,1636,1777,1837,1656,1219,1502,1637,1262,1700,1320,1865,1657,1702,1829,1375,1204,1653,1416,1200,1197;
+	setarray $@Monsteridstrong[1],1194,1882,1415,1101,1408,1260,1321,1412,1186,1369,1277,1213,1680,1512,1510,1517,1410,1142,1404,1249,1255,1189,1686,1276,1682,1323,1037,1495,1208,1236,1497;
+	setarray $@Healitem[1],521,12321,505,548,547,12123,12299,12320,12016,607;
+	setarray $@Useableitem[1],662,12354,12257,12704,14598,12212,12135,14607,12268,12128,12266,12310,14601,12019;
+	
+	if(getgmlevel() < 20) 				//check if GM Lvl is high enough
+		warp "prontera",156,184;
+		
+	if($@Event!=0){									//Check if Event is already running
+		mes "[ ^0C66C0Event Helper^000000 ]";
+		mes "Event is already running!";
+		if (getgmlevel() > 20) {
+		mes "Do you want to stop it?";
+		switch (select("Yes:No")) {
+			case 1:
+				announce strcharinfo(0)+ " had stopped the invasion event..",bc_all,0xFFFF46;
+				killmonster $@Map$,"All";
+				//Clear variables
+				cleararray $@kills[0],0,200;
+				cleararray $@killer$[0],"",200;
+				cleararray $@flag[0],0,10;
+				removemapflag $@Map$,mf_nomobloot;
+				set $@Event,0;
+				close;
+			case 2:
+				close;
+			}
+		}
+		close;
+	}
+	set $@Map$,"prontera";				//default map=prontera
+	while(1)
+	{
+		mes "[ ^0C66C0Event Helper^000000 ]";
+		mes "Please choose your parameters.";
+		next;
+		switch(select("Item "+callfunc("F_IsItemValid",$@itemID)+":Map " +callfunc("F_IsMapValid",$@Map$)+":Monster:Clear current values:Start Event!")){
+			Case 1:   
+					mes "[ ^0C66C0Event Helper^000000 ]";
+					mes "The reward for the top 10 killers.";
+					mes "The player with the most kills gets the amount of items you choose, the following ranks get 10% less per rank.";
+					next;
+					input $@itemID;
+					if (getitemname($@itemID) == "" || getitemname($@itemID) == "null") {
+					mes "^CC0000Sorry, "+ $@itemID +" is an invalid item ID.^000000";
+					close;
+					}
+					else if ($@itemID == 7179) {
+					mes "^CC0000Sorry, "+ $@itemID +" / "+getitemname($@itemID)+" can't be use as a reward.^000000";
+					close;
+					}
+					next;
+					mes "[ ^0C66C0Event Helper^000000 ]";
+					mes "Choose the desired amount, 1 is the minimum, 100 the maximum.";
+					next;
+					input $@Amount,1,100;
+					break;
+			Case 2:
+					mes "[ ^0C66C0Event Helper^000000 ]";
+					mes "Please choose your desired map!";
+					mes "Obviously, the map has to be valid.";    
+					next;
+					do{								//Loop to ensure valid map
+					input $@Map$;}while(mobcount($@Map$,"") == -1 );
+					break;
+			Case 3:
+			
+					mes "[ ^0C66C0Event Helper^000000 ]";
+					mes "Which monster do you want to spawn?";
+					mes "You can spawn 7 different monsters.";
+					mes "Minimum monster amount is 20, maximum is 300";
+					next;
+					mes "[ ^0C66C0Event Helper^000000 ]";
+					mes "Please choose the desired monster and the desired amount.";
+					next;
+					//Stay in menu until player has chosen all monsters he wants
+					while(1){
+						set @ChosenPlace,select("Mob 1 - "+callfunc("F_IsMobValid",$@Monsters[0],$@MobAmount[0])+":Mob 2 - "+callfunc("F_IsMobValid",$@Monsters[1],$@MobAmount[1])+":Mob 3 - "+callfunc("F_IsMobValid",$@Monsters[2],$@MobAmount[2])+":Mob 4 - "+callfunc("F_IsMobValid",$@Monsters[3],$@MobAmount[3])+":Mob 5 - "+callfunc("F_IsMobValid",$@Monsters[4],$@MobAmount[4])+":Mob 6 - "+callfunc("F_IsMobValid",$@Monsters[5],$@MobAmount[5])+":Mob 7 - "+callfunc("F_IsMobValid",$@Monsters[6],$@MobAmount[6])+":No more monsters.")-1;
+						
+						if(@ChosenPlace>6) break;
+							callfunc("F_ChooseMob",@ChosenPlace);
+					}
+					break;	
+						
+				
+			Case 4:	
+					callfunc("F_ClearGarbagez");
+					break;
+			Case 5:
+
+					if( $@Map$ == "" || $@Monsters[0] == 0){				//Check if Map and Monsters are set
+					mes "[ ^0C66C0Event Helper^000000 ]";
+					mes "Please check your parameters.";
+					next;
+					break;
+					}
+
+					mes "[ ^0C66C0Event Helper^000000 ]";
+					mes "The Event has been started!";
+					goto OnEventStart;
+					close;
+			}
+	}
+
+OnHour0000:
+OnHour0300:
+OnHour0600:
+OnHour0900:
+OnHour1200:
+OnHour1500:
+OnHour1800:
+OnHour2100:
+OnEventStart:
+	stopnpctimer;
+	setarray $@randnum[0],rand(30,60),rand(200,300),rand(450,500),rand(900,1000);
+	setmapflag $@Map$,mf_nomobloot;
+	set $@Event,1;
+	announce "Monsters have been sighted at "+$@Map$+"! Keep pushing them back!",bc_all,0xFFFF86;
+	sleep2 2500;
+	if ($@itemID != 0)
+	announce "The reward for the best killer will be "+$@Amount+" x "+getitemname($@itemID)+". Subsequent killers receive 10% less per rank until rank 10." ,bc_all,0xFFFF86;
+	sleep2 2500;
+	announce "The following monsters have been sighted:",bc_all,0xB7D2E9;
+	sleep2 1000;
+	for (set $@i,0; $@i < 7; set $@i,$@i+1){				//Spawn Monsters and announce them
+		if($@Monsters[$@i]!=0){
+		announce getmonsterinfo($@Monsters[$@i],0)+" x "+$@MobAmount[$@i],bc_all,0xB7D2E9;
+		monster $@Map$,0,0,"--ja--",$@Monsters[$@i],$@MobAmount[$@i],strnpcinfo(3)+"::OnMobKill";
+		}
+	}
+	initnpctimer;
+	announce "Monster Invasion will only lasts for 15 minutes, kill as many monsters as you can!",bc_all,0xB7D2E9;
+	end;
+
+OnMobKill:
+		getitem 607,1;
+		if (mobcount($@Map$,strnpcinfo(3)+"::OnMobKill") <= $@randnum[0] && mobcount($@Map$,strnpcinfo(3)+"::OnMobKill") > 5 || mobcount($@Map$,strnpcinfo(3)+"::OnMobKill") == $@randnum[1] || mobcount($@Map$,strnpcinfo(3)+"::OnMobKill") == $@randnum[2] || mobcount($@Map$,strnpcinfo(3)+"::OnMobKill") == $@randnum[3]) 
+		announce "Only "+mobcount($@Map$,strnpcinfo(3)+"::OnMobKill")+" Monsters left to kill.",bc_all,0xFFFF46;		//announce remaining monsters
+		
+		for(set $@i,0; $@i < 127; set $@i,$@i+1){							//Register the killer and add points
+			if($@killer$[$@i] == ""){
+					
+				for (set $@j,0; $@j < 127; set $@j,$@j+1){
+					if($@killer$[$@i]==$@killer$[$@j] && $@killer$[$@i]!= "")
+						goto Nameexists;			
+				}
+
+				set $@killer$[$@i],strcharinfo(0);
+				set $@kills[$@i],$@kills[$@i]+1;	
+				
+				break;
+			
+			}
+			else if($@killer$[$@i] == strcharinfo(0)){
+				Nameexists:
+				set $@kills[$@i],$@kills[$@i]+1;
+				break;
+			}
+		}
+		
+		if(mobcount($@Map$,strnpcinfo(3)+"::OnMobKill") <=5){			//If 5 or less mobs remain: kill all mobs, bubblesort the top 15 killers,announce the top 15 killers and give items (if set) to the Top 10.
+			killmonster $@Map$,"All";
+			announce "Most of the monsters have been defeated!",bc_all,0xFFFF46;
+			sleep2 2000;
+			announce "Our local guards managed to fend the remaining monsters off.",bc_all,0xFFFF46;
+			sleep2 2000;
+			announce "Let's look at the results:",bc_all,0xFFFF46;
+			sleep2 1000;
+			
+			for (set $@i,0; $@i < 15; set $@i,$@i+1){						//Do the Bubblesort
+				for (set $@j,0; $@j < 15; set $@j,$@j+1){					
+					if ($@kills[$@j] < $@kills[$@j+1]){					
+						set @tmpkills, $@kills[$@j+1];
+						set @tmpkillers$, $@killer$[$@j+1];
+						set $@kills[$@j+1], $@kills[$@j];
+						set $@killer$[$@j+1],$@killer$[$@j];
+						set $@kills[$@j], @tmpkills;
+						set $@killer$[$@j], @tmpkillers$;
+					}
+				}
+			 }
+			 
+			for(set $@i,0; $@i < 15; set $@i,$@i+1){						//Announce Top 15
+				if($@killer$[$@i] != "")
+				announce $@i+1+". Place: "+$@killer$[$@i]+" with "+$@kills[$@i]+" Monsters killed.",bc_all,0xB7D2E9;
+			}	
+			
+			
+			if ($@itemID != 0){											//Give item if set, 10% less per rank
+				for(set $@i,0; $@i < 10; set $@i,$@i+1){
+					if ($@killer$[$@i]!=""){	
+						getitem $@itemID,$@Amount-$@Amount*$@i/10,getcharid(3,$@killer$[$@i]);	
+					}
+				}
+			}
+			
+			//logmes "Monster Invasion complete, the Top 1 Killer is " + $@killer$[0] + " with "+$@kills[0]+ " Kills. The reward was " +getitemname($@itemID)+ " x "+$@Amount+". This was the "+$Invasioncount+". custom Monster Invasion.";
+			set $Invasioncount,$Invasioncount+1;
+			
+			//Clear variables
+			cleararray $@kills[0],0,200;
+			cleararray $@killer$[0],"",200;
+			cleararray $@flag[0],0,10;
+			removemapflag $@Map$,mf_nomobloot;
+			set $@Event,0; 
+			end;
+		}
+		end;
+
+OnTimer900000:
+		killmonster $@Map$,"All";
+		announce "15 minutes had passed and players were not able to kill all the monsters!",bc_all,0xFFFF46;
+		sleep2 2000;
+		announce "Monster Invasion Event ended.",bc_all,0xFFFF46;
+		//Clear variables
+		cleararray $@kills[0],0,200;
+		cleararray $@killer$[0],"",200;
+		cleararray $@flag[0],0,10;
+		removemapflag $@Map$,mf_nomobloot;
+		set $@Event,0;
+
+OnInit:
+set $@Map$,"Crystilia";
+set $@itemID,675;	//Silver Coin
+set $@Amount,10;
+//setarray $@Monsters[0],1301,1297,1403,1654,1268,1507,1830,1307;	// Weak
+//setarray $@Monsters[0],1002,1002,1002,1002,1002,1002,1002,1002;	// For trial
+setarray $@Monsters[0],1268,1702,1829,1641,1830,1636,1777;
+setarray $@MobAmount[0],30,30,30,30,30,30,30,30;
+}

@@ -1,0 +1,224 @@
+Crystilia,39,98,4	script	Disguise Event	795,{
+//--- Basic Script Configuration Options ---//
+set .@npcname$,"[^0000FFDisguise NPC^000000]"; //<- NPC Name.
+set $@GMLevel,40; //<- GM Level needed to be considered a GM.
+//--- The Script ---//
+if (getgmlevel()>=$@GMLevel){goto GM_Player;}
+if ($@EventON){end;}
+
+mes .@npcname$;
+mes "Welcome, how may i be of assistance.";
+menu "Information",iInfo,"Nothing, just passing through.",iNothing;
+  iInfo:
+  next;
+  mes .@npcname$;
+  mes "This event is actually quite simple";
+  mes "At the start of the event, I will disguise myself";
+  mes "into a monster randomly. You will then merely have to shout that monsters name outloud.";
+  next;
+  mes "If you get it correct, you get a prize. If not, then keep trying.";
+    mes "Thatis all there is to know about this event.";
+    close;
+    iNothing:
+    close;
+GM_Player:
+mes .@npcname$;
+mes "Please select an Option to modify.";
+menu "Turn ON/OFF Event",iEvent,"Event Settings",iSettings;
+  iEvent:
+  next;
+  mes .@npcname$;
+  if ($@EventON){mes "The Event is currently: [^0000FFON^000000]";
+  mes "Would you like to turn it OFF?";}
+  if (!$@EventON){mes "The Event is currently: [^FF0000OFF^000000]";
+  mes "Would you like to turn it ON?";}
+  menu "Yes",iYes,"No",iNothing;
+    iYes:
+    if ($@EventON)
+       {set $@EventON,0; set $@Timer,0;
+        setnpctimer 0; stopnpctimer;
+          announce "A GM has decided to turn the Disguise Event off. As a result no prizes will be given.",bc_map | bc_blue;
+        deletepset 1;
+          setnpcdisplay "Disguise Event",795;
+          close;}
+      set $@EventON,1; set $@Timer,1; setnpctimer 0; initnpctimer;
+      set $@ResetCounter,$@ResetCounter+1;
+      announce "The Disguise Event will begin in 3 minutes.",bc_all | bc_blue;
+      announce "The Event is being held at Crystilia,39,93.",bc_all | bc_blue;
+      close;
+    iSettings:
+    next;
+    mes .@npcname$;
+    mes "Please select a setting to modify.";
+    menu "Monster Display",iMonster,"Number of Rounds",iRounds,"Prize Settings",iPrize;
+      iMonster:
+      callfunc "Monster_Display";
+      iRounds:
+      callfunc "Rounds";
+      iPrize:
+      callfunc "Prizer";
+
+OnInit:
+defpattern 1,"([^:]+):.*\\sOMFGBBQLEETSAUCEGMOCEANRULESHAI!!.*", "iCorrect";
+activatepset 1;
+set $@EventON,0;
+set $@Wait,0;
+set $@Winner,0;
+set $Points,$Points;
+set $@ResetCounter,0;
+set $Rounds,20;
+set $Prize,673;
+set $PrizeAmt,1;
+set $Rule,1;
+setarray $@MVP[0],1511,1674,1785,1039,1874,1272,1719,1046,1389,1112,1115,1658,1957,1418,1871,1252,1786,1086,1885,1649,1651,1832,1492,1734,1251,1779,1688,1646,1373,1147,1059,1150,1956,1087,1190,1038,1157,1159,1052,1623,1916,1650,1583,1389,1312,1751,1685,1630,1648,1797,1796,1975,1867,1980,1988,2015,1995,1987,1994,1989,1986,1992,1993,1769,1770,1632,1773,1774,1838,1830,1829,1829,1839,1620,1616,1621,1753,1752,1754,2087,2068,2022;
+setarray $@BlackList[0],1003,1006,1017,1021,1022,1027,1043,1075,1136,1137,1168,1171,1172,1173,1181,1210,1217,1218,1222,1223,1224,1225,1226,1227,1228,1284,1407,1411,1414,1496,1501,1900;
+end;
+OnClock0000:
+OnClock0200:
+OnClock0400:
+OnClock0600:
+OnClock0800:
+OnClock1000:
+OnClock1200:
+OnClock1400:
+OnClock1600:
+OnClock1800:
+OnClock2000:
+OnClock2200:
+set $@ResetCounter,$@ResetCounter+1;
+set $@EventON,1;
+set $@Timer,1;
+set $@Wait,1;
+announce "The Disguise Event will begin in 3 minutes.",bc_all | bc_blue;
+announce "The Event is being held at Crystilia, 39, 93.",bc_all | bc_blue;
+setnpctimer 0;
+initnpctimer;
+end;
+OnTimer10000:
+if ($@Timer){end;}
+if ($@Change){end;}
+set $@Wait,0;
+goto iDisguise;
+//donpcevent "DisguiseEvent::OnDisguise";
+end;
+OnTimer30000:
+if ($@Timer){end;}
+set $@Change,0;
+setnpcdisplay "Disguise Event",795;
+npctalk "You took too long to guess what i was. Please wait 10 seconds while i disguise again.";
+specialeffect 725;
+set $MonsterName$,"OMFGBBQLEETSAUCEGMOCEANRULESHAI!!";
+deletepset 1;
+stopnpctimer;
+setnpctimer 0;
+initnpctimer;
+end;
+OnTimer60000:
+if ($@Timer!=1){end;}
+if ($@Timer==1)
+{announce "The Disguise Event will begin in 2 minutes.",bc_all | bc_blue;
+  announce "The Event is being held at Crystilia, 39,93.",bc_all | bc_blue;
+    end;}
+OnTimer120000:
+if ($@Timer!=1){end;}
+if ($@Timer==1)
+{announce "The Disguise Event will begin 1 minute.",bc_all | bc_blue;
+  announce "The Event is being held at Crystilia, 39,93.",bc_all | bc_blue;
+    end;}
+OnTimer180000:
+if ($@Timer!=1){end;}
+if ($@Timer==1)
+{announce "The Disguise Event has begun!",bc_all | bc_blue;
+  announce "The Event is being held at Crystilia, 39,93.",bc_all | bc_blue;
+    set $@Timer,0; stopnpctimer;
+    setnpctimer 0; initnpctimer;
+    goto iDisguise;
+    //donpcevent "DisguiseEvent::OnDisguise";
+    end;}
+announce "Something went wrong with the Disguise Event.",bc_all | bc_blue;
+announce "Please notify a GM ASAP. Thank you.",bc_all | bc_blue;
+end;
+iDisguise:
+if ($Rule==1)
+{set $@Winner,0;
+  set $@Monster,1000+rand(1,995);
+    for(set .@BL,0; .@BL<getarraysize($@BlackList); set .@BL,.@BL+1)
+     {if ($@Monster==$@BlackList[.@BL])
+       {goto iDisguise;}}
+  if ($@Monster==$@LastMonster){goto iDisguise;}
+  set $@LastMonster,$@Monster;
+  set $MonsterName$,getmonsterinfo($@Monster,0);}
+if ($Rule==2)
+{set $@Winner,0;
+  set $@Monster,rand(49);
+  set $MonsterName$,getmonsterinfo($@MVP[$@Monster],0);}
+deletepset 1;
+defpattern 1,"([^:]+):.*"+$MonsterName$+".*", "iCorrect";
+activatepset 1;
+if ($Rule==1){setnpcdisplay "Disguise Event",$@Monster;}
+if ($Rule==2){setnpcdisplay "Disguise Event",$@MVP[$@Monster];}
+set $@Change,1;
+setnpctimer 0;
+//npctalk ""+$@Monster+", "+$MonsterName$+"";
+end;
+iCorrect:
+if ($@Winner){dispbottom "Someone has already won this round."; end;}
+set $@Winner,1;
+set $@RoundCount,$@RoundCount+1;
+deletepset 1;
+defpattern 1,"([^:]+):.*\\sOMFGBBQLEETSAUCEGMOCEANRULESHAI!!.*", "iFailCheater";
+activatepset 1;
+getitem $Prize,$PrizeAmt;
+announce ""+strcharinfo(0)+" is correct! I was disguised as: "+$MonsterName$+"",bc_map | bc_blue;
+if ($@RoundCount>=$Rounds)
+  {setnpcdisplay "Disguise Event",795;
+   set $@RoundCount,0; set $@Change,0;
+   setnpctimer 0; stopnpctimer;
+   npctalk "Thank you all for playing. That was the last round of the Disguise Event. Come play again later.";
+     end;}
+setnpcdisplay "Disguise Event",795;
+set $@Change,0;
+setnpctimer 0;
+end;
+}
+//--- The Functions ---//
+function	script	Rounds	{
+next;
+mes "Please Input the number of rounds you want the event to last.";
+mes "Current Number of Roudns: [^0000FF"+$Rounds+"^000000]";
+input .@Rounds;
+set $Rounds,.@Rounds;
+next;
+mes "The number of rounds has been changed successfully.";
+mes "Number of Rounds: [^0000FF"+$Rounds+"^000000]";
+mes "Come again.";
+close;
+}
+function	script	Prizer	{
+next;
+mes "Please Input the ItemID of the prize that will be given each round.";
+mes "Current Items is: [^0000FF"+getitemname($Prize)+"^000000] ItemID - ^0000FF"+$Prize+"^000000";
+input .@Prize;
+if (getitemname(.@Prize)=="" || getitemname(.@Prize)=="null")
+{next; mes "That item does not exist. Please try again."; close;}
+set $Prize,.@Prize;
+next;
+mes "Please Input the Ammount that is to be given.";
+input .@Ammount;
+if (.@Ammount<=0 || .@Ammount>=10000)
+{next; mes "That ammount is invalid. Using default ammount of 1.";}
+set $PrizeAmt,.@Ammount;
+next;
+mes "The Prize has been changed successfully.";
+mes "Prize: [^0000FF"+getitemname($Prize)+"^000000]x(^0000FF"+$PrizeAmt+"^000000)";
+close;
+}
+function	script	Monster_Display	{
+	setarray .@r$[0],"Disguise as all monsters.","Disguise as MVPs only.";
+	mes "Choose a disguise rule.";
+	next;
+	set $Rule, select(implode(.@r$,":"));
+	mes "The Disguise Rule has been set:";
+	mes "  > ^0055FF"+.@r$[$Rule-1]+"^000000";
+	close;
+}

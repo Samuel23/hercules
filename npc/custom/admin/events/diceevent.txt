@@ -1,0 +1,214 @@
+//##########################################################################
+//By: ____                    _      __        __           ____    _____  #
+//   |    \   ___ __    __ _ | |     \ \      / /_  _   _  / ___\  / ____| #
+//   | ||  | / _ \\ \  / /| || |      \ \    / /| || \ | || | ___ | (___   #
+//   | ||  ||  __/ \ \/ / | || |__     \ \/\/ / | ||  \| || |___|\ \___ \  #
+// __|____/__\___|__\__/__|_||____|_____\_/\_/__|_||_|\__|_\_____/_____) | #
+//|_____________________________________________________________________/  #
+//                                                                         #
+//##########################################################################
+//                                                                         #
+//== Dice Event                                                            #
+//                                                                         #
+//##########################################################################
+//                                                                         #
+//== Automatically starts a dice event every 30 minutes of every hour      #
+//                                                                         #
+//== Prize- Change 13723 to any item ID you want the winner to recieved    #
+//                                                                         #                                         // Code Modify by : WordsUp
+// Credit still for mAisakaTaiga                                
+//##########################################################################
+
+-	script	Dice#announcer	-1,{
+
+OnInit:
+	disablenpc "prtevent";
+	hideonnpc "Dice#evnt1";
+	end;
+
+OnMinute00:
+	announce "Dice: We are going to have a Dice event.",0;
+	sleep2 10000;
+	announce "Dice: For those who wants to join, Please proceed to Crystilia 105 81 and enter the Warp Portal.",0;
+	sleep2 10000;
+	announce "Dice: After 1 Minute the Portal will close. Please proceed to Crystilia 105 81 and enter the Warp Portal.",0;
+	sleep2 10000;
+	announce "Dice: So please go to Crystilia 105 81 and enter the Warp Portal now if you want to join.",0;
+	enablenpc "prtevent";
+	initnpctimer;
+	end;
+
+OnTimer30000:
+	announce "Dice: Last 30 seconds.",0;
+	sleep2 5000;
+	announce "Dice: If you want to join please enter the Warp Portal beside me here in Crystilia 105 81.",0;
+	end;
+	
+OnTimer50000:
+	announce "Dice: Last 10 seconds.",0;
+	end;
+	
+OnTimer55000:
+	announce "Dice: 5.",0;
+	end;
+	
+OnTimer56000:
+	announce "Dice: 4.",0;
+	end;
+	
+OnTimer57000:
+	announce "Dice: 3.",0;
+	end;
+	
+OnTimer58000:
+	announce "Dice: 2.",0;
+	end;
+	
+OnTimer59000:
+	announce "Dice: 1.",0;
+	end;
+	
+OnTimer60000:
+	announce "Dice: Time's up.",0;
+	end;
+	
+OnTimer61000:
+	disablenpc "prtevent";
+	donpcevent "Dice#evnt1::OnEnable";
+	stopnpctimer;
+	end;
+	
+OnTimer62000:
+	announce "Dice: The next Dice event will begin when a GM activates it.",0;
+	end;
+	}
+	
+//--------------------------------------------------
+	
+Crystilia,105,81,0	warp	prtevent	2,2,quiz_01,204,90
+	
+//--------------------------------------------------
+
+quiz_01,204,93,6	script	Dice#evnt1	715,{
+
+//--------------------------------------------------
+
+	mes "[Dice]";
+	mes "Please tell me your name";
+	next;
+	input .@name$;
+	if(.@name$ != strcharinfo(0)) {
+		mes "[Dice]";
+		mes "Are you sure thats your character name?";
+		close;
+	}
+	mes "[Dice]";
+	mes "Congrats. You've won.";
+	close2;
+	announce "Dice: We have a winner, "+.@name$+".",0;
+	getitem 675,2;	// Silver Coin
+	warp "Crystilia",91,82;
+	hideonnpc "Dice#evnt1";
+	end;
+	
+OnEnable:
+	mapannounce "quiz_01","Dice: We are about to start the Dice event.",0;
+	sleep2 10000;
+	mapannounce "quiz_01","Dice: But before we start the event here's how to play the game. . .",0;
+	sleep2 10000;
+	mapannounce "quiz_01","Dice: I'm only gonna say this once so read carefully.",0;
+	sleep2 10000;
+	mapannounce "quiz_01","Dice: I'm going to pick a number, 1 to 4. Then I'll do a count down from 5 to 0.",0;
+	sleep2 10000;
+	mapannounce "quiz_01","Dice: All you have to do is go to the box of the number you want.",0;
+	sleep2 10000;
+	mapannounce "quiz_01","Dice: Example, If I get the number of 4, All the players standing on numbers 1 to 3 will be warped back to town.",0;
+	sleep2 10000;
+	mapannounce "quiz_01","Dice: We will do it again and again until we only have 1 player left on the map.",0;
+	sleep2 10000;
+	mapannounce "quiz_01","Dice: Oh yeah! Before I forget you MUST GO INSIDE THE BOX, because if you're caught standing on the stairs you'll be automatically disqualified.",0;
+	sleep2 10000;
+	mapannounce "quiz_01","Dice: That's that.. Now let's play...",0;
+	sleep2 10000;
+	goto L_Start;
+	end;
+	
+L_Start:
+	if(getmapusers("quiz_01") == 1) goto L_Champ;
+	if(getmapusers("quiz_01") == 0) goto L_None;
+	if(getmapusers("quiz_01") > 1) {
+	announce "Dice: . . . . .",0;
+	set $@number, rand(1,4);
+	sleep2 10000;
+	announce "Dice: I have a number now. Please go to the box of the number you want.... GO!",0;
+	sleep2 10000;
+	announce "Dice: 5",0;
+	sleep2 5000;
+	announce "Dice: 4",0;
+	sleep2 4000;
+	announce "Dice: 3",0;
+	sleep2 3000;
+	announce "Dice: 2",0;
+	sleep2 2000;
+	announce "Dice: 1",0;
+	sleep2 1000;
+	announce "Dice: Time's up.",0;
+	donpcevent "evnt#1::OnEnable";
+	announce "Dice: Winning number "+$@number+".",0;
+	if(($@number != 1) && ($@number != 2) && ($@number != 3)) goto L_Lose1;
+	if(($@number != 1) && ($@number != 2) && ($@number != 4)) goto L_Lose2;
+	if(($@number != 1) && ($@number != 3) && ($@number != 4)) goto L_Lose3;
+	if(($@number != 2) && ($@number != 3) && ($@number != 4)) goto L_Lose4;
+	end;
+	}
+	
+L_Lose1:
+	areawarp "quiz_01",183,81,191,60,"Crystilia",91,82;
+	areawarp "quiz_01",195,81,203,60,"Crystilia",91,82;
+	areawarp "quiz_01",207,81,215,60,"Crystilia",91,82;
+	goto L_Start;
+	end;
+
+L_Lose2:
+	areawarp "quiz_01",183,81,191,60,"Crystilia",91,82;
+	areawarp "quiz_01",195,81,203,60,"Crystilia",91,82;
+	areawarp "quiz_01",219,81,227,60,"Crystilia",91,82;
+	goto L_Start;
+	end;
+	
+L_Lose3:
+	areawarp "quiz_01",183,81,191,60,"Crystilia",91,82;
+	areawarp "quiz_01",207,81,215,60,"Crystilia",91,82;
+	areawarp "quiz_01",219,81,227,60,"Crystilia",91,82;
+	goto L_Start;
+	end;
+	
+L_Lose4:
+	areawarp "quiz_01",195,81,203,60,"Crystilia",91,82;
+	areawarp "quiz_01",207,81,215,60,"Crystilia",91,82;
+	areawarp "quiz_01",219,81,227,60,"Crystilia",91,82;
+	goto L_Start;
+	end;
+	
+L_Champ:
+	mapannounce "quiz_01","Dice: Come to me and tell me your name.",0;
+	hideoffnpc "Dice#evnt1";
+	end;
+	
+L_None:
+	announce "No One Enters the Dice Event. Closed",0;
+	hideonnpc "Dice#evnt1";
+	end;
+}
+	
+-	script	evnt#1	-1,{
+
+OnEnable:
+	areawarp "quiz_01",182,94,228,88,"Crystilia",91,82;
+	areawarp "quiz_01",185,87,188,82,"Crystilia",91,82;
+	areawarp "quiz_01",197,87,200,82,"Crystilia",91,82;
+	areawarp "quiz_01",209,87,212,82,"Crystilia",91,82;
+	areawarp "quiz_01",221,87,224,82,"Crystilia",91,82;
+	end;
+	}
+

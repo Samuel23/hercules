@@ -6,12 +6,11 @@
 // Want to show your thanks via Paypal? Shoot me a buck or two : decadenthearts06@gmail.com - Thanks!
 
 	OnInit:
-		bindatcmd("go","gobind::OnAtcommand",0,10);
+		bindatcmd("go","gobind::OnAtcommand");
 		end;
 	
-
 	OnAtcommand:
-		set @warp$,@atcmd_parameters$[0];
+		set @warp$,.@atcmd_parameters$[0];
 		set @warp,@warp$;
 
 if(@warp$ == "list") { dispbottom "Usage: @go #"; 

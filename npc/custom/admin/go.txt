@@ -13,7 +13,7 @@
 		set @warp$,.@atcmd_parameters$[0];
 		set @warp,@warp$;
 
-if(@warp$ == "list") { dispbottom "Usage: @go #"; 
+if(compare (@warp$,"list") { dispbottom "Usage: @go #"; 
 	dispbottom "0=Prontera         1=Morroc        2=Geffen      3=Payon      4=Alberta";
 	dispbottom "5=Izlude           6=Al De Baran   7=Lutie       8=Comodo     9=Yuno";
 	dispbottom "10=Amatsu          11=Gonryun      12=Umbala     13=Niflheim  14=Louyang";

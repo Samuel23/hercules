@@ -69,6 +69,8 @@ else {
 	dispbottom "[Server] : To use @go, enter a number 0 or greater. For a full list of available warps, type '@go list'.";
 	end;
 }
+end;
+
 	Process:
 		set @group,getarg(4);
 		set @lvl,getarg(3);

@@ -8,7 +8,7 @@ setarray .News$[0],	// Random Message to be Announced
 		"Rates: 150x/100x/custom drop rate. You can use @rates to check it out.",
 		"Max Lvl 150, Max Job Lvl 50, Max Stats 120. With 3rd Jobs.",
 		"Welcome to ExhilarateRO's Server Alpha Test! Tell us how you feel!",
-		"Welcome to ExhilarateRO's Server Alpha Test! Invite more players!",
+		"Welcome to ExhilarateRO's Server Alpha Test! Invite more players!";
 while( 1 ){
 	announce .News$[ rand( getarraysize( .News$ ) ) ],0;
 	sleep ( .Time * 60000 );

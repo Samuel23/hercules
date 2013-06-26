@@ -6,7 +6,7 @@ passwd: wakoko23
 // NOTE: Do not use spaces or any of these characters which are not allowed in 
 //       Windows filenames \/:*?"<>|
 //       ... or else guild emblems won't work client-side!
-server_name: Hercules
+server_name: ExhilarateRO
 
 login_ip: 127.0.0.1
 char_ip: 127.0.0.1

@@ -10,16 +10,7 @@ Crystilia,75,80,4	script	ExhilarateRO Master	108,{
 		switch (select(.faqmenu$ + ":Cancel")) {
 		case 1:
 			mes "[^0000FFExhilarateRO Master^000000]";
-			mes "The server has 10k/10k/custom drop rates.";
-			mes "MVP Cards Drop Rate: 10%";
-			mes "Normal Cards Drop Rate: 20%";
-			mes "All Equipments Drop Rate: 20%";
-			close;
-		case 2:
-			mes "[^0000FFExhilarateRO Master^000000]";
-			mes "You can check your inventory for the Job Change Scroll.";
-			mes "It is used for instant job changing with max level.";
-			mes "Remember that you can only have 1 scroll per account.";
+			mes "The server has 150x/100x/custom drop rates.";
 			close;
 		default:
 			close;
@@ -521,21 +512,172 @@ Get_Platinum:
 		return; }
 	// Save
 	case 10:
-		save "Crystilia",68,77;
-		mes "[^0000FFExhilarateRO Master^000000]";
-		mes "You're save point was now changed to Crystilia..";
-		close;
+		mes "[Kafra Employee]";
+		mes "Welcome to the";
+		mes "Kafra Corporation.";
+		mes "The Kafra services";
+		mes "are always on your side.";
+		mes "How may I assist you?";
+		next;
+		switch(select("Save:Use Storage:Cancel")) {
+			case 1:
+				save "Crystilia",68,77;
+				mes "[Kafra Employee]";
+				mes "You're save point was now changed to Crystilia..";
+				close;
+				end;
+			case 2:
+				mes "[Kafra Employee]";
+				mes "Here, let me open";
+				mes "your Storage for you.";
+				mes "Thank you for using";
+				mes "the Kafra Service.";
+				close2;
+				openstorage;
+				end;
+			default:
+				close;
+		}
+	//Coin Exchanger
+	case 11:
+		cutin "kafra_08",2;
+		mes "[ ^336699Coin Exchanger^000000 ]";
+		mes "What do you want to do today?";
+		next;
+		switch(select("Coins->Zeny:Zeny->Coins:Cancel")) {
+			case 1:	//Coins->Zeny
+				mes "[ ^336699Coin Exchanger^000000 ]";
+				mes "Very well. Here is the list on how much each coin is worth:";
+				mes "^996633Bronze Coin^000000: "+.BronzeCoin$+"m Zeny";
+				mes "^666666Silver Coin^000000: "+.SilverCoin$+"m Zeny";
+				mes "^FFFF00Gold Coin^000000: "+.GoldCoin$+"m Zeny";
+				mes "^99CCCCMithril Coin^000000: "+.MithrilCoin$+"m Zeny";
+				mes "^999999Platinum Coin^000000: "+.PlatinumCoin$+"m Zeny";
+				mes "Tell me, what coin would you like to exchange?";
+				next;
+				switch(select("^996633Bronze Coin^000000:^666666Silver Coin^000000:^FFFF00Gold Coin^000000:^99CCCCMithril Coin^000000:^999999Platinum Coin^000000:Cancel")) {
+					case 1:	//Bronze Coin
+						callsub CoinstoZen,.Bronzecoin,673;
+					case 2:	//Silver Coin
+						callsub CoinstoZen,.Silvercoin,675;
+					case 3:	//Gold Coin
+						callsub CoinstoZen,.Goldcoin,671;
+					case 4:	//Mithril Coin
+						callsub CoinstoZen,.Mithrilcoin,674;
+					case 5:	//Platinum Coin
+						callsub CoinstoZen,.Platinumcoin,677;
+					default:
+						goto L_No;
+				}
+			case 2:	//Zeny->Coins
+				mes "[ ^336699Coin Exchanger^000000 ]";
+				mes "Very well. Here is the list on how much each coin is worth:";
+				mes "^996633Bronze Coin^000000: "+.BronzeCoin$+"m Zeny";
+				mes "^666666Silver Coin^000000: "+.SilverCoin$+"m Zeny";
+				mes "^FFFF00Gold Coin^000000: "+.GoldCoin$+"m Zeny";
+				mes "^99CCCCMithril Coin^000000: "+.MithrilCoin$+"m Zeny";
+				mes "^999999Platinum Coin^000000: "+.PlatinumCoin$+"m Zeny";
+				mes "Tell me, what coin would you like to get?";
+				next;
+				switch(select("^996633Bronze Coin^000000:^666666Silver Coin^000000:^FFFF00Gold Coin^000000:^99CCCCMithril Coin^000000:^999999Platinum Coin^000000:Cancel")) {
+					case 1:	//Bronze Coin
+						callsub ZentoCoins,.Bronzecoin,673;
+					case 2:	//Silver Coin
+						callsub ZentoCoins,.Silvercoin,675;
+					case 3:	//Gold Coin
+						callsub ZentoCoins,.Goldcoin,671;
+					case 4:	//Mithril Coin
+						callsub ZentoCoins,.Mithrilcoin,674;
+					case 5:	//Platinum Coin
+						callsub ZentoCoins,.Platinumcoin,677;
+					default:
+						goto L_No;
+				}
+			default:
+				goto L_No;
+			}
 		end;
 
+CoinstoZen:
+	next;
+	mes "[ ^336699Coin Exchanger^000000 ]";
+	mes "How many coins would you like to give up?";
+	set @mamount,0;
+	input @mamount;
+	if (@mamount <= 0) goto L_No;
+	if (countitem(getarg(1)) < @mamount) goto L_No;
+	if ((getarg(0) * @mamount) > 1000000000) {
+	next;
+	mes "[ ^336699Coin Exchanger^000000 ]";
+	mes "This exchange will exceed the maximum zeny you can have...";
+	mes "Would you like to continue the transaction?";
+	switch (select("Yes:No")) {
+		case 1:
+			set Zeny,(Zeny + (getarg(0) * @mamount));
+			delitem getarg(1),@mamount;
+			dispbottom "You have gained "+(getarg(0) * @mamount)+"z";
+			goto L_Thanks;
 		default:
-			close;
+			goto L_No;
+	}
+	}
+	else {
+		set Zeny,(Zeny + (getarg(0) * @mamount));
+		delitem getarg(1),@mamount;
+		dispbottom "You have gained "+(getarg(0) * @mamount)+"z";
+		goto L_Thanks;
+	}
+	end;
+
+ZentoCoins:
+	next;
+	mes "[ ^336699Coin Exchanger^000000 ]";
+	mes "How many coins would you like?";
+	set @mamount,0;
+	input @mamount;
+	if (zeny < 0) goto L_No;
+	if (zeny < (getarg(0) * @mamount)) goto L_No;
+	if (checkweight(getarg(1),@mamount)) {
+	set Zeny,(zeny - (getarg(0) * @mamount));
+	getitem getarg(1),@mamount;
+	goto L_Thanks;
+	}
+	else goto L_Overweight;
+	end;
+
+L_Overweight:
+next;
+	mes "[ ^336699Coin Exchanger^000000 ]";
+	mes "Sorry but you're overweight!";
+	close2;
+	cutin "", 255;
+	end;
+
+L_Thanks:
+	next;
+	mes "[ ^336699Trade Master^000000 ]";
+	mes "Pleasure doing business with you.";
+	close2;
+	cutin "", 255;
+	end;
+
+L_No:
+	next;
+	mes "[ ^336699Trade Master^000000 ]";
+	mes "Okay~ Bye!";
+	close2;
+	cutin "", 255;
+	end;
+
+	default:
+		close;
 	
 	}
 
 OnInit:
-	set .menu$,"FAQ's:Special Rooms:Job Changer:Reset NPC:Card Remover:Platinum Skills:Rental NPC:Stylist:Build Manager:Save";
+	set .menu$,"FAQ's:Special Rooms:Job Changer:Reset NPC:Card Remover:Platinum Skills:Rental NPC:Stylist:Build Manager:Kafra:Coin Exchanger";
 
-	set .faqmenu$,"Server Rates:Job Change Scroll";
+	set .faqmenu$,"Server Rates";
 
 	setarray .Rebirth[0],99,50;	// Minimum base level, job level to rebirth OR change to third class
 	setarray .JobReq[0],10,40;	// Minimum job level to turn into 1st class, 2nd class
@@ -545,6 +687,17 @@ OnInit:
 	set .SkillPointCheck,1;		// Force player to use up all skill points? (1: yes / 0: no)
 	set .Platinum,1;		// Get platinum skills automatically? (1: yes / 0: no)
 
+	/* Coin Exchanger */
+	set	.BronzeCoin,100000;
+	set .SilverCoin,1000000;
+	set .GoldCoin,10000000;
+	set .MithrilCoin,100000000;
+	set .PlatinumCoin,1000000000;
+	set	.BronzeCoin$,"100,000";
+	set .SilverCoin$,"1,000,000";
+	set .GoldCoin$,"10,000,000";
+	set .MithrilCoin$,"100,000,000";
+	set .PlatinumCoin$,"1,000,000,000";
 
 waitingroom "ExhilarateRO Master",0;
 end;

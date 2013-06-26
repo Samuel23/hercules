@@ -1,0 +1,584 @@
+//===== eAthena Script ======================================= 
+//= Itemizer
+//===== By: ================================================== 
+//= Elijah (ExhilarateRO Server Admin) (C) 2013 exhilarate-ro.com
+//===== Current Version: ===================================== 
+//= 1.0
+//===== Compatible With: ===================================== 
+//= Any SQL eAthena Version 
+//===== Description: ========================================= 
+//= To prevent GM Corruption you can disable all item related
+//= commands and use this NPC to distribute Items.
+//===== Additional Comments: =================================
+//= v1.0 - Initial Release
+//============================================================
+
+//===== SQL Table ============================================ 
+//= Execute This Query On Your Ragnarok Database Prior To Use.
+//= 
+//CREATE TABLE IF NOT EXISTS `itemizer` (
+//  `id` int(11) unsigned NOT NULL auto_increment,
+//  `item_id` int(11) NOT NULL,
+//  `item_amount` int(11) NOT NULL,
+//  `item_name` varchar(255) NOT NULL,
+//  `bound` int(11) NOT NULL,
+//  `char_id` int(11) NOT NULL,
+//  `char_name` varchar(255) NOT NULL,
+//  `reason` varchar(255) NOT NULL,
+//  `by_gm` varchar(255) NOT NULL,
+//  `when` datetime NOT NULL,
+//  `for` varchar(255) NOT NULL,
+//  `collected` tinyint(1) NOT NULL,
+//  PRIMARY KEY  (`id`)
+//) ENGINE=MyISAM ;
+
+//
+// Script Interface For Event Prize NPC
+//
+Crystilia,88,90,4	script	Events Reward Giver	906,{
+	mes .npc$;
+	if (getgmlevel() >= .min_gm_lvl) {
+		mes "Hello "+ strcharinfo(0) +".";
+		mes "What would you like today?";
+		switch(select("Make Item","Give Item","Give Group Item","Player Menu","Nothing")) {
+			case 1:	// Make Item
+				goto GM_MakeItem;
+			case 2:	// Give Item
+				goto GM_GiveItem;
+			case 3:	// Give Group Item
+				goto GM_GiveGroup;
+			case 4:	// Player Menu
+				goto Player_Collect;
+			default:
+				close; break;
+		}
+	}
+	else {
+		mes "Hello, what would you like today?";
+		switch(select("Collect Event Prize","Collection Log","Nothing")) {
+			case 1:	// Collect Event Prize
+				goto Player_Collect;
+			case 2:	// Collection Log
+				goto Collect_Log;
+			default: close;
+		}
+	}
+
+// Make Item [GM]
+GM_MakeItem:
+	next;
+	mes .npc$;
+	mes "What item would you like?";
+	mes "Enter the ID.";
+	input .@ep_item_id;
+	next;
+	if (getitemname(.@ep_item_id) == "" || getitemname(.@ep_item_id) == "null")
+	{
+		mes .npc$;
+		mes "^CC0000Sorry, "+ .@ep_item_id +" is an invalid item ID.^000000";
+		close;
+	}
+	mes .npc$;
+	mes "Okay, how many "+ getitemname(.@ep_item_id) +" do you want?";
+	mes "Min "+ .min_item_amount +" and Max "+ .max_item_amount +".";
+	input .@ep_item_count;
+	next;
+	if (.@ep_item_count < .min_item_amount || .@ep_item_count > .max_item_amount)
+	{
+		mes .npc$;
+		mes "^CC0000Sorry, "+ .@ep_item_count +" is an invalid amount.";
+		mes "Min "+ .min_item_amount +" and Max "+ .max_item_amount +".^000000";
+		close;
+	}
+	if (.check_weight && checkweight(.@ep_item_id, .@ep_item_count) == 0)
+	{
+		mes .npc$;
+		mes "^CC0000Sorry, you cannot hold "+ .@ep_item_count +"x "+ getitemname(.@ep_item_id) +".";
+		mes "Your inventory is full.^000000";
+		close;
+	}
+	set .@when$,callfunc("makeTimestamp");
+	set .@nb,query_sql("INSERT INTO `itemizer` VALUES(NULL,'"+ (.@ep_item_id) +"','"+ (.@ep_item_count) +"','"+ escape_sql(getitemname(.@ep_item_id)) +"','"+ (.@ep_account_bound) +"','"+ (getcharid(0)) +"','"+ escape_sql(strcharinfo(0)) +"','N/A','"+ escape_sql(strcharinfo(0)) +"','"+ escape_sql(.@when$) +"','gm','1')");
+	getitem .@ep_item_id,.@ep_item_count;
+	mes .npc$;
+	mes "All done ~";	
+	close;
+	end;
+
+// Give Item [GM]
+GM_GiveItem:
+	next;
+	mes .npc$;
+	if (getgmlevel() < .min_eventgm_lvl)
+	{
+		mes "^CC0000Access Denied!";
+		mes "You must be atleast level "+ .min_eventgm_lvl +" GM.^000000";
+		close;
+	}
+	mes "Enter the ID of the Item you would like to give a player.";
+	mes "E.g. ^0000FFID 512^000000 == ^008000Apple^000000";
+	input .@ep_item_id;
+	next;
+	if (getitemname(.@ep_item_id) == "" || getitemname(.@ep_item_id) == "null") {
+		mes .npc$;
+		mes "^CC0000Sorry, "+ .@ep_item_id +" is an invalid item ID.^000000";
+		close;
+	}
+	else if (.@ep_item_id == 7179) {
+		mes .npc$;
+		mes "^CC0000Sorry, "+ .@ep_item_id +" / "+getitemname(.@ep_item_id)+" can't be given through this npc.^000000";
+		close;
+	}
+	mes .npc$;
+	mes "Okay, how many ^008000"+ getitemname(.@ep_item_id) +"^000000 do you want to give a player?";
+	mes "Min "+ .min_item_amount +" and Max "+ .max_item_amount +".";
+	input .@ep_item_count;
+	next;
+	if (.@ep_item_count < .min_item_amount || .@ep_item_count > .max_item_amount)
+	{
+		mes .npc$;
+		mes "^CC0000Sorry, "+ .@ep_item_count +" is an invalid amount.";
+		mes "Min "+ .min_item_amount +" and Max "+ .max_item_amount +".^000000";
+		close;
+	}
+	mes .npc$;
+	mes "Is it account bound?";
+	if (.account_bound == 0) {
+	mes "Account Bound Items disabled.";
+	set .@ep_account_bound,0;
+	}
+	else {
+	mes "1 = Yes";
+	mes "0 = No";
+	input .@ep_account_bound;
+		if (.@ep_account_bound > 1) {
+			mes .npc$;
+			mes "^CC0000Sorry, "+ .@ep_account_bound +" is an invalid feature.";
+			close;
+		}
+	}
+	next;
+	set .@ep_char_id,getcharid(0,.@ep_char_name$);
+	mes .npc$;
+	mes "Okay, who do you want to give ^0000FF"+ .@ep_item_count +"x^000000 ^008000"+ getitemname(.@ep_item_id) +"^000000?";
+	mes "Enter player name"+ (.check_online ? " (must be online)." : " .");
+	input .@ep_char_name$;
+	next;
+	set .@ep_char_id,getcharid(0,.@ep_char_name$);
+	if (.check_online && !isloggedin(getcharid(3,.@ep_char_name$)))
+	{
+		mes .npc$;
+		mes "^CC0000Sorry, "+ .@ep_char_name$ +" is invalid.";
+		mes "This player either doesn't exist or s/he is not online now.^000000";
+		close;
+	}
+	mes .npc$;
+	mes "Now, enter the reason for giving "+ .@ep_item_count +"x "+ getitemname(.@ep_item_id) +" to "+ .@ep_char_name$ +".";
+	input .@ep_reason$;
+	next;
+	if (.@ep_reason$ == "")
+	{
+		mes .npc$;
+		mes "^CC0000Sorry, that is not a valid reason.^000000";
+		close;
+	}
+	mes .npc$;
+	set .@anounce_msg$, strcharinfo(0) +" Gave "+ .@ep_item_count +"x "+ getitemname(.@ep_item_id) +" to "+ .@ep_char_name$ +". Reason: "+ .@ep_reason$;
+	mes "Is this correct?";
+	mes "Give ^0000FF"+ .@ep_item_count +"x^000000 ^008000"+ getitemname(.@ep_item_id) +"^000000 to ^CC0000"+ .@ep_char_name$ +"^000000.";
+	mes "Reason : "+ .@ep_reason$;
+	switch (select("Yes:No")) {
+	case 1:
+		next;
+		set .@when$,callfunc("makeTimestamp");
+		set .@nb,query_sql("INSERT INTO `itemizer` VALUES(NULL,'"+ (.@ep_item_id) +"','"+ (.@ep_item_count) +"','"+ escape_sql(getitemname(.@ep_item_id)) +"','"+ (.@ep_account_bound) +"','"+ (.@ep_char_id) +"','"+ escape_sql(.@ep_char_name$) +"','"+ escape_sql(.@ep_reason$) +"','"+ escape_sql(strcharinfo(0)) +"','"+ escape_sql(.@when$) +"','player','0')");
+		mes .npc$;
+		mes "All Done~";
+		message .@ep_char_name$,""+ strcharinfo(0) +" Has Given You "+ .@ep_item_count +"x "+ getitemname(.@ep_item_id) +".";
+		announce .@anounce_msg$,bc_blue|bc_all;
+		close;
+	default:
+		close;
+	}
+	end;
+
+// Collect Event Prize (Part 1) [Player]
+Player_Collect:
+	next;
+	mes .npc$;
+	mes " ";
+	mes "Would you like to check if any item is waiting to be collected?";
+	if (select("Yes Please:No Thanks") == 1)
+	{
+		next;
+		if (getarraysize(.@db_id))
+		{
+			deletearray .@db_id,127;
+			deletearray .@item_id,127;
+			deletearray .@item_name$,127;
+			deletearray .@item_amount,127;
+			deletearray .@account_bound,127;
+			deletearray .@reason$,127;
+			deletearray .@by_gm$,127;
+		}
+		set .@result,query_sql("SELECT `id`,`item_id`,`item_name`,`item_amount`,`bound`,`reason`,`by_gm` FROM `itemizer` WHERE (`char_name` = '"+ strcharinfo(0) +"' AND `for` = 'player' AND `collected` = 0) LIMIT 127",
+							  .@db_id,
+							  .@item_id,
+							  .@item_name$,
+							  .@item_amount,
+							  .@account_bound,
+							  .@reason$,
+							  .@by_gm$);
+		if (!.@result)
+		{
+			mes .npc$;
+			mes "^CC0000No items are waiting to be collected by you.^000000";
+			close;
+		}
+		else
+		{
+			goto Collect_Final;
+		}
+	}
+	close;
+	end;
+
+// Collect Event Prize (Part 2) [Player]
+Collect_Final:
+	set .@options$,"";
+	for (set @i,0; @i < .@result; set @i,@i+1)
+	{
+		set .@options$,.@options$+.@item_amount[@i] +"x "+.@item_name$[@i]+":";
+	}
+	mes .npc$;
+	mes "Here is a list of item(s) waiting to be collected by you.";
+	mes "Pick the item you want to collect now.";
+	set .@choice,select(.@options$) - 1;
+	next;
+	mes .npc$;
+	mes "ID - "+ .@item_id[.@choice];
+	mes "Name - "+ .@item_name$[.@choice];
+	mes "Amount - "+ .@item_amount[.@choice] +"x";
+	mes "Account Bound - "+ (.@account_bound[.@choice]?"Yes":"No");
+	mes "By - "+ .@by_gm$[.@choice];
+	mes "Reason - "+ .@reason$[.@choice];
+	switch (select("Collect Now:Collect Later") == 1) {
+
+		case 1:
+		next;
+			if (.check_weight && checkweight(.@item_id[.@choice], .@item_amount[.@choice]) == 0) {
+			mes .npc$;
+			mes "^CC0000Sorry, you cannot hold "+ .@item_amount[.@choice] +"x "+ .@item_name$[.@choice] +".";
+			mes "Your inventory is full.^000000";
+			close;
+			}
+			else if (.@item_id[.@choice] == 7179) {
+			mes .npc$;
+			mes "^CC0000Sorry, you cannot get "+ .@item_id[.@choice] +" / "+ .@item_name$[.@choice] +" here!.";
+			query_sql "DELETE FROM `itemizer` WHERE `item_id`='"+.@item_id[.@choice]+"' && `item_name`='"+.@item_name$[.@choice]+"'";
+			close;
+			}
+		if ( .@account_bound[.@choice] == 1) {
+		set .@nb,query_sql("UPDATE `itemizer` SET `collected` = 1 WHERE (`id` = '"+ .@db_id[.@choice] +"') LIMIT 1");
+			/*itembound .@item_id[.@choice],.@item_amount[.@choice];*/
+			getitem .@item_id[.@choice],.@item_amount[.@choice];	// Account Bound Script not yet available for hercules
+		}
+		else {
+		set .@nb,query_sql("UPDATE `itemizer` SET `collected` = 1 WHERE (`id` = '"+ .@db_id[.@choice] +"') LIMIT 1");
+			getitem .@item_id[.@choice],.@item_amount[.@choice];
+		}
+		
+		set .@result,(.@result - 1);
+		deletearray .@db_id[.@choice],1;
+		deletearray .@item_id[.@choice],1;
+		deletearray .@item_name$[.@choice],1;
+		deletearray .@item_amount[.@choice],1;
+		deletearray .@reason$[.@choice],1;
+		deletearray .@by_gm$[.@choice],1;
+		goto Collect_Final;
+	
+		case 2:
+		next;
+		goto Collect_Final;
+	}
+	end;
+
+// Collection Log [Player]
+Collect_Log:
+	next;
+	mes .npc$;
+	if (getarraysize(.@item_name$))
+	{
+		deletearray .@item_name$,127;
+		deletearray .@item_amount,127;
+		deletearray .@reason$,127;
+		deletearray .@by_gm$,127;
+		deletearray .@when$,127;
+	}
+	if (!.@offset){ set .@offset,0; }
+	if (!.@rows_per_page) { set .@rows_per_page,10; }
+	set .@result,query_sql("SELECT `item_name`,`item_amount`,`reason`,`by_gm`,`when` FROM `itemizer` WHERE (`char_id` = '"+ getcharid(0) +"' AND `for` = 'player' AND `collected` = 1) ORDER BY `when` DESC LIMIT "+ @offset +","+ @rows_per_page,
+				.@item_name$,
+				.@item_amount,
+				.@reason$,
+				.@by_gm$,
+				.@when$);
+	if(!.@result)
+	{
+		if (.@offset == 10) {
+			mes "^CC0000You have not collected any items from me yet.^000000";
+		} else {
+			mes "^CC0000Sorry, there is no more data.^000000";
+		}
+		close2;
+		if (.@offset) { set .@offset,0; }
+		end;
+	}
+	else
+	{
+		for (set @i,0; @i < .@result; set @i,@i+1)
+		{
+			mes "^0000FF"+ .@item_amount[@i] +"x^000000 ^008000"+ .@item_name$[@i] +"^000000";
+			mes "Reason - "+ .@reason$[@i];
+			mes "By - "+ .@by_gm$[@i];
+			mes "When - "+ .@when$[@i];
+			if (@i != (@result - 1)) { mes " "; }
+		}
+		set .@offset,(.@offset + .@rows_per_page);
+		if (select("Next "+ .@rows_per_page +" Logs:Cancel") == 2)
+		{
+			close2;
+			if (.@offset) { set .@offset,0; }
+			end;
+		}
+		goto Collect_Log;
+	}
+	end;
+
+// Group Item
+GM_GiveGroup:
+if (.group_item == 0 ) {
+	next;
+	mes .npc$;
+	mes "Sorry, Group Item giving is currently disabled.";
+	close;
+}
+else {
+	next;
+	mes .npc$;
+	if (getgmlevel() < .min_eventgm_lvl)
+	{
+		mes "^CC0000Access Denied!";
+		mes "You must be atleast level "+ .min_eventgm_lvl +" GM.^000000";
+		close;
+	}
+	mes "Enter the ID of the Item you would like to give.";
+	mes "E.g. ^0000FFID 512^000000 == ^008000Apple^000000";
+	input @ep_groupitem_id;
+	next;
+	if (getitemname(@ep_groupitem_id) == "" || getitemname(@ep_groupitem_id) == "null") {
+		mes .npc$;
+		mes "^CC0000Sorry, "+ @ep_groupitem_id +" is an invalid item ID.^000000";
+		close;
+	}
+	else if (@ep_groupitem_id == 7179) {
+		mes .npc$;
+		mes "^CC0000Sorry, "+ @ep_groupitem_id +" / "+getitemname(@ep_groupitem_id)+" can't be given through this npc.^000000";
+		close;
+	}
+	mes .npc$;
+	mes "Okay, how many ^008000"+ getitemname(@ep_groupitem_id) +"^000000 do you want to give?";
+	mes "Min "+ .min_item_amount +" and Max "+ .max_item_amount +".";
+	input @ep_groupitem_count;
+	next;
+	if (@ep_groupitem_count < .min_item_amount || @ep_groupitem_count > .max_item_amount)
+	{
+		mes .npc$;
+		mes "^CC0000Sorry, "+ @ep_groupitem_count +" is an invalid amount.";
+		mes "Min "+ .min_item_amount +" and Max "+ .max_item_amount +".^000000";
+		close;
+	}
+	mes .npc$;
+	mes "Okay, where do you want to give ^0000FF"+ @ep_groupitem_count +"x^000000 ^008000"+ getitemname(@ep_groupitem_id) +"^000000?";
+	mes "Type the name of the map..";
+	next;
+	input @ep_map_name$;
+	if (@ep_map_name$ == "") {
+		mes .npc$;
+		mes "^CC0000Sorry, that is not a valid map name.^000000";
+		close;
+	}
+	mes .npc$;
+	mes "Okay, to whom do you want to give ^0000FF"+ @ep_groupitem_count +"x^000000 ^008000"+ getitemname(@ep_groupitem_id) +"^000000?";
+	next;
+	switch (select("All:Party:Guild")) {
+		case 1:
+			set @ep_type,0;
+			set @ep_give_name$,"All";
+			break;
+		case 2:
+			set @ep_type,1;
+			mes .npc$;
+			mes "Please input the name of the party you want to give prize";
+			next;
+			input @ep_give_name$;
+			if (@ep_give_name$ == "") {
+				mes .npc$;
+				mes "^CC0000Sorry, that is not a valid party name.^000000";
+				close;
+			}
+			query_sql "SELECT `party_id` FROM `veniaro`.`party` WHERE `name` = '"+@ep_give_name$+"'",@ep_type_id;
+			if (@ep_type_id == 0) {
+				mes .npc$;
+				mes "^CC0000Sorry, that party doesn't exists.^000000";
+				close;
+			}
+			break;
+		case 3:
+			set @ep_type,2;
+			mes .npc$;
+			mes "Please input the name of the guild you want to give prize";
+			next;
+			input @ep_give_name$;
+			if (@ep_give_name$ == "") {
+				mes .npc$;
+				mes "^CC0000Sorry, that is not a valid guild name.^000000";
+				close;
+			}
+			query_sql "SELECT `guild_id` FROM `veniaro`.`guild` WHERE `name` = '"+@ep_give_name$+"'",@ep_type_id;
+			if (@ep_type_id == 0) {
+				mes .npc$;
+				mes "^CC0000Sorry, that guild doesn't exists.^000000";
+				close;
+			}
+			break;
+		default:
+			set @ep_type,0;
+			break;
+		}
+	mes .npc$;
+	mes "Now, enter the reason for giving "+ @ep_groupitem_count +"x "+ getitemname(@ep_groupitem_id) +" to "+ .@ep_give_name$ +".";
+	input @ep_reason$;
+	next;
+	if (@ep_reason$ == "")
+	{
+		mes .npc$;
+		mes "^CC0000Sorry, that is not a valid reason.^000000";
+		close;
+	}
+	mes .npc$;
+	if (@ep_type == 0) {
+	set @anounce_msg$, strcharinfo(0) +" Gave "+ @ep_groupitem_count +"x "+ getitemname(@ep_groupitem_id) +" to "+ @ep_give_name$ +" at "+ @ep_map_name$ +". Reason: "+ @ep_reason$;
+	}
+	else if (@ep_type == 1) {
+	set @anounce_msg$, strcharinfo(0) +" Gave "+ @ep_groupitem_count +"x "+ getitemname(@ep_groupitem_id) +" to "+ @ep_give_name$ +" at "+ @ep_map_name$ +" party. Reason: "+ @ep_reason$;
+	}
+	else if (@ep_type == 2) {
+	set @anounce_msg$, strcharinfo(0) +" Gave "+ @ep_groupitem_count +"x "+ getitemname(@ep_groupitem_id) +" to "+ @ep_give_name$ +" at "+ @ep_map_name$ +" guild. Reason: "+ @ep_reason$;
+	}
+	mes "Is this correct?";
+	mes "Give ^0000FF"+ @ep_groupitem_count +"x^000000 ^008000"+ getitemname(@ep_groupitem_id) +"^000000 to ^CC0000"+ @ep_give_name$ +"^000000 at ^0000FF"+ @ep_map_name$ +"^000000.";
+	mes "Reason : "+ @ep_reason$;
+	switch (select("Yes:No")) {
+	case 1:
+		next;
+		set .@when$,callfunc("makeTimestamp");
+		if (@ep_type == 0) {
+		set .@nb,query_sql("INSERT INTO `itemizer` VALUES(NULL,'"+ (@ep_groupitem_id) +"','"+ (@ep_groupitem_count) +"','"+ escape_sql(getitemname(@ep_groupitem_id)) +"','"+ (@ep_type_id) +"','"+ escape_sql(@ep_map_name$) +"','"+ escape_sql(@ep_reason$) +"','"+ escape_sql(strcharinfo(0)) +"','"+ escape_sql(.@when$) +"','"+ escape_sql(@ep_give_name$) +"','0')");
+		}
+		else if (@ep_type == 1) {
+		set .@nb,query_sql("INSERT INTO `itemizer` VALUES(NULL,'"+ (@ep_groupitem_id) +"','"+ (@ep_groupitem_count) +"','"+ escape_sql(getitemname(@ep_groupitem_id)) +"','"+ (@ep_type_id) +"','"+ escape_sql(@ep_map_name$) +"','"+ escape_sql(@ep_reason$) +"','"+ escape_sql(strcharinfo(0)) +"','"+ escape_sql(.@when$) +"','"+ escape_sql(@ep_give_name$) +" party','0')");
+		}
+		else if (@ep_type == 2) {
+		set .@nb,query_sql("INSERT INTO `itemizer` VALUES(NULL,'"+ (@ep_groupitem_id) +"','"+ (@ep_groupitem_count) +"','"+ escape_sql(getitemname(@ep_groupitem_id)) +"','"+ (@ep_type_id) +"','"+ escape_sql(@ep_map_name$) +"','"+ escape_sql(@ep_reason$) +"','"+ escape_sql(strcharinfo(0)) +"','"+ escape_sql(.@when$) +"','"+ escape_sql(@ep_give_name$) +" guild','0')");
+		}
+		mes .npc$;
+		mes "All Done~";
+		announce @anounce_msg$,bc_blue|bc_all;
+		//getitem_map @ep_groupitem_id,@ep_groupitem_count,""+@ep_map_name$+"",@ep_type,@ep_type_id;
+		close;
+	default:
+		close;
+	}
+}
+	end;
+
+OnInit:
+// Script Config
+set .npc$,"^008000[ Events Reward Giver ]^000000"; // NPC Name
+
+// Advance Script Config
+set .check_weight,1;		// 1 == Yes | 0 == No (Check If Player Is Over Weight)
+set .min_gm_lvl,60;			// Minimum GM Level Required To "Make Item"
+set .min_eventgm_lvl,60;	// Minimum GM Level Required To "Give Item"
+set .min_item_amount,1;		// Minimum Item Amount
+set .max_item_amount,1000;	// Maximum Item Amount
+set .check_online,0;		// Check If Target Player Is Online Before Giving Item
+set .account_bound,0;		// Enabled Account Bound Item Giving 1 == Yes | 0 == No
+set .allow_announce,1;		// 1 == Yes | 0 == No (Let GM Choose If He/She Wants To Announce)
+set .group_item,0;			// Enabled Group Item Giving 1 == Yes | 0 == No
+setarray .announce_loc$,	// Possible Announce Locations
+			"bc_all",
+			"bc_map",
+			"bc_area"; 
+end;
+}
+
+//
+// Func To Make MySQL Friendly Timestamp
+//
+function	script	makeTimestamp	{
+
+// Get Current Date & Time Variables
+set .@curYear,gettime(7);
+set .@curMonth,gettime(6);
+set .@curDay,gettime(5);
+set .@curHour,gettime(3);
+set .@curMinute,gettime(2);
+set .@curSecond,gettime(1);
+
+// Start A New Timestamp Variable
+set .@timestamp$,"";
+
+// MySQL Timestamp Friendly :: Year
+set .@timestamp$,.@timestamp$+.@curYear+"-";
+
+// MySQL Timestamp Friendly :: Month
+if (.@curMonth <= 9) {
+	set .@timestamp$,.@timestamp$+"0"+.@curMonth+"-";
+} else {
+	set .@timestamp$,.@timestamp$+.@curMonth+"-";
+}
+
+// MySQL Timestamp Friendly :: Day
+if (.@curDay <= 9) {
+	set .@timestamp$,.@timestamp$+"0"+.@curDay+" ";
+} else {
+	set .@timestamp$,.@timestamp$+.@curDay+" ";
+}
+
+// MySQL Timestamp Friendly :: Hour
+if (.@curHour <= 9) {
+	set .@timestamp$,.@timestamp$+"0"+.@curHour+":";
+} else {
+	set .@timestamp$,.@timestamp$+.@curHour+":";
+}
+
+// MySQL Timestamp Friendly :: Minute
+if (.@curMinute <= 9) {
+	set .@timestamp$,.@timestamp$+"0"+.@curMinute+":";
+} else {
+	set .@timestamp$,.@timestamp$+.@curMinute+":";
+}
+
+// MySQL Timestamp Friendly :: Second
+if (.@curSecond <= 9) {
+	set .@timestamp$,.@timestamp$+"0"+.@curSecond;
+} else {
+	set .@timestamp$,.@timestamp$+.@curSecond;
+}
+
+// Return MySQL Friendly Timestamp
+return .@timestamp$;
+
+}

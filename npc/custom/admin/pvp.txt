@@ -176,7 +176,7 @@ if(@ks < 10){ set @ks, @ks + 1; }
 if(@mk < 6){ set @mk, @mk + 1; } 
 if(!NemesisKilled){ set NemesisKilled, killedrid; }
 if(NemesisKilled == killedrid){ set @nm, @nm + 1; }
-if (getmapflag(""+strcharinfo(3)+"",mf_pvp)) || (getmapflag(""+strcharinfo(3)+"",mf_gvg)) {
+if (getmapflag(""+strcharinfo(3)+"",mf_pvp) == 1) || (getmapflag(""+strcharinfo(3)+"",mf_gvg) == 1) {
 set Kill, Kill + 1;
 dispbottom "Total PvP Kills: " + Kill;
 }

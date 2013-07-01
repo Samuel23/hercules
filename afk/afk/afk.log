@@ -1,4 +1,4 @@
-﻿Build started 6/26/2013 9:47:18 AM.
+﻿Build started 7/1/2013 7:37:58 PM.
      1>Project "D:\hercules\Hercules\afk\afk.vcxproj" on node 3 (rebuild target(s)).
      1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(299,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
      1>InitializeBuildStatus:
@@ -19,4 +19,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:04.57
+Time Elapsed 00:00:05.87

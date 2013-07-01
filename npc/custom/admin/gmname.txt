@@ -1,0 +1,25 @@
+-	script	gmnamecheck	-1,{
+
+OnPcLoginEvent:
+if (getgmlevel() < 20) end;
+if (gmlvlnamecheck == 1) end;
+if (getgmlevel() == 99) set @gmlvlname$,"[Admin]";
+if (getgmlevel() == 98) set @gmlvlname$,"[Co-Admin]";
+if (getgmlevel() == 95) set @gmlvlname$,"[GM Chief]";
+if (getgmlevel() == 60) set @gmlvlname$,"[Event GM]";
+if (getgmlevel() == 30) set @gmlvlname$,"[GM Police]";
+if (getgmlevel() == 20) set @gmlvlname$,"[Support GM]";
+callfunc "gmloginchangename";
+}
+
+function	script	gmloginchangename	{
+set @nametemp$,"+strcharinfo(0)+";
+query_sql "UPDATE `char` SET `name` = '"+@gmlvlname$+" "+strcharinfo(0)+"'  WHERE `name`='"+strcharinfo(0)+"'";
+set gmlvlnamecheck,1;
+mes "As this is the first time you have loged in on this GM character, the administrator has changed your name from "+strcharinfo(0)+" to "+@gmlvlname$+" "+strcharinfo(0)+" and has added you into the GM guild";
+next;
+mes "you will be loged off in 5 seconds to reset your name";
+sleep2 5000;
+atcommand "@kick "+strcharinfo(0)+"";
+end;
+}

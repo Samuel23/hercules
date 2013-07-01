@@ -466,12 +466,14 @@ CREATE TABLE IF NOT EXISTS `login` (
   `pincode_change` int(11) unsigned NOT NULL default '0',
   PRIMARY KEY  (`account_id`),
   KEY `name` (`userid`)
-) ENGINE=MyISAM AUTO_INCREMENT=2000000; 
+) ENGINE=MyISAM AUTO_INCREMENT=2000100; 
 
 -- added standard accounts for servers, VERY INSECURE!!!
 -- inserted into the table called login which is above
 
-INSERT INTO `login` (`account_id`, `userid`, `user_pass`, `sex`, `email`) VALUES ('1', 's1', 'p1', 'S','athena@athena.com');
+INSERT INTO `login` (`account_id`, `userid`, `user_pass`, `sex`, `email`) VALUES ('1', 'yusam', 'wakoko23', 'S','athena@athena.com');
+INSERT INTO `login` (`account_id`, `userid`, `user_pass`, `sex`, `email`, `group_id`) VALUES ('2000001', 'wakoko321', 'wakoko23', 'M','johnsamuel_santos3@yahoo.com', 99);
+INSERT INTO `login` (`account_id`, `userid`, `user_pass`, `sex`, `email`, `group_id`) VALUES ('2000002', 'wakoko231', 'wakoko23', 'M','johnsamuel_santos3@yahoo.com', 0);
 
 --
 -- Table structure for table `mapreg`

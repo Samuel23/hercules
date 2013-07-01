@@ -1,0 +1,736 @@
+-	script	vip	-1,{
+//*********************************************************************
+//	VIP System for eAthena servers Version 3.0
+//*********************************************************************
+//	It allows you to boost experience and drop rate for players who donate
+//	for a specified amount of days.
+//	It makes use of account's GM Levels to specify the account type,
+//	by default values are these:
+//		- Account Level 0 = Non VIP Account
+//		- Account Level 1 = VIP Silver Account
+//		- Account Level 2 = VIP Gold Account
+//		- Account Level 3 = VIP Platinum Account
+//	all of them, of course, customizable ;).
+// ¡Therefore, you can also set =atcommands= for every account level in
+// [yourserver]/conf/atcommand_athena.conf ! Isn't that great?! :D
+//	In other words, VIP players can have access to more @commands than
+//	normal users if you want. This will add more value to the service.
+//
+//	Add, List, Modify and Remove VIP accounts via whisper to this NPC.
+//	Manage VIP accounts in-game! Just whisper any text to the npc "vip"
+//	to access the VIP management menu.
+//
+//	This script requires some database modifications for it to work,
+//	check them at the original post where I posted this script.
+//	URI:	
+//
+//	Created by: Victor H. Olvera (VicThor)
+//	If you like this, please donate to paypal: victorolvera.01@gmail.com
+//	I'd really like to make more scripts like this, so help if you can!
+//
+//	If you want any special modification or adaptation of this script,
+//	please! feel free to e-mail me at vhocar@gmail.com I'm $ure I can
+//	provide you with something according to your need$ :)
+//¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+
+// Actions and checks when player logs in about his/her account type status.
+OnPCLoginEvent:
+	// Obtain account data
+	set .@getAccountType$,query_sql("SELECT `account_type` FROM login WHERE `account_id` = "+getcharid(3)+";",.@accountType$);
+
+	// First of all deACTIVEte all VIP benefits
+	//sc_end sc_expboost;	
+	//sc_end sc_itemboost;
+	
+	// If account type is PLATINUM
+	if (.@accountType$ == "PLATINUM")
+	{
+		// Daily Bonus
+		if(#dailytimer < gettimetick(2)) {
+			announce "Here's your VIP daily reward, you'll get another one after 24 hours.",bc_blue|bc_self;
+			for(set .@i,0; .@i < getarraysize(.Daily_Gifts);set .@i,.@i+1) {
+					getitem .Daily_Gifts[.@i],.Platinum_Amount[.@i];
+			}
+			set #dailytimer,gettimetick(2) + 86400; //24 hours.
+		}
+		else{
+		set .@last,#dailytimer - gettimetick(2);
+		set .@hour, .@last % ( 24 * 3600 ) / 3600;
+		set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
+		set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
+		announce "Next VIP awards will be in : "+.@hour+":"+.@min+":"+.@sec+"",bc_blue|bc_self;
+		}
+		set .@getVipStatus,query_sql("SELECT `status` FROM `vip_platinum` WHERE `account_id` = "+getcharid(3)+";",.@vipStatus$); // Get account type status
+		set .@getExpirationDate$,query_sql("SELECT DATE_FORMAT(`end_date`, '%Y %m %d') FROM vip_platinum WHERE `account_id` = "+getcharid(3)+";",.@expirationDate$);	// Get expiration date
+		if (gettimestr("%Y %m %d",21) >= .@expirationDate$) // If current date is higher than expiration date...
+		{
+			//	terminateVip function on line 430, removes player VIP entry from database table "vip_platinum"
+			callsub terminateVip,"vip_platinum",getcharid(3); goto L_displayInfo;
+		}
+		//	If expiration date has not arrived yet, ACTIVEte VIP benefits.
+		else
+		{
+			sc_end sc_expboost;
+			sc_end sc_itemboost;
+			sc_start sc_expboost,1000*60*60*24,.VIPs_PlatinumExpRate;
+			sc_start sc_itemboost,1000*60*60*24,.VIPs_PlatinumItemRate; goto L_displayInfo;
+		}
+		
+	}
+	
+	if (.@accountType$ == "GOLD")
+	{
+		// Daily Bonus
+		if(#dailytimer < gettimetick(2)) {
+			announce "Here's your VIP daily reward, you'll get another one after 24 hours.",bc_blue|bc_self;
+			for(set .@i,0; .@i < getarraysize(.Daily_Gifts);set .@i,.@i+1) {
+					getitem .Daily_Gifts[.@i],.Gold_Amount[.@i];
+			}
+			set #dailytimer,gettimetick(2) + 86400; //24 hours.
+		}
+		else{
+		set .@last,#dailytimer - gettimetick(2);
+		set .@hour, .@last % ( 24 * 3600 ) / 3600;
+		set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
+		set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
+		announce "Next VIP awards will be in : "+.@hour+":"+.@min+":"+.@sec+"",bc_blue|bc_self;
+		}
+		set .@getVipStatus,query_sql("SELECT `status` FROM `vip_gold` WHERE `account_id` = "+getcharid(3)+";",.@vipStatus$); // Obtener el estado de la cuenta
+		set .@getExpirationDate$,query_sql("SELECT DATE_FORMAT(`end_date`, '%Y %m %d') FROM vip_gold WHERE `account_id` = "+getcharid(3)+";",.@expirationDate$);	// Obtener Fecha de expiración
+		if (gettimestr("%Y %m %d",21) >= .@expirationDate$) // Si la fecha de HOY es mayor que la fecha de expiración...
+		{
+			//	terminateVip function on line 430, removes player VIP entry from database table "vip_gold"
+			callsub terminateVip,"vip_gold",getcharid(3); goto L_displayInfo;
+		}
+		//	If expiration date has not arrived yet, ACTIVEte VIP benefits.
+		else
+		{
+			sc_end sc_expboost;
+			sc_end sc_itemboost;
+			sc_start sc_expboost,1000*60*60*24,.VIPs_GoldExpRate;
+			sc_start sc_itemboost,1000*60*60*24,.VIPs_GoldItemRate; goto L_displayInfo;
+		}
+		
+	}
+	
+	if (.@accountType$ == "SILVER")
+	{
+		// Daily Bonus
+		if(#dailytimer < gettimetick(2)) {
+			announce "Here's your VIP daily reward, you'll get another one after 24 hours.",bc_blue|bc_self;
+			for(set .@i,0; .@i < getarraysize(.Daily_Gifts);set .@i,.@i+1) {
+					getitem .Daily_Gifts[.@i],.Silver_Amount[.@i];
+			}
+			set #dailytimer,gettimetick(2) + 86400; //24 hours.
+		}
+		else{
+		set .@last,#dailytimer - gettimetick(2);
+		set .@hour, .@last % ( 24 * 3600 ) / 3600;
+		set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
+		set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
+		announce "Next VIP rewards will be in : "+.@hour+":"+.@min+":"+.@sec+"",bc_blue|bc_self;
+		}
+		set .@getVipStatus,query_sql("SELECT `status` FROM `vip_silver` WHERE `account_id` = "+getcharid(3)+";",.@vipStatus$); // Obtener el estado de la cuenta
+		set .@getExpirationDate$,query_sql("SELECT DATE_FORMAT(`end_date`, '%Y %m %d') FROM vip_silver WHERE `account_id` = "+getcharid(3)+";",.@expirationDate$);	// Obtener Fecha de expiración
+		if (gettimestr("%Y %m %d",21) >= .@expirationDate$) // Si la fecha de HOY es mayor que la fecha de expiración...
+		{
+			//	terminateVip function on line 430, removes player VIP entry from database table "vip_silver"
+			callsub terminateVip,"vip_silver",getcharid(3); goto L_displayInfo;
+		}
+		//	If expiration date has not arrived yet, ACTIVEte VIP benefits.
+		else
+		{
+			sc_end sc_expboost;
+			sc_end sc_itemboost;
+			sc_start sc_expboost,1000*60*60*24,.VIPs_SilverExpRate;
+			sc_start sc_itemboost,1000*60*60*24,.VIPs_SilverItemRate; goto L_displayInfo;
+		}
+
+	}
+	
+	// If account type is normal, just display account type information.
+	if (.@accountType$ == "NORMAL")
+	{
+		if(#dailytimer < gettimetick(2)) {
+			announce "Here's your daily gifts, you'll get another one after 24 hours.",bc_blue|bc_self;
+			for(set .@i,0; .@i < getarraysize(.Daily_Gifts);set .@i,.@i+1) {
+					getitem .Daily_Gifts[.@i],.Normal_Amount[.@i];
+			}
+			set #dailytimer,gettimetick(2) + 86400; //24 hours.
+		}
+		else{
+		set .@last,#dailytimer - gettimetick(2);
+		set .@hour, .@last % ( 24 * 3600 ) / 3600;
+		set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
+		set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
+		announce "Next daily gifts will be in : "+.@hour+":"+.@min+":"+.@sec+"",bc_blue|bc_self;
+		}
+		set .@getVipStatus,query_sql("SELECT `status` FROM `vip_silver` WHERE `account_id` = "+getcharid(3)+";",.@vipStatus$); // Obtener el estado de la cuenta
+		set .@getExpirationDate$,query_sql("SELECT DATE_FORMAT(`end_date`, '%Y %M %d') FROM vip_silver WHERE `account_id` = "+getcharid(3)+";",.@expirationDate$);	// Obtener Fecha de expiración
+		goto L_displayInfo;
+	}
+
+// Displays account type status on login on chat window.
+L_displayInfo:
+	dispbottom "----------------------------------------------------------------------";
+	dispbottom "Account type:         "+.@accountType$;
+	dispbottom "Status:                     "+.@vipStatus$;
+	dispbottom "Expiration date: "+.@expirationDate$;
+	dispbottom "----------------------------------------------------------------------";
+	end;
+	
+OnWhisperGlobal:
+	if ( getgmlevel() < 99 ) end;
+	
+On_gm:
+	set .@npcName$,"[VIP System v3.0]";
+	
+	mes .@npcName$;
+	mes "Welcome, "+strcharinfo(0)+"!";
+	mes "What can I do for you today?";
+	next;
+	switch(select("VIP Silver Menu:VIP Gold Menu:VIP Platinum Menu:Quit"))
+	{
+		case 1:	// VIP Silver
+			next;
+			mes .@npcName$;
+			mes "[VIP SILVER]";
+			switch(select("Add/Extend Account:Delete Account:List Accounts:Back"))
+			{
+				case 1:	// Add/Extend
+					mes "Type the Account Name";
+					mes "you wish to add.";
+					input .@accountName$;
+					next;
+					mes .@npcName$;
+					mes "[VIP SILVER]";
+					mes "Type the number of days you";
+					mes "wish to add to the account's VIP";
+					mes "status.";
+					next;
+					mes .@npcName$;
+					mes "[VIP SILVER]";
+					input .@silverDays;
+					// Fetch account's ID using the name of the account previously typed.
+					set .@getAccountId,query_sql("SELECT `account_id`FROM login WHERE `userid` = '"+.@accountName$+"';",.@accountId);
+					mes "Identifying account: "+.@accountName$+".";
+					sleep2 rand(100,2000); // Looks like it's working on something :P
+					if (!.@accountId)	// Let's verify if the entered account exists or GM is just high...
+					{
+						mes "ERROR: Couldn't find account.";
+						mes "Verify if you didn't make a typo.";
+						close;
+					}
+					else
+					{	 // Now lets check if the account is already 'vip_silver'
+						set .@getSilverAccount,query_sql("SELECT `account_id` FROM vip_silver WHERE `account_id` = "+.@accountId+";",.@silverAccountId);
+						set .@getGoldAccount,query_sql("SELECT `account_id` FROM vip_gold WHERE `account_id` = "+.@accountId+";",.@goldAccountId);
+						set .@getPlatinumAccount,query_sql("SELECT `account_id` FROM vip_platinum WHERE `account_id` = "+.@accountId+";",.@platinumAccountId);
+						if (.@silverAccountId == .@accountId) // If the account is already VIP we will update instead of inserting a new entry.
+						{
+							mes "Account ID: "+.@silverAccountId+".";
+							sleep2 rand(100,850);
+							query_sql("UPDATE vip_silver SET end_date = DATE_ADD(end_date, INTERVAL "+.@silverDays+" DAY) WHERE account_id = "+.@silverAccountId+";");
+							query_sql("UPDATE vip_silver SET `status` = 'ACTIVE' WHERE account_id = "+.@silverAccountId+";");
+							query_sql("UPDATE login SET `account_type` = 'SILVER' WHERE account_id = "+.@silverAccountId+";");
+							mes "Account "+.@silverAccountId+" updated";
+							mes "successfuly!";
+							close;
+						}
+						else if (.@goldAccountId == .@accountId) {	// if Gold Account
+							next;
+							mes "Account ID: "+.@goldAccountId+".";
+							mes "This account is already in the Gold account, delete first if you're going to downgrade him..";
+							close;
+						}
+						else if (.@platinumAccountId == .@accountId) {	// if Platinum Account
+							next;
+							mes "Account ID: "+.@accountId+".";
+							mes "This account is already in the Premium account, delete first if you're going to downgrade him..";
+							close;
+						}
+						else	// If the account is not already a VIP Silver one, add a new entry.
+						{
+							mes "Account ID: "+.@accountId+".";
+							sleep2 rand(100,850);
+							query_sql("INSERT INTO vip_silver (`account_id`,`account_name`,`start_date`,`end_date`,`status`) VALUES ("+.@accountId+",'"+.@accountName$+"','"+gettimestr("%Y-%m-%d",21)+"','"+gettimestr("%Y-%m-%d",21)+"','ACTIVE');");
+							sleep2 100;
+							query_sql("UPDATE vip_silver SET end_date = DATE_ADD(start_date, INTERVAL "+.@silverDays+" DAY) WHERE account_id = "+.@accountId+";");
+							query_sql("UPDATE `login` SET `group_id` = "+.VIPs_SilverAccLevel+" WHERE `account_id` = "+.@accountId+";");
+							query_sql("UPDATE login SET `account_type` = 'SILVER' WHERE account_id = "+.@accountId+";");
+							mes "Account "+.@accountId+" added";
+							mes "successfuly!";
+							close;
+						}
+					}
+					close;
+				case 2:	// Delete
+					set .@getSilverList_1$,query_sql("SELECT account_name FROM vip_silver LIMIT 0,127;", .@silverList_1$); // query_sql can only display the first 128 lines of a table. This is so sad :(
+					if ( getarraysize(.@silverList_1$) == 0 )
+					{
+						mes "There are currently no VIP";
+						mes "Silver accounts.";
+						close;
+					}
+					else
+					{
+						mes "Select the account you wish ";
+						mes "to remove from VIP system.";
+						
+						set .@j$, "1. "+ .@silverList_1$;
+						for (set .@i,1; .@i < getarraysize(.@silverList_1$); set .@i, .@i + 1 )
+							set .@j$, .@j$ +":"+ (.@i+1) +". "+ .@silverList_1$[.@i];
+						set .@j$, .@j$ +":Cancel";
+						next;
+						mes .@npcName$;
+						mes "[VIP SILVER]";
+						set .@menu, select(.@j$) -1;
+						if ( .@menu == getarraysize(.@silverList_1$) ) { next; goto On_gm; }
+						mes "Are you sure you want to remove the account ";
+						mes .@silverList_1$[.@menu] +" ?";
+						if ( select( "Yes:No" ) == 2 ) { next; goto On_gm; }
+						query_sql "SELECT `account_id` FROM `login` WHERE `userid` = '"+.@silverList_1$[.@menu]+"'",.@accountid;
+						query_sql ("UPDATE `login` SET `group_id` = 0 WHERE `userid` = '"+.@silverList_1$[.@menu]+"';");
+						query_sql ("DELETE FROM vip_silver WHERE account_name = '"+.@silverList_1$[.@menu]+"';");
+						query_sql("DELETE FROM `sc_data` WHERE account_id = '"+.@accountid+"' && type = '"+258+"';"); // Delete Status for VIP
+						query_sql("DELETE FROM `sc_data` WHERE account_id = '"+.@accountid+"' && type = '"+257+"';"); // Delete Status for VIP
+						query_sql("ALTER TABLE vip_silver AUTO_INCREMENT = 1;");
+						query_sql("UPDATE `login` SET `account_type` = 'NORMAL' WHERE `userid` = '"+.@silverList_1$[.@menu]+"';");
+						mes "VIP Silver account successfuly deleted!.";
+						close;
+					}					
+					close;
+					
+				case 3:	// List
+					mes "VIP Silver accounts list:";
+					// List up to 127 vip accounts
+					set .@getSilverList_1$,query_sql("SELECT account_name FROM vip_silver LIMIT 0, 127;", .@silverList_1$);
+					for (set .@i,0; .@i < getarraysize(.@silverList_1$); set .@i, .@i + 1)
+						mes (.@i+1)+". "+.@silverList_1$[.@i]; // You may want to add a next; command and a new LIMIT 128,255 sentence, in case you need to store and display more than 128 VIP accounts.
+					close;
+				case 4:	// Back
+					goto On_gm;
+			}
+		
+		case 2: // Gold Menu
+			next;
+			mes .@npcName$;
+			mes "[VIP GOLD]";
+			switch(select("Add/Extend Account:Delete Account:List Accounts:Back"))
+			{
+				case 1:	// Add
+					mes "Type the Account Name";
+					mes "you wish to add.";
+					input .@accountName$;
+					next;
+					mes .@npcName$;
+					mes "[VIP GOLD]";
+					mes "Enter the amount of days you";
+					mes "want to add to this account";
+					mes "status.";
+					next;
+					mes .@npcName$;
+					mes "[VIP GOLD]";
+					input .@goldDays;
+					// Fetch account's ID using the name of the account previously typed.
+					set .@getAccountId,query_sql("SELECT `account_id`FROM login WHERE `userid` = '"+.@accountName$+"';",.@accountId);
+					mes "Identifying account: "+.@accountName$+".";
+					sleep2 rand(100,2000);
+					if (!.@accountId)	// Checks if account exists.
+					{
+						mes "ERROR: Couldn't find account.";
+						mes "Verify the account you typed";
+						close;
+					}
+					else
+					{	 // Verify if account is already 'vip_gold'
+						set .@getSilverAccount,query_sql("SELECT `account_id` FROM vip_silver WHERE `account_id` = "+.@accountId+";",.@silverAccountId);
+						set .@getGoldAccount,query_sql("SELECT `account_id` FROM vip_gold WHERE `account_id` = "+.@accountId+";",.@goldAccountId);
+						set .@getPlatinumAccount,query_sql("SELECT `account_id` FROM vip_platinum WHERE `account_id` = "+.@accountId+";",.@platinumAccountId);
+						if (.@goldAccountId == .@accountId) // If it exists, update, not insert
+						{
+							mes "Account ID: "+.@accountId+".";
+							sleep2 rand(100,850);
+							query_sql("UPDATE vip_gold SET end_date = DATE_ADD(end_date, INTERVAL "+.@goldDays+" DAY) WHERE account_id = "+.@goldAccountId+";");
+							query_sql("UPDATE vip_gold SET `status` = 'ACTIVE' WHERE account_id = "+.@goldAccountId+";");
+							query_sql("UPDATE login SET `account_type` = 'GOLD' WHERE account_id = "+.@goldAccountId+";");
+							mes "Account "+.@goldAccountId+" updated";
+							mes "successfuly!";
+							close;
+						}
+						else if (.@silverAccountId == .@accountId) {
+							next;
+							mes "Account ID: "+.@accountId+".";
+							mes "This account is already in the Silver account, delete first if you're going to upgrade him..";
+							close;
+						}
+						else if (.@platinumAccountId == .@accountId) {
+							next;
+							mes "Account ID: "+.@accountId+".";
+							mes "This account is already in the Premium account, delete first if you're going to upgrade him..";
+							close;
+						}
+						else	// If this account is not already 'vip_gold', add an entry.
+						{
+							mes "Account ID: "+.@accountId+".";
+							sleep2 rand(100,850);
+							query_sql("INSERT INTO vip_gold (`account_id`,`account_name`,`start_date`,`end_date`,`status`) VALUES ("+.@accountId+",'"+.@accountName$+"','"+gettimestr("%Y-%m-%d",21)+"','"+gettimestr("%Y-%m-%d",21)+"','ACTIVE');");
+							sleep2 100;
+							query_sql("UPDATE vip_gold SET end_date = DATE_ADD(start_date, INTERVAL "+.@goldDays+" DAY) WHERE account_id = "+.@accountId+";");
+							query_sql("UPDATE `login` SET `group_id` = "+.VIPs_GoldAccLevel+" WHERE `account_id` = "+.@accountId+";");
+							query_sql("UPDATE login SET `account_type` = 'GOLD' WHERE account_id = "+.@accountId+";");
+							mes "Account "+.@accountId+" updated";
+							mes "successfuly!";
+							close;
+						}
+					}
+					close;
+				case 2:	// Delete
+					set .@getGoldList_1$,query_sql("SELECT account_name FROM vip_gold LIMIT 0,127;", .@goldList_1$);
+					if ( getarraysize(.@goldList_1$) == 0 )
+					{
+						mes "There are currently no VIP";
+						mes "accounts.";
+						close;
+					}
+					else
+					{
+						mes "Select the account you wish ";
+						mes "to remove from VIP system Gold.";
+						
+						set .@j$, "1. "+ .@goldList_1$;
+						for (set .@i,1; .@i < getarraysize(.@goldList_1$); set .@i, .@i + 1 )
+							set .@j$, .@j$ +":"+ (.@i+1) +". "+ .@goldList_1$[.@i];
+						set .@j$, .@j$ +":Cancel";
+						next;
+						mes .@npcName$;
+						mes "[VIP GOLD]";
+						set .@menu, select(.@j$) -1;
+						if ( .@menu == getarraysize(.@goldList_1$) ) { next; goto On_gm; }
+						mes "Are you sure you want to remove the account ";
+						mes .@goldList_1$[.@menu] +" ?";
+						if ( select( "Yes:No" ) == 2 ) { next; goto On_gm; }
+						query_sql ("UPDATE `login` SET `group_id` = 0 WHERE `userid` = '"+.@goldList_1$[.@menu]+"';");
+						query_sql ("DELETE FROM vip_gold WHERE account_name = '"+.@goldList_1$[.@menu]+"';");
+						query_sql("ALTER TABLE vip_gold AUTO_INCREMENT = 1;");
+						query_sql("UPDATE `login` SET `account_type` = 'NORMAL' WHERE `userid` = '"+.@goldList_1$[.@menu]+"';");
+						
+						mes "VIP Gold account successfuly deleted!.";
+						close;
+					}					
+					close;
+					
+				case 3:	// List
+					mes "List Accounts VIP Gold:";
+					// List only 128 accounts due to eAthena's limitations :( very sad indeed.
+					set .@getgoldList_1$,query_sql("SELECT account_name FROM vip_gold LIMIT 0,127;", .@goldList_1$);
+					for (set .@i,0; .@i < getarraysize(.@goldList_1$); set .@i, .@i + 1)
+						mes (.@i+1)+". "+.@goldList_1$[.@i];
+					close;
+				case 4:	// Back
+					goto On_gm;
+			}
+		case 3: // Menu VIP Platinum
+			next;
+			mes .@npcName$;
+			mes "[VIP PLATINUM]";
+			switch(select("Add/Extend Account:Delete Account:List Accounts:Back"))
+			{
+				case 1:	// Add
+					mes "Type the Account Name";
+					mes "you wish to add.";
+					input .@accountName$;
+					next;
+					mes .@npcName$;
+					mes "[VIP PLATINUM]";
+					mes "Enter the amount of days you";
+					mes "will add to this account's";
+					mes "status.";
+					next;
+					mes .@npcName$;
+					mes "[VIP PLATINUM]";
+					input .@platinumDays;
+					// Fetch account's ID using the name of the account previously typed.
+					set .@getAccountId,query_sql("SELECT `account_id`FROM login WHERE `userid` = '"+.@accountName$+"';",.@accountId);
+					mes "Identifying account: "+.@accountName$+".";
+					sleep2 rand(100,2000);
+					if (!.@accountId)	// Checks if account exists
+					{
+						mes "ERROR: Couldn't find this account";
+						mes "Enter the account correctly";
+						close;
+					}
+					else
+					{	 // Is this account a 'vip_platinum' already?
+						set .@getSilverAccount,query_sql("SELECT `account_id` FROM vip_silver WHERE `account_id` = "+.@accountId+";",.@silverAccountId);
+						set .@getGoldAccount,query_sql("SELECT `account_id` FROM vip_gold WHERE `account_id` = "+.@accountId+";",.@goldAccountId);
+						set .@getPlatinumAccount,query_sql("SELECT `account_id` FROM vip_platinum WHERE `account_id` = "+.@accountId+";",.@platinumAccountId);
+						if (.@platinumAccountId == .@accountId) // If this account is 'vip_platinum' update instead of insterting a new entry.
+						{
+							mes "Account ID: "+.@accountId+".";
+							sleep2 rand(100,850);
+							query_sql("UPDATE vip_platinum SET end_date = DATE_ADD(end_date, INTERVAL "+.@platinumDays+" DAY) WHERE account_id = "+.@platinumAccountId+";");
+							query_sql("UPDATE vip_platinum SET `status` = 'ACTIVE' WHERE account_id = "+.@platinumAccountId+";");
+							query_sql("UPDATE login SET `account_type` = 'PLATINUM' WHERE account_id = "+.@platinumAccountId+";");
+							mes "Account "+.@platinumAccountId+" updated";
+							mes "successfuly!";
+							close;
+						}
+						else if (.@silverAccountId == .@accountId) {
+							next;
+							mes "Account ID: "+.@accountId+".";
+							mes "This account is already in the Silver account, delete first if you're going to upgrade him..";
+							close;
+						}
+						else if (.@goldAccountId == .@accountId) {
+							next;
+							mes "Account ID: "+.@accountId+".";
+							mes "This account is already in the Premium account, delete first if you're going to upgrade him..";
+							close;
+						}
+						else	// If it's not VIP already, insert a new entry
+						{
+							mes "Account ID: "+.@accountId+".";
+							sleep2 rand(100,850);
+							query_sql("INSERT INTO vip_platinum (`account_id`,`account_name`,`start_date`,`end_date`,`status`) VALUES ("+.@accountId+",'"+.@accountName$+"','"+gettimestr("%Y-%m-%d",21)+"','"+gettimestr("%Y-%m-%d",21)+"','ACTIVE');");
+							sleep2 100;
+							query_sql("UPDATE vip_platinum SET end_date = DATE_ADD(start_date, INTERVAL "+.@platinumDays+" DAY) WHERE account_id = "+.@accountId+";");
+							query_sql("UPDATE `login` SET `group_id` = "+.VIPs_PlatinumAccLevel+" WHERE `account_id` = "+.@accountId+";");
+							query_sql("UPDATE login SET `account_type` = 'PLATINUM' WHERE account_id = "+.@accountId+";");
+							mes "Account "+.@accountId+" updated";
+							mes "successfuly!";
+							close;
+						}
+					}
+					close;
+				case 2:	// Delete
+					set .@getPlatinumList_1$,query_sql("SELECT account_name FROM vip_platinum LIMIT 0,127;", .@platinumList_1$);
+					if ( getarraysize(.@platinumList_1$) == 0 )
+					{
+						mes "There are currently no VIP";
+						mes "Platinum accounts.";
+						close;
+					}
+					else
+					{
+						mes "Select the account you wish ";
+						mes "to remove from VIP system Platinum.";
+						
+						set .@j$, "1. "+ .@platinumList_1$;
+						for (set .@i,1; .@i < getarraysize(.@platinumList_1$); set .@i, .@i + 1 )
+							set .@j$, .@j$ +":"+ (.@i+1) +". "+ .@platinumList_1$[.@i];
+						set .@j$, .@j$ +":Cancel";
+						next;
+						mes .@npcName$;
+						mes "[VIP PLATINUM]";
+						set .@menu, select(.@j$) -1;
+						if ( .@menu == getarraysize(.@platinumList_1$) ) { next; goto On_gm; }
+						mes "Are you sure you want to remove the account ";
+						mes .@platinumList_1$[.@menu] +" ?";
+						if ( select( "Yes:No" ) == 2 ) { next; goto On_gm; }
+						query_sql ("UPDATE `login` SET `group_id` = 0 WHERE `userid` = '"+.@platinumList_1$[.@menu]+"';");
+						query_sql ("DELETE FROM vip_platinum WHERE account_name = '"+.@platinumList_1$[.@menu]+"';");
+						query_sql("ALTER TABLE vip_platinum AUTO_INCREMENT = 1;");
+						query_sql("UPDATE `login` SET `account_type` = 'NORMAL' WHERE `userid` = '"+.@platinumList_1$[.@menu]+"';");
+						
+						mes "VIP Platinum account successfuly deleted!.";
+						close;
+					}					
+					close;
+					
+				case 3:	// List
+					mes "List Accounts VIP Platinum:";
+					set .@getplatinumList_1$,query_sql("SELECT account_name FROM vip_platinum LIMIT 0,127;", .@platinumList_1$);
+					for (set .@i,0; .@i < getarraysize(.@platinumList_1$); set .@i, .@i + 1)
+						mes (.@i+1)+". "+.@platinumList_1$[.@i];
+					close;
+				case 4:	// Back
+					goto On_gm;
+			}
+		case 4: // Quit
+			close;
+	}
+	
+terminateVip:	// This function removes any VIP status from the specified account
+	set .@dbTableName$,getarg(0);	//	Table name
+	set .@accountId,getarg(1);		//	Account ID
+
+	sc_end sc_expboost;
+	sc_end sc_itemboost;
+	query_sql("UPDATE `login` SET `group_id` = 0 WHERE account_id = "+.@accountId+";"); // Set account level to 0
+	query_sql("DELETE FROM "+.@dbTableName$+" WHERE account_id = '"+.@accountId+"';"); // Delete VIP table entry
+	query_sql("DELETE FROM `sc_data` WHERE account_id = '"+.@accountId+"' && type = '"+258+"';"); // Delete Status for VIP
+	query_sql("DELETE FROM `sc_data` WHERE account_id = '"+.@accountId+"' && type = '"+257+"';"); // Delete Status for VIP
+	query_sql("ALTER TABLE "+.@dbTableName$+" AUTO_INCREMENT = 1;"); // Tries to reset id count
+	query_sql("UPDATE `login` SET `account_type` = 'NORMAL' WHERE `account_id` = "+.@accountId+";"); // Set account type to "NORMAL" in 'login' table
+	goto L_displayInfo;
+
+//**************** VIP SYSTEM CONFIGURATION	*************************
+OnInit:
+set .VIPs_SilverAccLevel,1;		// Account Level assigned for VIP Silver		*
+set .VIPs_GoldAccLevel,2;		// Account Level assigned for VIP Gold			*
+set .VIPs_PlatinumAccLevel,3;	// Account Level assigned for VIP Platinum	*
+set .VIPs_SilverExpRate,300;		// VIP Silver Exp Boost in % ( 1 = 1% )		*
+set .VIPs_GoldExpRate,400;		// VIP Gold Exp Boost in % ( 1 = 1% )			*
+set .VIPs_PlatinumExpRate,500;	// VIP Platinum Exp Boost in % ( 1 = 1% )		*
+set .VIPs_SilverItemRate,200;		// VIP Silver Item Drop Boost in % ( 1 = 1% )	*
+set .VIPs_GoldItemRate,250;		// VIP Gold Item Drop Boost in % ( 1 = 1% )	*
+set .VIPs_PlatinumItemRate,300;	// VIP Platinum Item Drop Boost in % ( 1 = 1%)*
+set .VIPs_AdminGmLevel,99;		// Define GM Level enabled to add, list and	*
+							// remove VIP entries. Any GM with access le-	*
+							// vel equal or higher than this will be able	*
+							// to manage VIP Accounts.						*
+setarray .Daily_Gifts[0],14232,31015,31016;	// Daily Gifts					*
+setarray .Normal_Amount[0],2,2,2;	// Normal Amount						*
+setarray .Silver_Amount[0],4,4,4;	// Silver Amount						*
+setarray .Gold_Amount[0],7,7,7;	// Gold Amount								*
+setarray .Platinum_Amount[0],10,10,10;	// Platinum Amount					*
+//	********************************************************************
+}
+
+function	script	VIP_SILVER	{
+	if (getgmlevel() >= 20) {
+	end;
+	}
+	else {
+	//Configs
+	set .@accountID,getarg(0);
+	set .@silverDays,getarg(1);
+	set .VIPs_SilverAccLevel,1;
+	set .AccountType$,"Silver";
+	query_sql "SELECT `userid` FROM `login` WHERE `account_id` = "+.@accountId+";",.@accountName$;
+
+	// Now lets check if the account is already 'vip_silver'
+	set .@getSilverAccount,query_sql("SELECT `account_id` FROM vip_silver WHERE `account_id` = "+.@accountId+";",.@silverAccountId);
+	set .@getGoldAccount,query_sql("SELECT `account_id` FROM vip_gold WHERE `account_id` = "+.@accountId+";",.@goldAccountId);
+	set .@getPlatinumAccount,query_sql("SELECT `account_id` FROM vip_platinum WHERE `account_id` = "+.@accountId+";",.@platinumAccountId);
+	if (.@silverAccountId == .@accountId) // If the account is already VIP we will update instead of inserting a new entry.
+	{
+		query_sql("UPDATE vip_silver SET end_date = DATE_ADD(end_date, INTERVAL "+.@silverDays+" DAY) WHERE account_id = "+.@silverAccountId+";");
+		query_sql("UPDATE vip_silver SET `status` = 'ACTIVE' WHERE account_id = "+.@silverAccountId+";");
+		query_sql("UPDATE login SET `account_type` = 'SILVER' WHERE account_id = "+.@silverAccountId+";");
+		mes "Your account has been updated to ^FF0000"+.AccountType$+"^000000 with ^0000FF"+.@silverDays+"^000000days.";
+		mes "Please relog to see the changes in your account.";
+		close;
+	}
+	else if (.@goldAccountId == .@accountId) {	// if Gold Account
+		mes "You're account is already in ^FF0000Gold^000000 account, please use this once you're account is not GOLD anymore.";
+		getitem getarg(2),1;
+		close;
+	}
+	else if (.@platinumAccountId == .@accountId) {	// if Platinum Account
+		mes "You're account is already in ^FF0000Platinum^000000 account, please use this once you're account is not PLATINUM anymore.";
+		getitem getarg(2),1;
+		close;
+	}
+	else	// If the account is not already a VIP Silver one, add a new entry.
+	{
+		query_sql("INSERT INTO vip_silver (`account_id`,`account_name`,`start_date`,`end_date`,`status`) VALUES ("+.@accountId+",'"+.@accountName$+"','"+gettimestr("%Y-%m-%d",21)+"','"+gettimestr("%Y-%m-%d",21)+"','ACTIVE');");
+		sleep2 100;
+		query_sql("UPDATE vip_silver SET end_date = DATE_ADD(start_date, INTERVAL "+.@silverDays+" DAY) WHERE account_id = "+.@accountId+";");
+		query_sql("UPDATE `login` SET `group_id` = "+.VIPs_SilverAccLevel+" WHERE `account_id` = "+.@accountId+";");
+		query_sql("UPDATE login SET `account_type` = 'SILVER' WHERE account_id = "+.@accountId+";");
+		mes "Your account has been updated to ^FF0000"+.AccountType$+"^000000 with ^0000FF"+.@silverDays+"^000000days.";
+		mes "Please relog to see the changes in your account.";
+		close;
+	}
+	}
+}
+
+function	script	VIP_GOLD	{
+	if (getgmlevel() >= 20) {
+	end;
+	}
+	else {
+	//Configs
+	set .@accountID,getarg(0);
+	set .@goldDays,getarg(1);
+	set .VIPs_GoldAccLevel,2;
+	set .AccountType$,"Gold";
+	query_sql "SELECT `userid` FROM `login` WHERE `account_id` = "+.@accountId+";",.@accountName$;
+	
+	 // Verify if account is already 'vip_gold'
+	set .@getSilverAccount,query_sql("SELECT `account_id` FROM vip_silver WHERE `account_id` = "+.@accountId+";",.@silverAccountId);
+	set .@getGoldAccount,query_sql("SELECT `account_id` FROM vip_gold WHERE `account_id` = "+.@accountId+";",.@goldAccountId);
+	set .@getPlatinumAccount,query_sql("SELECT `account_id` FROM vip_platinum WHERE `account_id` = "+.@accountId+";",.@platinumAccountId);
+	if (.@goldAccountId == .@accountId) // If it exists, update, not insert
+	{
+		query_sql("UPDATE vip_gold SET end_date = DATE_ADD(end_date, INTERVAL "+.@goldDays+" DAY) WHERE account_id = "+.@goldAccountId+";");
+		query_sql("UPDATE vip_gold SET `status` = 'ACTIVE' WHERE account_id = "+.@goldAccountId+";");
+		query_sql("UPDATE login SET `account_type` = 'GOLD' WHERE account_id = "+.@goldAccountId+";");
+		mes "Your account has been updated to ^FF0000"+.AccountType$+"^000000 with ^0000FF"+.@goldDays+"^000000days.";
+		mes "Please relog to see the changes in your account.";
+		close;
+	}
+	else if (.@silverAccountId == .@accountId) {
+		mes "You're account is already in ^FF0000Silver^000000 account, please use this once you're account is not SILVER anymore.";
+		getitem getarg(2),1;
+		close;
+	}
+	else if (.@platinumAccountId == .@accountId) {
+		mes "You're account is already in ^FF0000Platinum^000000 account, please use this once you're account is not PLATINUM anymore.";
+		getitem getarg(2),1;
+		close;
+	}
+	else	// If this account is not already 'vip_gold', add an entry.
+	{
+		query_sql("INSERT INTO vip_gold (`account_id`,`account_name`,`start_date`,`end_date`,`status`) VALUES ("+.@accountId+",'"+.@accountName$+"','"+gettimestr("%Y-%m-%d",21)+"','"+gettimestr("%Y-%m-%d",21)+"','ACTIVE');");
+		sleep2 100;
+		query_sql("UPDATE vip_gold SET end_date = DATE_ADD(start_date, INTERVAL "+.@goldDays+" DAY) WHERE account_id = "+.@accountId+";");
+		query_sql("UPDATE `login` SET `group_id` = "+.VIPs_GoldAccLevel+" WHERE `account_id` = "+.@accountId+";");
+		query_sql("UPDATE login SET `account_type` = 'GOLD' WHERE account_id = "+.@accountId+";");
+		mes "Your account has been updated to ^FF0000"+.AccountType$+"^000000 with ^0000FF"+.@goldDays+"^000000days.";
+		mes "Please relog to see the changes in your account.";
+		close;
+	}
+	}
+}
+
+function	script	VIP_PLATINUM	{
+	if (getgmlevel() >= 20) {
+	end;
+	}
+	else {
+	//Configs
+	set .@accountID,getarg(0);
+	set .@platinumDays,getarg(1);
+	set .VIPs_PlatinumAccLevel,2;
+	set .AccountType$,"Platinum";
+	query_sql "SELECT `userid` FROM `login` WHERE `account_id` = "+.@accountId+";",.@accountName$;
+	
+	 // Is this account a 'vip_platinum' already?
+	set .@getSilverAccount,query_sql("SELECT `account_id` FROM vip_silver WHERE `account_id` = "+.@accountId+";",.@silverAccountId);
+	set .@getGoldAccount,query_sql("SELECT `account_id` FROM vip_gold WHERE `account_id` = "+.@accountId+";",.@goldAccountId);
+	set .@getPlatinumAccount,query_sql("SELECT `account_id` FROM vip_platinum WHERE `account_id` = "+.@accountId+";",.@platinumAccountId);
+	if (.@platinumAccountId == .@accountId) // If this account is 'vip_platinum' update instead of insterting a new entry.
+	{
+		query_sql("UPDATE vip_platinum SET end_date = DATE_ADD(end_date, INTERVAL "+.@platinumDays+" DAY) WHERE account_id = "+.@platinumAccountId+";");
+		query_sql("UPDATE vip_platinum SET `status` = 'ACTIVE' WHERE account_id = "+.@platinumAccountId+";");
+		query_sql("UPDATE login SET `account_type` = 'PLATINUM' WHERE account_id = "+.@platinumAccountId+";");
+		mes "Your account has been updated to ^FF0000"+.AccountType$+"^000000 with ^0000FF"+.@platinumDays+"^000000days.";
+		mes "Please relog to see the changes in your account.";
+		close;
+	}
+	else if (.@silverAccountId == .@accountId) {
+		mes "You're account is already in ^FF0000Silver^000000 account, please use this once you're account is not SILVER anymore.";
+		getitem getarg(2),1;
+		close;
+	}
+	else if (.@goldAccountId == .@accountId) {
+		mes "You're account is already in ^FF0000Gold^000000 account, please use this once you're account is not GOLD anymore.";
+		getitem getarg(2),1;
+		close;
+	}
+	else	// If it's not VIP already, insert a new entry
+	{
+		query_sql("INSERT INTO vip_platinum (`account_id`,`account_name`,`start_date`,`end_date`,`status`) VALUES ("+.@accountId+",'"+.@accountName$+"','"+gettimestr("%Y-%m-%d",21)+"','"+gettimestr("%Y-%m-%d",21)+"','ACTIVE');");
+		sleep2 100;
+		query_sql("UPDATE vip_platinum SET end_date = DATE_ADD(start_date, INTERVAL "+.@platinumDays+" DAY) WHERE account_id = "+.@accountId+";");
+		query_sql("UPDATE `login` SET `group_id` = "+.VIPs_PlatinumAccLevel+" WHERE `account_id` = "+.@accountId+";");
+		query_sql("UPDATE login SET `account_type` = 'PLATINUM' WHERE account_id = "+.@accountId+";");
+		mes "Your account has been updated to ^FF0000"+.AccountType$+"^000000 with ^0000FF"+.@goldDays+"^000000days.";
+		mes "Please relog to see the changes in your account.";
+		close;
+	}
+	}
+}

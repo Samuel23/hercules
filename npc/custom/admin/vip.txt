@@ -580,11 +580,11 @@ set .VIPs_AdminGmLevel,99;		// Define GM Level enabled to add, list and	*
 							// remove VIP entries. Any GM with access le-	*
 							// vel equal or higher than this will be able	*
 							// to manage VIP Accounts.						*
-setarray .Daily_Gifts[0],14232,31015,31016;	// Daily Gifts					*
-setarray .Normal_Amount[0],2,2,2;	// Normal Amount						*
-setarray .Silver_Amount[0],4,4,4;	// Silver Amount						*
-setarray .Gold_Amount[0],7,7,7;	// Gold Amount								*
-setarray .Platinum_Amount[0],10,10,10;	// Platinum Amount					*
+setarray .Daily_Gifts[0],14232;	// Daily Gifts					*
+setarray .Normal_Amount[0],2;	// Normal Amount						*
+setarray .Silver_Amount[0],4;	// Silver Amount						*
+setarray .Gold_Amount[0],7;	// Gold Amount								*
+setarray .Platinum_Amount[0],10;	// Platinum Amount					*
 //	********************************************************************
 }
 

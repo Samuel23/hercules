@@ -60,3 +60,12 @@ quiz_01	mapflag	nocommand	20
 Crystilia	mapflag	novending
 Crystilia	mapflag	nobranch
 Crystilia	mapflag	town
+
+/*Training Room*/
+train	mapflag	nowarp	20
+train	mapflag	nowarpto	20
+train	mapflag	noreturn	20
+train	mapflag	nomemo	20
+train	mapflag	noteleport
+train	mapflag	novending
+train	mapflag	nosave	SavePoint

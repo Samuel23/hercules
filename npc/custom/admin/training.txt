@@ -100,7 +100,6 @@ L_Tutorial:
 		mes "Attacking monsters and conversations with the people of this world can be done by simply clicking on them.";
 		next;
 		cutin "",255;
-		setquest 30000;
 		set job_novice_q,1;
 		mes "[ExhilarateRO Welcomer]";
 		mes "Well then, I will give you a quest to talk to me.";

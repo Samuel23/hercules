@@ -1,0 +1,2 @@
+// Can you use _M/_F to make new accounts on the server?
+new_account: no

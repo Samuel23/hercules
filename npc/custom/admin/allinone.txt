@@ -159,6 +159,7 @@ function Job_Menu {
 			if (.@i==4001 || .@i==4023) resetlvl(1);
 			specialeffect2 338; specialeffect2 432;
 			if (.Platinum) callsub Get_Platinum;
+			if (.@i >= 4054 && .Item3rd) callsub Get_3rditem;
 			close;
 		}
 		if (getargcount() == 1) return;
@@ -201,6 +202,26 @@ Get_Platinum:
 		case 18: skill 238,1,0; break;
 		case 19: skill 1010,1,0; break;
 		case 20: skill 1011,1,0; break;
+		default: break;
+	}
+	return;
+
+Get_3rditem:
+	getitem 2795,1;		//Green Apple Ring
+	switch(BaseJob) {
+		case 7: getitem 5746,1; break;	// Rune Knight
+		case 8: getitem 5747,1; break;	// Arch Bishop
+		case 9: getitem 5753,1; break;	// Warlock
+		case 10: getitem 5749,1; break;	// Mechanic
+		case 11: getitem 5748,1; break;	// Sniper
+		case 12: getitem 5755,1; break;	// Guillotine Cross
+		case 14: getitem 5757,1; break; // Royal Guard
+		case 15: getitem 5754,1; break;	// Sura
+		case 16: getitem 5756,1; break;	// Sorcerer
+		case 17: getitem 5750,1; break;	// Shadow Chaser
+		case 18: getitem 5752,1; break;	// Genetic
+		case 19: getitem 5751,1; break;	// Ministrel
+		case 20: getitem 5758,1; break;	// Wanderer
 		default: break;
 	}
 	return;
@@ -686,6 +707,7 @@ OnInit:
 	set .LastJob,1;			// Enforce linear class changes? (1: yes / 0: no)
 	set .SkillPointCheck,1;		// Force player to use up all skill points? (1: yes / 0: no)
 	set .Platinum,1;		// Get platinum skills automatically? (1: yes / 0: no)
+	set .Item3rd,1;		// Get thirdjob headgears automatically? (1: yes / 0: no)
 
 	/* Coin Exchanger */
 	set	.BronzeCoin,100000;

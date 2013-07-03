@@ -1,0 +1,213 @@
+//Small Guide:
+//	 - itemid -> Quest Reward ID
+//	 - questitems -> ItemID(:Quanity),ItemID2(:Quanity2)
+//	 if no quanity is given quanity 1 is used.
+//	 if ItemID is 1 Zeny is used
+
+//Example:
+//	INSERT INTO `questnpc` (`itemid`, `questitems`) VALUES ('2795', '1:1000,512:10');
+//	Makes a new Apple Ring (2795) Quest for 10 Apples (512) and 1000 Zeny
+
+-	shop	questshop	111,512:1000;
+mall,115,139,4	script	Quester	900,{
+	query_sql("CREATE TABLE IF NOT EXISTS `questnpc` (  `itemid` int(11) NOT NULL,  `questitems` longtext NOT NULL,  PRIMARY KEY (`itemid`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
+	set .npcname$,"[^0000FF"+strnpcinfo(1)+"^000000]";
+	set .itemtype,0; // 0 = All | list below -> example: 256 for Uppers
+	set .showitemid,1; // 1 = Shows the item ID
+	mes .npcname$;
+	mes "Hello, "+strcharinfo(0)+"";
+	set .items, query_sql("SELECT `itemid`, `questitems` FROM `questnpc`", .item, .quests$);
+	if(.items == 0) {
+		mes "I'm sorry, but I'm out of items. Ask a Game Master to add some items";
+		close;
+	}
+	set .@i,0;
+	set .@ii,0;
+	if(.itemtype == 0) {
+		set .@itemtypes$,"";
+		while(.@i < .items) {
+			if(strpos(.@itemtypes$, ""+getiteminfo(.item[.@i], 5)+" ")) {
+				set .@itemtypes$,".@itemtypes$ "+getiteminfo(.item[.@i], 5)+"";
+				set .@type$[.@ii],""+getiteminfo(.item[.@i], 5)+" ";
+				set .@tname$,"Other";
+				if(getiteminfo(.item[.@i], 5) == 256) set .@tname$,"Upper Headgear";
+				if(getiteminfo(.item[.@i], 5) == 512) set .@tname$,"Middle Headgear";
+				if(getiteminfo(.item[.@i], 5) == 1) set .@tname$,"Lower Headgear";
+				if(getiteminfo(.item[.@i], 5) == 16) set .@tname$,"Armor";
+				if(getiteminfo(.item[.@i], 5) == 2) set .@tname$,"Weapon";
+				if(getiteminfo(.item[.@i], 5) == 32) set .@tname$,"Shield";
+				if(getiteminfo(.item[.@i], 5) == 4) set .@tname$,"Garment";
+				if(getiteminfo(.item[.@i], 5) == 64) set .@tname$,"Footgear";
+				if(getiteminfo(.item[.@i], 5) == 8 || getiteminfo(.item[.@i], 5) == 128 || getiteminfo(.item[.@i], 5) == 136) set .@tname$,"Accessory";
+				set .@typename$[.@ii],""+.@tname$+"";
+				if(.@tname$ != "Other") set .@menu$,""+.@menu$+":"+.@tname$+"";
+				set .@ii,.@ii+1;
+			}
+			set .@i,.@i+1;
+		}
+		set .@i,0;
+		mes "What are you searching for?";
+		next;
+		set .@num,select(""+.@menu$+":Other");
+		set .@num,.@num-2;
+		set .@shopitems,0;
+		while(.@i < .items) {
+			set .@item,.item[.@i];
+			if(.@num == .@ii) {
+				if(getiteminfo(.item[.@i], 5) != 256 && getiteminfo(.item[.@i], 5) != 512 && getiteminfo(.item[.@i], 5) != 1 && getiteminfo(.item[.@i], 5) != 16 && getiteminfo(.item[.@i], 5) != 2 && getiteminfo(.item[.@i], 5) != 32 && getiteminfo(.item[.@i], 5) != 4 && getiteminfo(.item[.@i], 5) != 64 &&  getiteminfo(.item[.@i], 5) != 8 &&  getiteminfo(.item[.@i], 5) != 128 &&  getiteminfo(.item[.@i], 5) != 136) {
+					if(.@shopitems == 0) {
+						npcshopitem "questshop",.@item,getiteminfo(@item,0);
+						set .@shopitems,1;
+					} else {
+						npcshopadditem "questshop",.@item,getiteminfo(@item,0);
+						set .@shopitems,.@shopitems+1;
+					}
+				}
+			} else {
+				if(getiteminfo(.item[.@i], 5) == getiteminfo(.item[.@num], 5)) {
+					if(.@shopitems == 0) {
+						npcshopitem "questshop",.@item,getiteminfo(@item,0);
+						set .@shopitems,1;
+					} else {
+						npcshopadditem "questshop",.@item,getiteminfo(@item,0);
+						set .@shopitems,.@shopitems+1;
+					}
+				}
+			}
+			set .@i,.@i+1;
+		}
+	} else {
+		set .@shopitems,0;
+		set .@i,0;
+		while(.@i < .items) {
+			set .@item,.item[.@i];
+			if(getiteminfo(.item[.@i], 5) == .itemtype) {
+				if(.@shopitems == 0) {
+					npcshopitem "questshop",.@item,getiteminfo(@item,0);
+					set .@shopitems,1;
+				} else {
+					npcshopadditem "questshop",.@item,getiteminfo(@item,0);
+					set .@shopitems,.@shopitems+1;
+				}
+			}
+			set .@i,.@i+1;
+		}
+	}
+	set .@i,0;
+	if(.@shopitems == 0) {
+		mes .npcname$;
+		mes "I'm sorry! I don't have any other items";
+		emotion 17;
+		emotion 23,1;
+		close();
+	} else {
+		close2;
+		npcshopattach "questshop";
+		callshop "questshop",1;
+	}
+	end;
+
+	OnBuyItem:
+		set .@quest, query_sql("SELECT `itemid`, `questitems` FROM `questnpc` WHERE `itemid` LIKE '"+@bought_nameid+"'", .@questid, .@req$);
+		mes "[^0000FF"+@bought_quantity+"x "+getitemname(@bought_nameid)+"^000000]";
+		mes "  ";
+		explode(.@req$, .@req$, ",");
+		set .@i,0;
+		set .@buy,0;
+		while(.@i < getarraysize(.@req$)) {
+			if(strpos(.@req$[.@i], ":") != -1) {
+				explode(.@reqq$, .@req$[.@i], ":");
+				set .@reqid,.@reqq$[0];
+				set .@reqamt,.@reqq$[1];
+				set .@reqamt,.@reqamt*@bought_quantity;
+			} else {
+				set .@reqid,.@req$[0];
+				set .@reqamt,1*@bought_quantity;
+			}
+			if(.@reqid == 1) {
+				if(Zeny >= .@reqamt) {
+					mes " - ^00FF00 "+.@reqamt+"x Zeny^000000";
+				} else {
+					mes " - ^FF0000 "+.@reqamt+"x Zeny^000000";
+					set .@buy,1;
+				}
+			} else {
+				if(countitem(.@reqid) >= .@reqamt) {
+					if(.showitemid) {
+						mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+" ("+.@reqid+")^000000";
+					} else {
+						mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+"^000000";
+					}
+				} else {
+					if(.showitemid) {
+						mes " - ^FF0000 "+.@reqamt+"x "+getitemname(.@reqid)+" ("+.@reqid+")^000000";
+					} else {
+						mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+"^000000";
+					}
+					set .@buy,1;
+				}
+			}
+			set .@i,.@i+1;
+		}
+		set .@i,0;
+		next;
+		if(.@buy == 1) {
+			mes .npcname$;
+			mes "Come back when you have the required items.";
+		} else {
+			mes .npcname$;
+			mes "Do you want to buy this item?";
+			next;
+			if(select("Yes:No")==2) {
+				mes .npcname$;
+				mes "Stop wasting my time!";
+				emotion 17,1;
+				emotion 23;
+				close();
+			} else {
+				while(.@i < getarraysize(.@req$)) {
+					set .@req$[.@i],replacestr(.@req$[.@i], " ", "");
+					if(strpos(.@req$[.@i], ":") != -1) {
+						explode(.@reqq$, .@req$[.@i], ":");
+						set .@reqid,.@reqq$[0];
+						set .@reqamt,.@reqq$[1];
+						set .@reqamt,.@reqamt*@bought_quantity;
+					} else {
+						set .@reqid,.@req$[0];
+						set .@reqamt,1*@bought_quantity;
+					}
+					if(.@reqid == 1) {
+						if(Zeny >= .@reqamt) {			set Zeny,Zeny-.@reqamt;	} else {	close();	}
+					} else {
+						if(countitem(.@reqid) >= .@reqamt) {	delitem .@reqid,.@reqamt;	} else {	close();	}
+					}
+					set .@i,.@i+1;
+				}
+				set .@i,0;
+				getitem @bought_nameid,@bought_quantity;
+			}
+		}
+		close;
+
+}
+
+
+////////////////////////////////////////////////////////////
+//              H   H  OOOO  SSSS  TTTT     ZZZZ          //
+//              H   H  O  O  S      TT        Z           //
+//              HHHHH  O  O  SSSS   TT  ===  Z            //
+//              H   H  O  O     S   TT      Z             //
+//              H   H  OOOO  SSSS   TT      ZZZZ          //
+////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+

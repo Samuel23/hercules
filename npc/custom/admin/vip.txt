@@ -43,23 +43,7 @@ OnPCLoginEvent:
 	//sc_end sc_itemboost;
 	
 	// If account type is PLATINUM
-	if (.@accountType$ == "PLATINUM")
-	{
-		// Daily Bonus
-		if(#dailytimer < gettimetick(2)) {
-			announce "Here's your VIP daily reward, you'll get another one after 24 hours.",bc_blue|bc_self;
-			for(set .@i,0; .@i < getarraysize(.Daily_Gifts);set .@i,.@i+1) {
-					getitem .Daily_Gifts[.@i],.Platinum_Amount[.@i];
-			}
-			set #dailytimer,gettimetick(2) + 86400; //24 hours.
-		}
-		else{
-		set .@last,#dailytimer - gettimetick(2);
-		set .@hour, .@last % ( 24 * 3600 ) / 3600;
-		set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
-		set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
-		announce "Next VIP awards will be in : "+.@hour+":"+.@min+":"+.@sec+"",bc_blue|bc_self;
-		}
+	if (.@accountType$ == "PLATINUM") {
 		set .@getVipStatus,query_sql("SELECT `status` FROM `vip_platinum` WHERE `account_id` = "+getcharid(3)+";",.@vipStatus$); // Get account type status
 		set .@getExpirationDate$,query_sql("SELECT DATE_FORMAT(`end_date`, '%Y %m %d') FROM vip_platinum WHERE `account_id` = "+getcharid(3)+";",.@expirationDate$);	// Get expiration date
 		if (gettimestr("%Y %m %d",21) >= .@expirationDate$) // If current date is higher than expiration date...
@@ -70,31 +54,15 @@ OnPCLoginEvent:
 		//	If expiration date has not arrived yet, ACTIVEte VIP benefits.
 		else
 		{
-			sc_end sc_expboost;
-			sc_end sc_itemboost;
-			sc_start sc_expboost,1000*60*60*24,.VIPs_PlatinumExpRate;
-			sc_start sc_itemboost,1000*60*60*24,.VIPs_PlatinumItemRate; goto L_displayInfo;
+			sc_end SC_CASH_PLUSEXP;
+			sc_end SC_CASH_RECEIVEITEM;
+			sc_start SC_CASH_PLUSEXP,1000*60*60*24,.VIPs_PlatinumExpRate;
+			sc_start SC_CASH_RECEIVEITEM,1000*60*60*24,.VIPs_PlatinumItemRate; goto L_displayInfo;
 		}
 		
 	}
 	
-	if (.@accountType$ == "GOLD")
-	{
-		// Daily Bonus
-		if(#dailytimer < gettimetick(2)) {
-			announce "Here's your VIP daily reward, you'll get another one after 24 hours.",bc_blue|bc_self;
-			for(set .@i,0; .@i < getarraysize(.Daily_Gifts);set .@i,.@i+1) {
-					getitem .Daily_Gifts[.@i],.Gold_Amount[.@i];
-			}
-			set #dailytimer,gettimetick(2) + 86400; //24 hours.
-		}
-		else{
-		set .@last,#dailytimer - gettimetick(2);
-		set .@hour, .@last % ( 24 * 3600 ) / 3600;
-		set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
-		set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
-		announce "Next VIP awards will be in : "+.@hour+":"+.@min+":"+.@sec+"",bc_blue|bc_self;
-		}
+	if (.@accountType$ == "GOLD") {
 		set .@getVipStatus,query_sql("SELECT `status` FROM `vip_gold` WHERE `account_id` = "+getcharid(3)+";",.@vipStatus$); // Obtener el estado de la cuenta
 		set .@getExpirationDate$,query_sql("SELECT DATE_FORMAT(`end_date`, '%Y %m %d') FROM vip_gold WHERE `account_id` = "+getcharid(3)+";",.@expirationDate$);	// Obtener Fecha de expiración
 		if (gettimestr("%Y %m %d",21) >= .@expirationDate$) // Si la fecha de HOY es mayor que la fecha de expiración...
@@ -105,31 +73,15 @@ OnPCLoginEvent:
 		//	If expiration date has not arrived yet, ACTIVEte VIP benefits.
 		else
 		{
-			sc_end sc_expboost;
-			sc_end sc_itemboost;
-			sc_start sc_expboost,1000*60*60*24,.VIPs_GoldExpRate;
-			sc_start sc_itemboost,1000*60*60*24,.VIPs_GoldItemRate; goto L_displayInfo;
+			sc_end SC_CASH_PLUSEXP;
+			sc_end SC_CASH_RECEIVEITEM;
+			sc_start SC_CASH_PLUSEXP,1000*60*60*24,.VIPs_GoldExpRate;
+			sc_start SC_CASH_RECEIVEITEM,1000*60*60*24,.VIPs_GoldItemRate; goto L_displayInfo;
 		}
 		
 	}
 	
-	if (.@accountType$ == "SILVER")
-	{
-		// Daily Bonus
-		if(#dailytimer < gettimetick(2)) {
-			announce "Here's your VIP daily reward, you'll get another one after 24 hours.",bc_blue|bc_self;
-			for(set .@i,0; .@i < getarraysize(.Daily_Gifts);set .@i,.@i+1) {
-					getitem .Daily_Gifts[.@i],.Silver_Amount[.@i];
-			}
-			set #dailytimer,gettimetick(2) + 86400; //24 hours.
-		}
-		else{
-		set .@last,#dailytimer - gettimetick(2);
-		set .@hour, .@last % ( 24 * 3600 ) / 3600;
-		set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
-		set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
-		announce "Next VIP rewards will be in : "+.@hour+":"+.@min+":"+.@sec+"",bc_blue|bc_self;
-		}
+	if (.@accountType$ == "SILVER") {
 		set .@getVipStatus,query_sql("SELECT `status` FROM `vip_silver` WHERE `account_id` = "+getcharid(3)+";",.@vipStatus$); // Obtener el estado de la cuenta
 		set .@getExpirationDate$,query_sql("SELECT DATE_FORMAT(`end_date`, '%Y %m %d') FROM vip_silver WHERE `account_id` = "+getcharid(3)+";",.@expirationDate$);	// Obtener Fecha de expiración
 		if (gettimestr("%Y %m %d",21) >= .@expirationDate$) // Si la fecha de HOY es mayor que la fecha de expiración...
@@ -140,31 +92,16 @@ OnPCLoginEvent:
 		//	If expiration date has not arrived yet, ACTIVEte VIP benefits.
 		else
 		{
-			sc_end sc_expboost;
-			sc_end sc_itemboost;
-			sc_start sc_expboost,1000*60*60*24,.VIPs_SilverExpRate;
-			sc_start sc_itemboost,1000*60*60*24,.VIPs_SilverItemRate; goto L_displayInfo;
+			sc_end SC_CASH_PLUSEXP;
+			sc_end SC_CASH_RECEIVEITEM;
+			sc_start SC_CASH_PLUSEXP,1000*60*60*24,.VIPs_SilverExpRate;
+			sc_start SC_CASH_RECEIVEITEM,1000*60*60*24,.VIPs_SilverItemRate; goto L_displayInfo;
 		}
 
 	}
 	
 	// If account type is normal, just display account type information.
-	if (.@accountType$ == "NORMAL")
-	{
-		if(#dailytimer < gettimetick(2)) {
-			announce "Here's your daily gifts, you'll get another one after 24 hours.",bc_blue|bc_self;
-			for(set .@i,0; .@i < getarraysize(.Daily_Gifts);set .@i,.@i+1) {
-					getitem .Daily_Gifts[.@i],.Normal_Amount[.@i];
-			}
-			set #dailytimer,gettimetick(2) + 86400; //24 hours.
-		}
-		else{
-		set .@last,#dailytimer - gettimetick(2);
-		set .@hour, .@last % ( 24 * 3600 ) / 3600;
-		set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
-		set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
-		announce "Next daily gifts will be in : "+.@hour+":"+.@min+":"+.@sec+"",bc_blue|bc_self;
-		}
+	if (.@accountType$ == "NORMAL") {
 		set .@getVipStatus,query_sql("SELECT `status` FROM `vip_silver` WHERE `account_id` = "+getcharid(3)+";",.@vipStatus$); // Obtener el estado de la cuenta
 		set .@getExpirationDate$,query_sql("SELECT DATE_FORMAT(`end_date`, '%Y %M %d') FROM vip_silver WHERE `account_id` = "+getcharid(3)+";",.@expirationDate$);	// Obtener Fecha de expiración
 		goto L_displayInfo;
@@ -580,11 +517,6 @@ set .VIPs_AdminGmLevel,99;		// Define GM Level enabled to add, list and	*
 							// remove VIP entries. Any GM with access le-	*
 							// vel equal or higher than this will be able	*
 							// to manage VIP Accounts.						*
-setarray .Daily_Gifts[0],14232;	// Daily Gifts					*
-setarray .Normal_Amount[0],2;	// Normal Amount						*
-setarray .Silver_Amount[0],4;	// Silver Amount						*
-setarray .Gold_Amount[0],7;	// Gold Amount								*
-setarray .Platinum_Amount[0],10;	// Platinum Amount					*
 //	********************************************************************
 }
 

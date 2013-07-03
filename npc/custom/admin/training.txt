@@ -29,6 +29,7 @@ train,20,108,4	script	ExhilarateRO Welcomer	75,{
 		}
 
 L_Tutorial:
+		if(job_novice_q < 1) {
 		mes "[ExhilarateRO Welcomer]";
 		mes "Hello there! Welcome to the World of ExhilarateRO. I'm in charge of giving you basic gameplay tips.";
 		mes "Click on the [Next] button or press [Enter] to continue.";
@@ -49,6 +50,7 @@ L_Tutorial:
 		next;
 		warpportal 28,111,"train",139,168;
 		setquest 30000;
+		set job_novice_q,1;
 		mes "[ExhilarateRO Welcomer]";
 		mes "Walk over that portal.";
 		mes "I will be waiting for you at the end of that portal.";
@@ -69,11 +71,18 @@ L_Tutorial:
 		mes "Have you checked the Quest Info Window?";
 		mes "I'll be waiting in the castle across the bridge.";
 		close;
+		}
+	else {
+	mes "[ExhilarateRO Welcomer]";
+	mes "I will be waiting for you at the end of that portal.";
+	close;
+	}
 
 OnInit:
 waitingroom "ExhilarateRO Welcomer",0;
 end;
 }
+train,28,111,0	warp	train#1	1,1,train,139,168
 
 // ExhilarateRO Welcomer (Inside Castle)
 //============================================================
@@ -83,6 +92,14 @@ train,139,179,4	script	ExhilarateRO Welcomer#2	90,{
 	}
 	if(job_novice_q == 1) {
 	callsub L_Questcom;
+	}
+	else {
+	mes "[ExhilarateRO Welcomer]";
+	mes "Instructor 'Brade' will help you afterwards.";
+	mes "Please, Go see him.";
+	close2;
+	warp "train",140,101;
+	end;
 	}
 
 L_Tutorial:
@@ -100,6 +117,7 @@ L_Tutorial:
 		mes "Attacking monsters and conversations with the people of this world can be done by simply clicking on them.";
 		next;
 		cutin "",255;
+		setquest 30000;
 		set job_novice_q,1;
 		mes "[ExhilarateRO Welcomer]";
 		mes "Well then, I will give you a quest to talk to me.";
@@ -191,8 +209,8 @@ train,140,108,4	script	Brade#1	733,{
 		getitem 1243,1;	// Novice_Knife
 		getitem 2112,1;	// Novice_Guard
 		getitem 569,300;	// Novice_Potion
-		setquest 30002;
 		set job_novice_q,5;
+		setquest 30002;
 		next;
 		mes "[Instructor Brade]";
 		mes "In the upper left Basic Info Window, press the 'Item' icon to open the Item Window.";

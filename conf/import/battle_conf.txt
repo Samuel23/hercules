@@ -199,7 +199,7 @@ pet_status_support: yes
 /* player.conf */
 
 // Maximum atk speed. (Default 190, Highest allowed 199)
-max_aspd: 196
+max_aspd: 193
 
 // Same as max_aspd, but for 3rd classes. (Default 193, Highest allowed 199)
 max_third_aspd: 196

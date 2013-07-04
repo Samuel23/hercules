@@ -6,7 +6,7 @@
 // Want to show your thanks via Paypal? Shoot me a buck or two : decadenthearts06@gmail.com - Thanks!
 
 	OnInit:
-		bindatcmd "go","gobind::OnAtcommand",1,10;
+		bindatcmd "go","gobind::OnAtcommand",0,10;
 		end;
 	
 OnAtcommand:

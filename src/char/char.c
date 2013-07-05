@@ -75,7 +75,9 @@ static DBMap* char_db_; // int char_id -> struct mmo_charstatus*
 
 char db_path[1024] = "db";
 
-int db_use_sqldbs;
+int db_use_sql_item_db;
+int db_use_sql_mob_db;
+int db_use_sql_mob_skill_db;
 
 struct mmo_map_server {
 	int fd;
@@ -3620,7 +3622,7 @@ static void char_delete2_req(int fd, struct char_session_data* sd)
 static void char_delete2_accept(int fd, struct char_session_data* sd)
 {// CH: <0829>.W <char id>.L <birth date:YYMMDD>.6B
 	char birthdate[8+1];
-	int char_id, i, k;
+	int char_id, i;
 	unsigned int base_level;
 	char* data;
 	time_t delete_date;

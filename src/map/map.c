@@ -357,7 +357,7 @@ int map_moveblock(struct block_list *bl, int x1, int y1, unsigned int tick)
 
 	//TODO: Perhaps some outs of bounds checking should be placed here?
 	if (bl->type&BL_CHAR) {
-		sc = status_get_sc(bl);
+		sc = iStatus->get_sc(bl);
 
 		skill->unit_move(bl,tick,2);
 		status_change_end(bl, SC_RG_CCONFINE_M, INVALID_TIMER);
@@ -1672,7 +1672,7 @@ int map_quit(struct map_session_data *sd) {
 	if( sd->sc.count ) {
 		//Status that are not saved...
 		for(i=0; i < SC_MAX; i++){
-			if ( status_get_sc_type(i)&SC_NO_SAVE ){
+			if ( iStatus->get_sc_type(i)&SC_NO_SAVE ){
 				if ( !sd->sc.data[i] )
 					continue;
 				switch( i ){
@@ -3548,9 +3548,17 @@ int inter_config_read(char *cfgName) {
 			strcpy(map_server_db, w2);
 		else if(strcmpi(w1,"default_codepage")==0)
 			strcpy(default_codepage, w2);
-		else if(strcmpi(w1,"use_sql_db")==0) {
-			iMap->db_use_sqldbs = config_switch(w2);
-			ShowStatus ("Using SQL dbs: %s\n",w2);
+		else if(strcmpi(w1,"use_sql_item_db")==0) {
+			iMap->db_use_sql_item_db = config_switch(w2);
+			ShowStatus ("Using item database as SQL: '%s'\n", w2);
+		}
+		else if(strcmpi(w1,"use_sql_mob_db")==0) {
+			iMap->db_use_sql_mob_db = config_switch(w2);
+			ShowStatus ("Using monster database as SQL: '%s'\n", w2);
+		}
+		else if(strcmpi(w1,"use_sql_mob_skill_db")==0) {
+			iMap->db_use_sql_mob_skill_db = config_switch(w2);
+			ShowStatus ("Using monster skill database as SQL: '%s'\n", w2);
 		}
 		/* sql log db */
 		else if(strcmpi(w1,"log_db_ip")==0)
@@ -5043,7 +5051,7 @@ void do_final(void)
 	homun->final();
 	atcommand->final_msg();
 	skill->final();
-	do_final_status();
+	iStatus->do_final_status();
 	do_final_unit();
 	do_final_battleground();
 	do_final_duel();
@@ -5254,6 +5262,7 @@ void map_hp_symbols(void) {
 	HPM->share(party,"party");
 	HPM->share(storage,"storage");
 	HPM->share(trade,"trade");
+	HPM->share(iStatus,"iStatus");
 	/* partial */
 	HPM->share(mapit,"mapit");
 	/* sql link */
@@ -5289,6 +5298,7 @@ void load_defaults(void) {
 	party_defaults();
 	storage_defaults();
 	trade_defaults();
+	status_defaults();
 }
 int do_init(int argc, char *argv[])
 {
@@ -5317,7 +5327,9 @@ int do_init(int argc, char *argv[])
 	iMap->night_flag = 0; // 0=day, 1=night [Yor]
 	iMap->enable_spy = 0; //To enable/disable @spy commands, which consume too much cpu time when sending packets. [Skotlex]
 
-	iMap->db_use_sqldbs = 0;
+	iMap->db_use_sql_item_db = 0;
+	iMap->db_use_sql_mob_db = 0;
+	iMap->db_use_sql_mob_skill_db = 0;
 
 	sprintf(iMap->item_db_db, "item_db");
 	sprintf(iMap->item_db2_db, "item_db2");
@@ -5476,7 +5488,7 @@ int do_init(int argc, char *argv[])
 	read_map_zone_db();/* read after item and skill initalization */
 	do_init_mob();
 	pc->do_init_pc();
-	do_init_status();
+	iStatus->do_init_status();
 	party->do_init_party();
 	guild->init();
 	storage->init();

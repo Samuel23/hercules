@@ -9,7 +9,7 @@
 //	Makes a new Apple Ring (2795) Quest for 10 Apples (512) and 1000 Zeny
 
 -	shop	questshop	111,512:1000;
-mall,115,139,4	script	Quester	900,{
+mall,115,139,4	script	Hat Maker	408,{
 	query_sql("CREATE TABLE IF NOT EXISTS `questnpc` (  `itemid` int(11) NOT NULL,  `questitems` longtext NOT NULL,  PRIMARY KEY (`itemid`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
 	set .npcname$,"[^0000FF"+strnpcinfo(1)+"^000000]";
 	set .itemtype,0; // 0 = All | list below -> example: 256 for Uppers

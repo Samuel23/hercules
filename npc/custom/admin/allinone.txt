@@ -565,7 +565,7 @@ Get_3rditem:
 		mes "[ ^336699Coin Exchanger^000000 ]";
 		mes "What do you want to do today?";
 		next;
-		switch(select("Coins->Zeny:Zeny->Coins:Cancel")) {
+		switch(select("Coins->Zeny:Zeny->Coins:Vote Points->Vote Coin:Cancel")) {
 			case 1:	//Coins->Zeny
 				mes "[ ^336699Coin Exchanger^000000 ]";
 				mes "Very well. Here is the list on how much each coin is worth:";
@@ -613,6 +613,40 @@ Get_3rditem:
 						callsub ZentoCoins,.Platinumcoin,677;
 					default:
 						goto L_No;
+				}
+			case 3:	//Vote Points->Vote Coin
+				mes "So you want to exchange your Vote Points to Vote Coins?";
+				switch (select("Yes:No")) {
+				case 1:
+					query_sql "SELECT `points` FROM `cp_v4p_voters` WHERE `account_id` = '"+getcharid(3)+"'",.@vpoints;
+					next;
+					mes "[ ^336699Coin Exchanger^000000 ]";
+					mes "So you have ^0000FF"+.@vpoints+"^000000 vote points.";
+					mes "How many points you want to exchange for vote coins?";
+					input .@vptamt;
+					next;
+					if (.@vpoints < .@vptamt) {
+						mes "[ ^336699Coin Exchanger^000000 ]";
+						mes "Sorry but you don't have enough vote points!";
+						close2;
+						cutin "", 255;
+						end;
+					}
+					else {
+						mes "[ ^336699Coin Exchanger^000000 ]";
+						mes "So you want to exchange ^FF0000"+.@vptamt+"^000000 of vote points";
+						mes "Exchange now?";
+						switch (select("Yes:No")) {
+							case 1:
+								query_sql "UPDATE `cp_v4p_voters` SET `points` = '"+(.@vpoints - .@vptamt)+"' WHERE `account_id` = '"+getcharid(3)+"'";
+								getitem 31050,.@vptamt;
+								goto L_Thanks;
+							default:
+								goto L_No;
+						}
+					}
+				default:
+					goto L_No;
 				}
 			default:
 				goto L_No;

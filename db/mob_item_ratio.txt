@@ -28,3 +28,13 @@
 //   for different monsters, override drop rate with Ratio=100 and edit
 //   base drop rates in mob_db.
 // - This file is reloaded by @reloadmobdb.
+
+12921,500
+12920,500
+30000,2000
+30001,1000
+30002,2000
+616,10000
+616,10000
+13550,2000
+2423,100,1354

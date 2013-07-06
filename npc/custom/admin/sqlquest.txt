@@ -21,91 +21,84 @@ mall,115,139,4	script	Hat Maker	408,{
 		mes "I'm sorry, but I'm out of items. Ask a Game Master to add some items";
 		close;
 	}
-	set .@i,0;
-	set .@ii,0;
-	if(.itemtype == 0) {
-		set .@itemtypes$,"";
-		while(.@i < .items) {
-			if(strpos(.@itemtypes$, ""+getiteminfo(.item[.@i], 5)+" ")) {
-				set .@itemtypes$,".@itemtypes$ "+getiteminfo(.item[.@i], 5)+"";
-				set .@type$[.@ii],""+getiteminfo(.item[.@i], 5)+" ";
-				set .@tname$,"Other";
-				if(getiteminfo(.item[.@i], 5) == 256) set .@tname$,"Upper Headgear";
-				if(getiteminfo(.item[.@i], 5) == 512) set .@tname$,"Middle Headgear";
-				if(getiteminfo(.item[.@i], 5) == 1) set .@tname$,"Lower Headgear";
-				if(getiteminfo(.item[.@i], 5) == 16) set .@tname$,"Armor";
-				if(getiteminfo(.item[.@i], 5) == 2) set .@tname$,"Weapon";
-				if(getiteminfo(.item[.@i], 5) == 32) set .@tname$,"Shield";
-				if(getiteminfo(.item[.@i], 5) == 4) set .@tname$,"Garment";
-				if(getiteminfo(.item[.@i], 5) == 64) set .@tname$,"Footgear";
-				if(getiteminfo(.item[.@i], 5) == 8 || getiteminfo(.item[.@i], 5) == 128 || getiteminfo(.item[.@i], 5) == 136) set .@tname$,"Accessory";
-				set .@typename$[.@ii],""+.@tname$+"";
-				if(.@tname$ != "Other") set .@menu$,""+.@menu$+":"+.@tname$+"";
-				set .@ii,.@ii+1;
-			}
-			set .@i,.@i+1;
-		}
-		set .@i,0;
+	else {
 		mes "What are you searching for?";
 		next;
-		set .@num,select(""+.@menu$+":Other");
-		set .@num,.@num-2;
-		set .@shopitems,0;
-		while(.@i < .items) {
-			set .@item,.item[.@i];
-			if(.@num == .@ii) {
-				if(getiteminfo(.item[.@i], 5) != 256 && getiteminfo(.item[.@i], 5) != 512 && getiteminfo(.item[.@i], 5) != 1 && getiteminfo(.item[.@i], 5) != 16 && getiteminfo(.item[.@i], 5) != 2 && getiteminfo(.item[.@i], 5) != 32 && getiteminfo(.item[.@i], 5) != 4 && getiteminfo(.item[.@i], 5) != 64 &&  getiteminfo(.item[.@i], 5) != 8 &&  getiteminfo(.item[.@i], 5) != 128 &&  getiteminfo(.item[.@i], 5) != 136) {
-					if(.@shopitems == 0) {
-						npcshopitem "questshop",.@item,getiteminfo(@item,0);
-						set .@shopitems,1;
-					} else {
-						npcshopadditem "questshop",.@item,getiteminfo(@item,0);
-						set .@shopitems,.@shopitems+1;
+		switch (select("Upper Headgear:Middle Headgear:Lower Headgear")) {
+			case 1:
+				set .@shopitems,0;
+				set .@i,0;
+				set .itemtype,256;
+				while(.@i < .items) {
+				set .@item,.item[.@i];
+					if(getiteminfo(.item[.@i], 5) == .itemtype) {
+						if(.@shopitems == 0) {
+							npcshopitem "questshop",.@item,getiteminfo(@item,0);
+							set .@shopitems,1;
+						}
+						else {
+							npcshopadditem "questshop",.@item,getiteminfo(@item,0);
+							set .@shopitems,.@shopitems+1;
+						}
 					}
+				set .@i,.@i+1;
 				}
-			} else {
-				if(getiteminfo(.item[.@i], 5) == getiteminfo(.item[.@num], 5)) {
-					if(.@shopitems == 0) {
-						npcshopitem "questshop",.@item,getiteminfo(@item,0);
-						set .@shopitems,1;
-					} else {
-						npcshopadditem "questshop",.@item,getiteminfo(@item,0);
-						set .@shopitems,.@shopitems+1;
+				break;
+			case 2:
+				set .@shopitems,0;
+				set .@i,0;
+				set .itemtype,512;
+				while(.@i < .items) {
+				set .@item,.item[.@i];
+					if(getiteminfo(.item[.@i], 5) == .itemtype) {
+						if(.@shopitems == 0) {
+							npcshopitem "questshop",.@item,getiteminfo(@item,0);
+							set .@shopitems,1;
+						}
+						else {
+							npcshopadditem "questshop",.@item,getiteminfo(@item,0);
+							set .@shopitems,.@shopitems+1;
+						}
 					}
+				set .@i,.@i+1;
 				}
-			}
-			set .@i,.@i+1;
+				break;
+			case 3:
+				set .@shopitems,0;
+				set .@i,0;
+				set .itemtype,1;
+				while(.@i < .items) {
+				set .@item,.item[.@i];
+					if(getiteminfo(.item[.@i], 5) == .itemtype) {
+						if(.@shopitems == 0) {
+							npcshopitem "questshop",.@item,getiteminfo(@item,0);
+							set .@shopitems,1;
+						}
+						else {
+							npcshopadditem "questshop",.@item,getiteminfo(@item,0);
+							set .@shopitems,.@shopitems+1;
+						}
+					}
+				set .@i,.@i+1;
+				}
+				break;
+			default:
+				close;
 		}
-	} else {
-		set .@shopitems,0;
 		set .@i,0;
-		while(.@i < .items) {
-			set .@item,.item[.@i];
-			if(getiteminfo(.item[.@i], 5) == .itemtype) {
-				if(.@shopitems == 0) {
-					npcshopitem "questshop",.@item,getiteminfo(@item,0);
-					set .@shopitems,1;
-				} else {
-					npcshopadditem "questshop",.@item,getiteminfo(@item,0);
-					set .@shopitems,.@shopitems+1;
-				}
-			}
-			set .@i,.@i+1;
-		}
-	}
-	set .@i,0;
-	if(.@shopitems == 0) {
+		if(.@shopitems == 0) {
 		mes .npcname$;
 		mes "I'm sorry! I don't have any other items";
 		emotion 17;
 		emotion 23,1;
 		close();
-	} else {
+		} else {
 		close2;
 		npcshopattach "questshop";
 		callshop "questshop",1;
+		}
+		end;
 	}
-	end;
 
 	OnBuyItem:
 		set .@quest, query_sql("SELECT `itemid`, `questitems` FROM `questnpc` WHERE `itemid` LIKE '"+@bought_nameid+"'", .@questid, .@req$);

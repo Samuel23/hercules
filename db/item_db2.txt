@@ -61,4 +61,8 @@
 //==================================================================
 //2338,Wedding_Dress,Wedding Dress,5,43000,,500,,0,,0,0xFFFFFFFE,7,0,16,,0,1,0,{},{ sc_start SC_WEDDING,-1,0; },{ sc_end SC_WEDDING; }
 //7170,Tuxedo,Tuxedo,5,43000,,10,,0,,0,0xFFFFFFFE,7,1,16,,0,1,0,{},{ sc_start SC_WEDDING,-1,0; },{ sc_end SC_WEDDING; }
+30000,Acid_Bomb_Box_100,Acid Bomb Box II,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 7135,100; getitem 7136,100; },{},{}
+30001,Yggdrasil_Berry_Box_20,Yggdrasil Berry Box II,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 607,20; },{},{}
+30002,Poison_Bottle_Box_40,Poison Bottle Box II,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 678,40; },{},{}
+30003,Fish_Slice_Box_50,Fish Slice Box II,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 14524,50; },{},{}
 31050,Vote_Coin,Vote Coin,3,0,,0,,,,,0xFFFFFFFF,7,2,,,,,,{},{},{}

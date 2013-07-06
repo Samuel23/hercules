@@ -226,7 +226,7 @@ int battle_delay_damage_sub(int tid, unsigned int tick, int id, intptr_t data) {
 		}
 
 		src = iMap->id2bl(dat->src_id);
-
+		
 		if( src && target->m == src->m &&
 			(target->type != BL_PC || ((TBL_PC*)target)->invincible_timer == INVALID_TIMER) &&
 			check_distance_bl(src, target, dat->distance) ) //Check to see if you haven't teleported. [Skotlex]
@@ -246,6 +246,9 @@ int battle_delay_damage_sub(int tid, unsigned int tick, int id, intptr_t data) {
 			status_fix_damage(target, target, dat->damage, dat->delay);
 			iMap->freeblock_unlock();
 		}
+		
+		if( src && src->type == BL_PC )
+			((TBL_PC*)src)->delayed_damage--;
 	}
 	ers_free(delay_damage_ers, dat);
 	return 0;
@@ -287,6 +290,9 @@ int battle_delay_damage (unsigned int tick, int amotion, struct block_list *src,
 	if (src->type != BL_PC && amotion > 1000)
 		amotion = 1000; //Aegis places a damage-delay cap of 1 sec to non player attacks. [Skotlex]
 
+	if( src->type == BL_PC )
+		((TBL_PC*)src)->delayed_damage++;
+	
 	iTimer->add_timer(tick+amotion, battle->delay_damage_sub, 0, (intptr_t)dat);
 
 	return 0;
@@ -1554,7 +1560,7 @@ int battle_calc_skillratio(int attack_type, struct block_list *src, struct block
 
 					if( sd && sd->status.party_id ){
 						struct map_session_data* psd;
-						int static p_sd[5] = {0, 0, 0, 0, 0}, c; // just limit it to 5
+						int p_sd[5] = {0, 0, 0, 0, 0}, c; // just limit it to 5
 
 						c = 0;
 						memset (p_sd, 0, sizeof(p_sd));
@@ -1594,7 +1600,7 @@ int battle_calc_skillratio(int attack_type, struct block_list *src, struct block
 					break;
 				case LG_RAYOFGENESIS:
 				{
-					int16 lv = skill_lv;
+					uint16 lv = skill_lv;
 					int bandingBonus = 0;
 					if( sc && sc->data[SC_BANDING] )
 						bandingBonus = 200 * (sd ? skill->check_pc_partner(sd,skill_id,&lv,skill->get_splash(skill_id,skill_lv),0) : 1);
@@ -2378,7 +2384,7 @@ int battle_calc_skillratio(int attack_type, struct block_list *src, struct block
 				case WM_GREAT_ECHO:
 					skillratio += 800 + 100 * skill_lv;
 					if( sd ) {	// Still need official value [pakpil]
-						short lv = (short)skill_lv;
+						uint16 lv = skill_lv;
 						skillratio += 100 * skill->check_pc_partner(sd,skill_id,&lv,skill->get_splash(skill_id,skill_lv),0);
 					}
 					break;
@@ -6461,7 +6467,7 @@ static const struct _battle_data {
 	{ "item_enabled_npc",					&battle_config.item_enabled_npc,				1,      0,      1,				},
 	{ "gm_ignore_warpable_area",			&battle_config.gm_ignore_warpable_area,			0,		2,		100,			},
 	{ "packet_obfuscation",					&battle_config.packet_obfuscation,				1,		0,		3,				},
-	{ "client_accept_chatdori",             &battle_config.client_accept_chatdori,          0,      0,      1,         		},
+	{ "client_accept_chatdori",             &battle_config.client_accept_chatdori,          0,      0,      INT_MAX,		},
 };
 #ifndef STATS_OPT_OUT
 /**

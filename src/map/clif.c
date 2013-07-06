@@ -10664,7 +10664,7 @@ void clif_parse_EquipItem(int fd,struct map_session_data *sd)
 	else if ( pc_cant_act2(sd) || sd->state.prerefining )
 		return;
 
-	if(!sd->status.inventory[index].identify) {
+	if(!sd->status.inventory[index].identify || sd->delayed_damage != 0) {
 		clif->equipitemack(sd,index,0,0);	// fail
 		return;
 	}
@@ -13255,9 +13255,14 @@ void clif_parse_GMKick(int fd, struct map_session_data *sd)
 
 		case BL_NPC:
 		{
-			char command[NAME_LENGTH+11];
-			sprintf(command, "%cunloadnpc %s", atcommand->at_symbol, iStatus->get_name(target));
-			atcommand->parse(fd, sd, command, 1);
+			struct npc_data* nd = (struct npc_data *)target;
+			if( !pc->can_use_command(sd, "@unloadnpc")) {
+				clif->GM_kickack(sd, 0);
+				return;
+			}
+			npc_unload_duplicates(nd);
+			npc_unload(nd,true);
+			npc_read_event_script();
 		}
 		break;
 
@@ -13419,6 +13424,7 @@ void clif_parse_GMReqNoChat(int fd,struct map_session_data *sd)
 		if (pc->get_group_level(sd) > 0 || sd->bl.id != id)
 			return;
 
+		value = battle_config.client_accept_chatdori;
 		dstsd = sd;	
 	}
 	else

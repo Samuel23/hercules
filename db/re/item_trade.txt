@@ -1956,3 +1956,6 @@
 4542,457,100	// Sealed Detale Card
 4543,457,100	// Sealed Hatii Card
 4544,457,100	// Sealed Evil Snake Lord Card
+
+// Custom Items
+30010,511,100	// Starting Gear Box

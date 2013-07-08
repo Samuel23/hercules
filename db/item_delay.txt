@@ -35,3 +35,10 @@
 12732,1000 // Runstone_Pertz,Wyrd Rune
 22540,60000 // Runstone_Luxanima,Lux Anima Rune
 
+// Custom Items
+30004,3000 // Premium Fly Wing 3 secs
+30005,3000 // Premium Fish Slice 3 secs
+30006,1800000 // Premium Field Manual 30 minutes
+30007,7200000 // Premium Bubble Gum 2 hours
+30008,3000 // Premium Green Potion 3 secs
+30009,1800000 // Premium Life Insurance 30 minutes

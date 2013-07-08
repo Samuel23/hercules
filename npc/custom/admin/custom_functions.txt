@@ -1,0 +1,84 @@
+function	script	startingbox	{
+
+set .@time,604800;	// 7 days
+setarray .@Swordsman[0],1407,1101,2315,2766,2766,2405,2505,2105;
+setarray .@Mage[0],2321,2102,2403,2503,1642,2768,2768;
+setarray .@Archer[0],2330,1716,2405,2503,2769,2769;
+setarray .@Acolyte[0],2325,2103,2403,2503,1519,2767,2767;
+setarray .@Merchant[0],1353,2315,2103,2405,2505,2771,2771;
+setarray .@Thief[0],2335,2103,1207,2405,2505,2770,2770;
+setarray .@Gunslinger[0],2321,2605,2605,2102,2403,2503,13111;
+setarray .@Ninja[0],2337,2102,2403,2503,1207,2607,2607;
+setarray .@Taekwon[0],1550,2102,2403,2503,2607,2607,2321;
+
+	mes "[^FF0000Gear Expert^000000]";
+	mes "So which job's starting item set do you want?";
+	switch(select("Swordsman:Mage:Archer:Acolyte:Merchant:Thief:Gunslinger:Ninja:Taekwon:Cancel")) {
+		case 1:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Swordsman); set .@i, .@i +1 ) {
+				rentitem .@Swordsman[.@i],.@time;
+			}
+			close;
+			end;
+		case 2:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Mage); set .@i, .@i +1 ) {
+				rentitem .@Mage[.@i],.@time;
+			}
+			close;
+			end;
+		case 3:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Archer); set .@i, .@i +1 ) {
+				rentitem .@Archer[.@i],.@time;
+			}
+			close;
+			end;
+		case 4:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Acolyte); set .@i, .@i +1 ) {
+				rentitem .@Acolyte[.@i],.@time;
+			}
+			close;
+			end;
+		case 5:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Merchant); set .@i, .@i +1 ) {
+				rentitem .@Merchant[.@i],.@time;
+			}
+			close;
+			end;
+		case 6:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Thief); set .@i, .@i +1 ) {
+				rentitem .@Thief[.@i],.@time;
+			}
+			close;
+			end;
+		case 7:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Gunslinger); set .@i, .@i +1 ) {
+				rentitem .@Gunslinger[.@i],.@time;
+			}
+			close;
+			end;
+		case 8:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Ninja); set .@i, .@i +1 ) {
+				rentitem .@Ninja[.@i],.@time;
+			}
+			close;
+			end;
+		case 9:
+			set .@i,0;
+			for( set .@i, 0; .@i < getarraysize(.@Taekwon); set .@i, .@i +1 ) {
+				rentitem .@Taekwon[.@i],.@time;
+			}
+			close;
+			end;
+		default:
+			close;
+	}
+	return;
+}

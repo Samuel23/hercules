@@ -20,7 +20,7 @@ function Go; function Disp; function Pick;
 
 menu	"Last Warp ^777777["+lastwarp$+"]^000000",-,
 	" ~ Towns",Towns, " ~ Fields",Fields, " ~ Dungeons",Dungeons,
-	" ~ Guild Castles",Castles, " ~ Special Areas",Special;
+	" ~ Guild Castles",Castles, " ~ PvP/GvG",PvP, " ~ Special Areas",Special;
 
 	if (lastwarp$ == "") dispbottom "You have not warped anywhere yet.";
 		else warp lastwarp$,lastwarpx,lastwarpy;
@@ -325,6 +325,38 @@ C6: setarray @c[2],293,100,288,252,97,196,137,90,71,315;
 	Pick("","sch_gld","sch_gld","sch_gld","sch_gld","sch_gld");
 
 // --------------------------------------------------
+	PvP:
+// --------------------------------------------------
+menu	"^0000FFNon-Donor PvP Arena 1 [" + getmapusers("pvpmap.gat") + " / 20]^000000",NPvP1,	// Non Donor with Usable items
+		//"^0000FFNon-Donor PvP Arena 2 [" + getmapusers("pvpmap2.gat") + " / 20]^000000",L2,	// Non Donor without Usable items
+		"^0000FFDonor PvP Arena 1 [" + getmapusers("pvpmap3.gat") + " / 20]^000000",DPvP1,	// Donor with Usable items
+		//"^0000FFDonor PvP Arena 2 [" + getmapusers("pvpmap4.gat") + " / 20]^000000",LD2,	// Donor without Usable items
+		"^FF0000GvG Arena 1 [" + getmapusers("guild_vs1.gat") + " / 20]^000000",GvG;	// GVG Room
+		//"^FF0000GvG Arena 2 [" + getmapusers("prt_are01.gat") + " / 20]^000000",L4,
+		//"Baby PvP Arena  [" + getmapusers("guild_vs2.gat") + " / 20]",L5,
+		//"Novice Event Arena  [" + getmapusers("nov_nov01.gat") + " / 20]",L6;
+
+NPvP1: 
+	if (getmapusers("pvpmap.gat") > 19) goto Lsorry;
+	else if ( Upper == 2 || Upper == 6 ) goto L_yesbaby;
+	callsub DetectDonate;
+	announce "[ "+strcharinfo(0)+" ] is warped into Non Donor PVP Arena 1.",0;
+	Go("pvpmap",0,0);
+
+DPvP1:
+	if (getmapusers("pvpmap3.gat") > 19) goto Lsorry;
+	else if ( Upper == 2 || Upper == 6 ) goto L_yesbaby;
+	announce "[ "+strcharinfo(0)+" ] is warped into Donor PVP Arena 1.",0;
+	Go("pvpmap3",0,0);
+
+GvG:
+	if (getmapusers("guild_vs1.gat") > 19) goto Lsorry2;
+	else if (getcharid(2) == 0) goto L_noguild;
+	announce "[ "+strcharinfo(0)+" ] is warped into GVG Arena 1.",0;
+	Go("guild_vs1",0,0);
+
+
+// --------------------------------------------------
 	Special:
 // --------------------------------------------------
 menu	"Mall/Vending",MV,"Auction Hall",S1, "Battlegrounds",S2, "Casino",S3, "Gonryun Arena",S4,
@@ -338,6 +370,111 @@ S4: Go("gon_test",48,10);
 S5: Go("arena_room",100,88);
 S6: Go("p_track01",62,41);
 S7: Go("turbo_room",99,114);
+
+Lsorry:
+mes "[Warper]";
+mes "Sorry but this PVP Arena is full, maybe you could try another one.";
+close;
+end;
+
+Lsorry2:
+mes "[Warper]";
+mes "Sorry but this GVG Arena is full, maybe you could try another one.";
+close;
+end;
+
+L_notbaby:
+mes "[Warper]";
+mes "Sorry but this PVP Arena is for baby jobs only!";
+close;
+end;
+
+L_yesbaby:
+mes "[Warper]";
+mes "Sorry but baby jobs cannot enter this PVP Arena!";
+close;
+end;
+
+L_noguild:
+mes "[Warper]";
+mes "Sorry but you don't have a guild!";
+close;
+end;
+
+DetectDonate:
+	for (set .@i,0; .@i < (getarraysize(.DonorUpper)); set .@i,.@i+1) {
+		if (countitem(.DonorUpper[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorUpper[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorLower)); set .@i,.@i+1) {
+		if	(countitem(.DonorLower[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorLower[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorMiddle)); set .@i,.@i+1) {
+		if	(countitem(.DonorMiddle[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorMiddle[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorArmor)); set .@i,.@i+1) {
+		if	(countitem(.DonorArmor[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorArmor[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorWeapon)); set .@i,.@i+1) {
+		if	(countitem(.DonorWeapon[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorWeapon[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorShield)); set .@i,.@i+1) {
+		if	(countitem(.DonorShield[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorShield[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorGarment)); set .@i,.@i+1) {
+		if	(countitem(.DonorGarment[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorGarment[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorShoes)); set .@i,.@i+1) {
+		if	(countitem(.DonorShoes[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorShoes[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorAccessories)); set .@i,.@i+1) {
+		if	(countitem(.DonorAccessories[.@i]) >= 1) {
+			next;
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorAccessories[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	return;
 }
 
 // --------------------------------------------------

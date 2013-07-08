@@ -26,3 +26,11 @@
 
 // Arch Bishop
 12333,3,1  // Ancilla
+
+// Premium Items
+30004,1,15  // Premium Fly Wing
+30005,1,15  // Premium Fish Slice
+30006,1,15  // Premium Field Manual
+30007,1,15  // Premium Bubble Gum
+30008,1,15  // Premium Green Potion
+30009,1,15  // Premium Life Insurance

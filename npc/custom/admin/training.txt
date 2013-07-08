@@ -1,32 +1,43 @@
 train,20,108,4	script	ExhilarateRO Welcomer	75,{
+
+	if(job_novice_q < 1) {
 		mes "[ExhilarateRO Welcomer]";
 		mes "Hi! Welcome to ExhilarateRO!";
 		mes "I know you're a new player, do you want to do some tutorials?";
+		next;
 		switch(select("Yes:No")) {
 		case 1:
 			callsub L_Tutorial;
 		case 2:
 			mes "[ExhilarateRO Welcomer]";
 			mes "Alright, I'll send you to the real world now.";
-			getitem 2352,1;	// Novice_Plate
-			getitem 2510,1;	// Novice_Hood
-			getitem 2414,1;	// Novice_Boots
-			getitem 5055,1;	// Novice_Egg_Cap
-			getitem 1243,1;	// Novice_Knife
-			getitem 2112,1;	// Novice_Guard
-			getitem 569,300;	// Novice_Potion
-			getitem 12323,50;	// N_Fly_Wing
-			getitem 12324,20;	// N_Butterfly_Wing
-			getitem 2393,1;	// N_Adventurer's_Suit
-			skill "NV_FIRSTAID",1,0;	// NV_FIRSTAID
-			getitem 7059,20;	// Cargo_Free_Ticket
-			getitem 7060,30;	// Warp_Free_Ticket
-			announce "Please welcome "+strcharinfo(0)+"  to our server!",bc_all,0x0099FF;
+			if (#newplayer == 0) {
+				getitem 30011,1;	// Account Freebies
+				set #newplayer,1;
+			}
+			if (Newplayer == 0) {
+				getitem 30010,1;	// Char Freebies
+				getitem 569,300;	// Novice_Potion
+				getitem 12323,50;	// N_Fly_Wing
+				getitem 12324,20;	// N_Butterfly_Wing
+				skill "NV_FIRSTAID",1,0;	// NV_FIRSTAID
+				getitem 7059,20;	// Cargo_Free_Ticket
+				getitem 7060,30;	// Warp_Free_Ticket
+				set Newplayer,1;
+				announce "Please welcome "+strcharinfo(0)+"  to our server!",bc_all,0x0099FF;
+			}
 			close2;
 			savepoint "Crystilia",70,68;
 			warp "Crystilia",70,68;
 			end;
 		}
+	}
+
+	else {
+	mes "[ExhilarateRO Welcomer]";
+	mes "I will be waiting for you at the end of that portal.";
+	close;
+	}
 
 L_Tutorial:
 		if(job_novice_q < 1) {
@@ -48,7 +59,6 @@ L_Tutorial:
 		mes "First off, try moving around.";
 		mes "Do you see that portal to the right?";
 		next;
-		warpportal 28,111,"train",139,168;
 		setquest 30000;
 		set job_novice_q,1;
 		mes "[ExhilarateRO Welcomer]";
@@ -931,6 +941,15 @@ train,111,101,4	script	Soldier#nv	105,{
 			next;
 			mes "[Brade]";
 			mes "Alright, I'll send you now to Crystilia where you can talk to ExhilarateRO Master to change your job.";
+			if (#newplayer == 0) {
+				getitem 30011,1;	// Account Freebies
+				set #newplayer,1;
+			}
+			if (Newplayer == 0) {
+				getitem 30010,1;	// Char Freebies
+				set Newplayer,1;
+				announce "Please welcome "+strcharinfo(0)+"  to our server!",bc_all,0x0099FF;
+			}
 			close2;
 			savepoint "Crystilia",70,68;
 			warp "Crystilia",70,68;

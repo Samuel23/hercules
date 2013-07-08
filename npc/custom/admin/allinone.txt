@@ -34,7 +34,7 @@ Crystilia,75,80,4	script	ExhilarateRO Master	108,{
 			close;
 
 			case 4:
-			warp "vend_zone",100,97;
+			warp "mall",99,117;
 			close;
 
 			default:

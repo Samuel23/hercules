@@ -684,7 +684,10 @@ void itemdb_read_groups(void) {
 			} else
 				itname = config_setting_get_string_elem(itg,c - 1);
 			
-			if( !( data = itemdb->name2id(itname) ) )
+			if( itname[0] == 'I' && itname[1] == 'D' && strlen(itname) < 7 ) {
+				if( !( data = itemdb->exists(atoi(itname+2)) ) )
+					ShowWarning("itemdb_read_groups: unknown item ID '%d' in group '%s'!\n",atoi(itname+2),config_setting_name(itg));
+			} else if( !( data = itemdb->name2id(itname) ) )
 				ShowWarning("itemdb_read_groups: unknown item '%s' in group '%s'!\n",itname,config_setting_name(itg));
 			
 			itemdb->groups[count].nameid[ecount] = data ? data->nameid : 0;
@@ -791,6 +794,7 @@ bool itemdb_read_cached_packages(const char *config_filename) {
 
 	for( i = 0; i < pcount; i++ ) {
 		unsigned short id = 0, random_qty = 0, must_qty = 0;
+		struct item_data *data;
 		struct item_package *package = &itemdb->packages[i];
 		unsigned short c;
 		
@@ -800,6 +804,11 @@ bool itemdb_read_cached_packages(const char *config_filename) {
 		fread(&must_qty,sizeof(must_qty),1,file);
 		//next 2 bytes = random count
 		fread(&random_qty,sizeof(random_qty),1,file);
+		
+		if( !(data = itemdb->exists(id)) )
+			ShowWarning("itemdb_read_packages: unknown package item '%d', skipping..\n",id);
+		else
+			data->package = &itemdb->packages[i];
 		
 		package->id = id;
 		package->random_qty = random_qty;
@@ -841,6 +850,7 @@ bool itemdb_read_cached_packages(const char *config_filename) {
 			CREATE(package->random_groups, struct item_package_rand_group, package->random_qty);
 			for(c = 0; c < package->random_qty; c++) {
 				unsigned short group_qty = 0, h;
+				struct item_package_rand_entry *prev = NULL;
 				
 				//next 2 bytes = how many entries in this group
 				fread(&group_qty,sizeof(group_qty),1,file);
@@ -855,6 +865,8 @@ bool itemdb_read_cached_packages(const char *config_filename) {
 					unsigned char announce = 0, named = 0;
 					struct item_data *data;
 
+					if( prev ) prev->next = entry;
+					
 					//first 2 byte = item id
 					fread(&mid,sizeof(mid),1,file);
 					//next 2 byte = qty
@@ -877,7 +889,11 @@ bool itemdb_read_cached_packages(const char *config_filename) {
 					entry->qty = qty;
 					entry->announce = announce ? 1 : 0;
 					entry->named = named ? 1 : 0;
+					
+					prev = entry;
 				}
+				if( prev )
+					prev->next = &itemdb->packages[i].random_groups[c].random_list[0];
 			}
 		}
 	}
@@ -1020,7 +1036,10 @@ void itemdb_read_packages(void) {
 			
 			itname = config_setting_name(it);
 			
-			if( !( data = itemdb->name2id(itname) ) )
+			if( itname[0] == 'I' && itname[1] == 'D' && strlen(itname) < 7 ) {
+				if( !( data = itemdb->exists(atoi(itname+2)) ) )
+					ShowWarning("itemdb_read_packages: unknown item ID '%d' in package '%s'!\n",atoi(itname+2),config_setting_name(itg));
+			} else if( !( data = itemdb->name2id(itname) ) )
 				ShowWarning("itemdb_read_packages: unknown item '%s' in package '%s'!\n",itname,config_setting_name(itg));
 
 			if( ( t = config_setting_get_member(it, "Count")) )
@@ -1674,7 +1693,6 @@ int itemdb_parse_dbrow(char** str, const char* source, int line, int scriptopt) 
 	if (*str[21+offset])
 		id->unequip_script = parse_script(str[21+offset], source, line, scriptopt);
 
-	strdb_put(itemdb->names, id->name, id);
 	return id->nameid;
 }
 
@@ -1901,10 +1919,16 @@ int itemdb_uid_load() {
  * read all item-related databases
  *------------------------------------*/
 static void itemdb_read(void) {
+	int i;
+	
 	if (iMap->db_use_sql_item_db)
 		itemdb_read_sqldb();
 	else
 		itemdb_readdb();
+	
+	for( i = 0; i < ARRAYLENGTH(itemdb_array); ++i )
+		if( itemdb_array[i] )
+			strdb_put(itemdb->names, itemdb_array[i]->name, itemdb_array[i]);
 	
 	itemdb_read_combos();
 	itemdb->read_groups();

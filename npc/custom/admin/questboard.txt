@@ -93,7 +93,7 @@ case 1:
 		mes "[^FF7700Questboard^000000]";
 		if(.@time_left < 60) mes "You have to wait ^0000FF"+.@time_left+" seconds^000000 to do this quest again.";
 		if(.@time_left < 3600) mes "You have to wait ^0000FF"+.@time_left/60+" minutes^000000 to do this quest again.";
-		mes "You have to wait ^0000FF"+.@time_left/60/60+" hours^000000 to do this quest again.";
+		else mes "You have to wait ^0000FF"+.@time_left/60/60+" hours^000000 to do this quest again.";
 		close;
 	}
 	mes "[^FF7700Questboard^000000]";
@@ -140,7 +140,7 @@ case 2:
 		mes "[^FF7700Questboard^000000]";
 		if(.@time_left < 60) mes "You have to wait ^0000FF"+.@time_left+" seconds^000000 to do this quest again.";
 		if(.@time_left < 3600) mes "You have to wait ^0000FF"+.@time_left/60+" minutes^000000 to do this quest again.";
-		mes "You have to wait ^0000FF"+.@time_left/60/60+" hours^000000 to do this quest again.";
+		else mes "You have to wait ^0000FF"+.@time_left/60/60+" hours^000000 to do this quest again.";
 		close;
 	}
 	mes "[^FF7700Questboard^000000]";
@@ -198,7 +198,7 @@ L_checkitems:
 	if(getd("." +currentquest$+"_collectionprize")!=0) getitem(getd("." +currentquest$+"_collectionprize"),getd("." +currentquest$+"_collectionamount"));
 	set Zeny,Zeny+getd("." +currentquest$+"_collectionzeny");
 	getexp getd("." +currentquest$+"_collectionexp["+0+"]"),getd("." +currentquest$+"_collectionexp["+1+"]");
-	setd(currentquest$ + "_collection_delay"),gettimetick(2)+.quest_delay;
+	setd(currentquest$ + "_collection_delay"),gettimetick(2)+getd("." +currentquest$+"_collectiondelay");
 	set currentquest$, "";
 	set c_run, 0;
 	close;
@@ -232,7 +232,7 @@ L_checkmobs2:
 	if(getd("." +currentquest$+"_huntingprize")!=0) getitem(getd("." +currentquest$+"_huntingprize"),getd("." +currentquest$+"_huntingamount"));
 	set Zeny, Zeny+getd("." +currentquest$+"_huntingzeny");
 	getexp getd("." +currentquest$+"_huntingexp["+0+"]"),getd("." +currentquest$+"_huntingexp["+1+"]");
-	setd(currentquest$ + "_hunting_delay"),gettimetick(2)+.quest_delay;
+	setd(currentquest$ + "_hunting_delay"),gettimetick(2)+getd("." +currentquest$+"_huntingdelay");
 	set currentquest$, "";
 	set h_run, 0;
 	close;
@@ -262,19 +262,22 @@ OnInit:
 	
 	//Quest Delay (seconds)
 	//24 hours = 86400 seconds
-	set .quest_delay, 0;
+	set .quest_delay, 86400;
 	
 	//Checks if quests are loaded (prevents out of index)
 	if(.questsloaded==1) end;
 		set .questsloaded, 1;
 		
 		//Add Collection Quests here
-		//AddCollection("<Quest Name>",<Min Lvl>,<Max Lvl>,<Reward|Item ID>,<Reward|Item Amount>,<Zeny Reward>,<Base EXP>,<Job EXP>,<Item ID>,<Item Amount>,...);
-		
-		
+		//AddCollection("<Quest Name>",<Min Lvl>,<Max Lvl>,<Reward|Item ID>,<Reward|Item Amount>,<Zeny Reward>,<Quest Delay>,<Base EXP>,<Job EXP>,<Item ID>,<Item Amount>,...);
+		AddCollection("Dental Care",1,80,0,0,10000,3600,1500,800,909,5);
+		AddCollection("Dental Care 2",1,80,0,0,10000,86400,1500,800,713,5);
+
 		//Add Hunting Quests here
-		//AddHunting("<Quest Name>",<Min Lvl>,<Max Lvl>,<Reward|Item ID>,<Reward|Item Amount>,<Zeny Reward>,<Base EXP>,<Job EXP>,<Monster ID>,<Monster Amount>,...);
-		
+		//AddHunting("<Quest Name>",<Min Lvl>,<Max Lvl>,<Reward|Item ID>,<Reward|Item Amount>,<Zeny Reward>,<Quest Delay>,<Base EXP>,<Job EXP>,<Monster ID>,<Monster Amount>,...);
+		AddHunting("For The Glory",1,150,0,0,100000,3600,1000,1000,1002,5);
+		AddHunting("For The Glory 2",1,150,0,0,100000,86400,1000,1000,1031,2);
+
 		end;
 		
 
@@ -286,7 +289,8 @@ function AddCollection {
 	setd ("." +.collectionquestcount+"_collectionprize", getarg(3));
 	setd ("." +.collectionquestcount+"_collectionamount", getarg(4));
 	setd ("." +.collectionquestcount+"_collectionzeny", getarg(5));
-	set .@argcount, 6;
+	setd ("." +.collectionquestcount+"_collectiondelay", getarg(6));
+	set .@argcount, 7;
 	set .@size, getarraysize(getd("."+ .collectionquestcount + "_collectionexp"));
 	setd ("." +.collectionquestcount+"_collectionexp["+.@size+"]",getarg(.@argcount)); 
 	setd ("." +.collectionquestcount+"_collectionexp["+(.@size+1)+"]",getarg(.@argcount+1)); 
@@ -308,8 +312,9 @@ function AddHunting {
 	setd ("." +.huntingquestcount+"_huntingprize", getarg(3));
 	setd ("." +.huntingquestcount+"_huntingamount", getarg(4));
 	setd ("." +.huntingquestcount+"_huntingzeny", getarg(5));
+	setd ("." +.huntingquestcount+"_huntingdelay", getarg(6));
 	set .@size, getarraysize(getd("."+ .huntingquestcount + "_huntingexp"));
-	set .@argcount, 6;
+	set .@argcount, 7;
 	setd ("." +.huntingquestcount+"_huntingexp["+.@size+"]",getarg(.@argcount));
 	setd ("." +.huntingquestcount+"_huntingexp["+(.@size+1)+"]",getarg(.@argcount+1)); 
 	set .@argcount, .@argcount+2;

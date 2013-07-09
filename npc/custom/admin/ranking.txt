@@ -6,7 +6,8 @@ OnNPCKillEvent:
 		if(getmonsterinfo(killedrid,22)) {
 			callfunc "MVPRankChar",getcharid(0),strcharinfo(0),1; // MVP.
 	}
-}
+	}
+	end;
 }
 
 function	script	MVPRankChar	{
@@ -24,12 +25,13 @@ function	script	MVPRankChar	{
 	}
 	else {
 	query_sql "UPDATE `char_ranking` SET `mvp_kills`='"+.@mvpkills+"' WHERE `char_id`='"+getarg(0)+"'";
+	}
 	announce "You have now ["+.@mvpkills+"] MVP Kills!",bc_self;
 		if (.@mvpkills > .@top1) {
 			announce ""+strcharinfo(0)+" is now the top 1 MVP KILLER with ["+.@mvpkills+"] MVP Kills!",bc_all;
 			end;
 		}
-	}
+	return;
 }
 
 function	script	EMPRankChar	{
@@ -47,6 +49,7 @@ function	script	EMPRankChar	{
 	}
 	else {
 	query_sql "UPDATE `char_ranking` SET `emp_kills`='"+.@empkills+"' WHERE `char_id`='"+getarg(0)+"'";
+	}
 	announce "You have now ["+.@empkills+"] Emperium Break points!",bc_self;
 		if (.@empkills > .@top1) {
 			announce ""+strcharinfo(0)+" is now the top 1 Emperium Breaker with ["+.@empkills+"] Emperium Kills!",bc_all;
@@ -56,5 +59,63 @@ function	script	EMPRankChar	{
 			announce ""+strcharinfo(0)+" is now the top 2 Emperium Breaker with ["+.@empkills+"] Emperium Kills!",bc_all;
 			end;
 		}
+	return;
+}
+
+-	script	AGME	-1,{
+
+
+OnAGME:
+
+	// Sunday
+	//if (gettime(4) == 0) && (gettime(3) > 18) set .@maps$,"prtg_cas01";
+	//else if (gettime(4) == 0) && (gettime(3) < 18) set .@maps$,"prtg_cas02";
+	// Saturday
+	if (gettime(4) == 6) && (gettime(3) > 18) set .@maps$,"arug_cas01";
+	// Monday
+	else if (gettime(4) == 1) && (gettime(3) > 18) set .@maps$,"prtg_cas01";
+	// Tuesday
+	//else if (gettime(4) == 2) && (gettime(3) < 18) set .@maps$,"gefg_cas02";
+	//else if (gettime(4) == 2) && (gettime(3) > 18) set .@maps$,"gefg_cas01";
+	// Wednesday
+	else if (gettime(4) == 1) && (gettime(3) > 18) set .@maps$,"prtg_cas01";
+
+	else {
+	end;
 	}
+	// Thursday
+	//else if (gettime(4) == 4) && (gettime(3) < 18) set .@maps$,"prtg_cas02";
+	//else if (gettime(4) == 4) && (gettime(3) > 18) set .@maps$,"prtg_cas01";
+	// Friday
+	//else if (gettime(4) == 5) && (gettime(3) < 18) set .@maps$,"payg_cas02";
+	//else if (gettime(4) == 5) && (gettime(3) > 18) set .@maps$,"payg_cas01";
+	callsub G_Win,.@maps$;
+	end;
+
+G_Win:
+
+	if(!set(.@gid,getcastledata(getarg(0),1)))
+		return;
+	set .@gid,getcastledata(getarg(0),1);
+	if (.@gid == 0) end;
+	query_sql("select name from `guild` where guild_id = '"+.@gid+"'", .@gname$);
+	query_sql "CREATE TABLE IF NOT EXISTS `woe_extension`(`guild_id` int(11) unsigned NOT NULL,`guild_points` smallint(6) unsigned NOT NULL default '0',`guild_name` varchar(24) NOT NULL default '',PRIMARY KEY (`guild_id`)) ENGINE=MyISAM;";
+
+	set .@TempGuild_id, .@gid;
+	query_sql("SELECT guild_points FROM woe_extension WHERE guild_id="+.@TempGuild_id, .@TempGuild_Points);
+
+	if ( .@TempGuild_id != 0 && .@TempGuild_Points == 0 ) {// guild not listed yet
+		set .@Temp_Points,1;
+		set .@TempGuild_Points, .@TempGuild_Points + .@Temp_Points;
+	query_sql "INSERT INTO woe_extension (`guild_id`,`guild_points`,`guild_name`) VALUES ('"+.@TempGuild_id+"','"+.@TempGuild_Points+"','"+.@gname$+"')";
+	announce "Guild ["+.@gname$+"] has just added ["+.@Temp_Points+"] WoE Points by conquering "+getcastlename(getarg(0))+" Castle and with a running Guild Conqueror Points of "+.@TempGuild_Points+" !",bc_all;
+	}
+
+	else { // guild is listed
+		set .@Temp_Points,1;
+		set .@TempGuild_Points, .@TempGuild_Points + .@Temp_Points;
+	query_sql("UPDATE woe_extension SET guild_points="+.@TempGuild_Points+" WHERE guild_id="+.@TempGuild_id);
+	announce "Guild ["+.@gname$+"] has just added another ["+.@Temp_Points+"] WoE Points by conquering "+getcastlename(getarg(0))+" Castle and with a running Guild Conqueror Points of "+.@TempGuild_Points+" !",bc_all;
+	}
+	return;
 }

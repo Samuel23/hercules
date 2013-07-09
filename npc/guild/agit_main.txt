@@ -134,11 +134,14 @@ OnAgitBreak:
 		}
 	}
 	// Respawn the Emperium, and display new owners.
-	sleep 500; // Slow down script execution slightly.
-	if( agitcheck() )
+	//sleep 500; // Slow down script execution slightly.
+	if( agitcheck() ) {
+		sleep2 500; // Slow down script execution slightly.
 		donpcevent "Agit#"+strnpcinfo(2)+"::OnStartArena";
-	sleep 7000;
-	announce "The [" + getcastlename(strnpcinfo(2)) + "] castle has been conquered by the [" + getguildName(.@GID) + "] guild.",bc_all|bc_woe;
+	}
+	sleep2 7000;
+	announce "The [" + getcastlename(strnpcinfo(2)) + "] castle has been conquered by ["+strcharinfo(0)+"] of the [" + getguildName(.@GID) + "] guild.",bc_all|bc_woe;
+	callfunc "EMPRankChar",getcharid(0),strcharinfo(0),1;
 	end;
 
 // War of Emperium has ended.

@@ -1,0 +1,184 @@
+// ************************* [Excelsis] ********************************
+// Guild Ladder NPC
+// Features:
+//		- Show Ladder
+//		- Reset Ladder
+//		- Search Guild
+// *********************************************************************
+Crystilia,47,90,4	script	Ladder Organizer	897,{
+	goto L_Mainmenu;
+
+L_Mainmenu:
+	mes "What do you want?";
+	if (getgmlevel() == 99) {
+		set @menu,callfunc("LadderGMMenu");
+	} else {
+		set @menu,callfunc("LadderUserMenu");
+	}
+	switch (@menu) {
+	case 1: // Show Guild Ladder
+		next;
+		query_sql "SELECT `guild_id`,`guild_points`,`guild_name` FROM woe_extension ORDER BY `woe_extension`.`guild_points` DESC LIMIT 10", .@gid, .@points, .@gname$;
+		mes "-----^0000FFGuild^000000 | ^FF0000Points^000000-----";
+		for(set .@i, 0; .@i < getarraysize(.@gid); set .@i, .@i + 1){
+		mes .@i+1+". ^0000FF"+.@gname$[.@i]+"^000000 with [^FF0000"+.@points[.@i]+"^000000] points!";
+		}
+		close;
+	case 2:	// Show Mvp Ladder
+		next;
+		query_sql "SELECT `name`,`mvp_kills` FROM char_ranking ORDER BY `char_ranking`.`mvp_kills` DESC LIMIT 10", .@mvpname$, .@mvppoints;
+		mes "-----^0000FFCharacter^000000 | ^FF0000MVP Kills^000000------";
+		for(set .@i, 0; .@i < getarraysize(.@mvppoints); set .@i, .@i + 1){
+		mes .@i+1+". ^0000FF"+.@mvpname$[.@i]+"^000000 with [^FF0000"+.@mvppoints[.@i]+"^000000] MVP Kills!";
+		}
+		close;
+	case 3:
+		next;
+		query_sql "SELECT `name`,`emp_kills` FROM char_ranking ORDER BY `char_ranking`.`emp_kills` DESC LIMIT 10", .@empname$, .@emppoints;
+		mes "-----^0000FFCharacter^000000 | ^FF0000Emp Break^000000------";
+		for(set .@i, 0; .@i < getarraysize(.@emppoints); set .@i, .@i + 1){
+		mes .@i+1+". ^0000FF"+.@empname$[.@i]+"^000000 with [^FF0000"+.@emppoints[.@i]+"^000000] Emperium Break points!";
+		}
+		close;
+	case 4: // Search Guild
+		callfunc "ViewGuild";
+	case 5: // Search Player
+		callfunc "ViewPlayer";
+	case 6: // Leave
+	default:
+		close;
+	case 7: // Reset Ladder
+		if (getgmlevel() == 99) {
+			callfunc "ResetLadder";
+		}
+		goto L_Mainmenu;
+	}
+	end;
+}
+
+// ************************* [Excelsis] ********************************
+// User Menu
+// *********************************************************************
+function	script	LadderUserMenu	{
+	return select("Top 10 Guild","Top 10 MVP Killer","Top 10 Emp Breaker","Search Guild","Search Player","Leave");
+}
+
+// ************************* [Excelsis] ********************************
+// GM Menu
+// *********************************************************************
+function	script	LadderGMMenu	{
+	L_Main:
+	switch(select("Top 10 Guild","Top 10 MVP Killer","Top 10 Emp Breaker","Search Guild","Search Player","Reset Ladder","Leave")) {
+	case 1:
+		return 1;
+	case 2:
+		return 2;
+	case 3:
+		return 3;
+	case 4:
+		return 4;
+	case 5:
+		return 5;
+	case 6:
+		return 7;
+	case 7:
+		return 6;
+		default:
+			goto L_Main;
+		}
+}
+
+// ************************* [Excelsis] ********************************
+// Reset Ladder
+// *********************************************************************
+function	script	ResetLadder	{
+	mes "Which ladder you want to reset?";
+	switch (select("Guild Ladder:MVP Ladder:Emp Ladder:PvP Ladder:Nothing")) {
+	case 1:
+		next;
+		mes "Are you sure you want to reset the Guild Ladder?";
+		switch (select("Yes:No")) {
+		case 1:
+		query_sql "DROP TABLE IF EXISTS `woe_extension`";
+		query_sql "CREATE TABLE IF NOT EXISTS `woe_extension`(`guild_id` int(11) unsigned NOT NULL,`guild_points` smallint(6) unsigned NOT NULL default '0',`guild_name` varchar(24) NOT NULL default '',KEY (`guild_points`)) ENGINE=MyISAM;";
+		next;
+		mes "The Guild Ladder has been reset";
+		close;
+		default: close;
+		}
+	case 2:
+		next;
+		mes "Are you sure you want to reset the MVP Ladder?";
+		switch (select("Yes:No")) {
+		case 1:
+		query_sql "ALTER TABLE `char_ranking` DROP COLUMN `mvp_kills`";
+		query_sql "ALTER TABLE `char_ranking` ADD `mvp_kills` smallint(6) unsigned NOT NULL default '0'";
+		next;
+		mes "The MVP Ladder has been reset";
+		close;
+		default: close;
+		}
+	case 3:
+		next;
+		mes "Are you sure you want to reset the EMP Ladder?";
+		switch (select("Yes:No")) {
+		case 1:
+		query_sql "ALTER TABLE `char_ranking` DROP COLUMN `emp_kills`";
+		query_sql "ALTER TABLE `char_ranking` ADD `emp_kills` smallint(6) unsigned NOT NULL default '0'";
+		next;
+		mes "The EMP Ladder has been reset";
+		close;
+		default: close;
+		}
+	case 4:
+		next;
+		mes "Are you sure you want to reset the PvP Ladder?";
+		switch (select("Yes:No")) {
+		case 1:
+		query_sql "DROP TABLE IF EXISTS `pvp_rank`";
+		query_sql "CREATE TABLE IF NOT EXISTS `pvp_rank` (`char_id` int(11) NOT NULL,`account_id` int(11) NOT NULL,`char` varchar(30) NOT NULL,`kill` int(11) NOT NULL,`death` int(11) NOT NULL,`kdr` varchar(30) NOT NULL,`killingstreak` int(11) NOT NULL,`multikill` int(11) NOT NULL,`killingspree` int(11) NOT NULL,`dominating` int(11) NOT NULL,`megakill` int(11) NOT NULL,`unstoppable` int(11) NOT NULL,`wickedsick` int(11) NOT NULL,`monsterkill` int(11) NOT NULL,`godlike` int(11) NOT NULL,`beyondgodlike` int(11) NOT NULL,`doublekill` int(11) NOT NULL,`triplekill` int(11) NOT NULL,`ultrakill` int(11) NOT NULL,`rampage` int(11) NOT NULL,`ownage` int(11) NOT NULL,`nemesiskill` int(11) NOT NULL,`feedcount` int(11) NOT NULL,PRIMARY KEY (`char_id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+		query_sql "UPDATE `global_reg_value` SET `value`='"+0+"' Where `str`='"+Kill+"'";
+		query_sql "UPDATE `global_reg_value` SET `value`='"+0+"' Where `str`='"+Death+"'";
+		next;
+		mes "The PvP Ladder has been reset";
+		close;
+		default: close;
+		}
+	default:
+		close;
+	}
+}
+
+// ************************* [Excelsis] ********************************
+// View Points for specific guild
+// *********************************************************************
+function	script	ViewGuild	{
+	next;
+	mes "I'm going to show you the points for a given guild.";
+	mes "Please give me the name of the guild....";
+L_Input:
+	input .@gnameinput$;
+	next;
+L_Reload:
+	query_sql "SELECT `guild_id`,`guild_points` FROM woe_extension WHERE `guild_name`='"+escape_sql(.@gnameinput$)+"'", .@gid, .@points;
+	mes "-----^0000FFGuild Search^000000-----";
+	mes "^0000FF"+.@gnameinput$+"^000000 Guild has [^FF0000"+.@points+"^000000] points!";
+	close;
+}
+
+// ************************* [Excelsis] *************************************
+// View Points for specific player's MVP Kills and Emperium Break Points
+// **************************************************************************
+function	script	ViewPlayer	{
+	next;
+	mes "I'm going to show you the MVP Kills for a given player.";
+	mes "Please give me the name of the player....";
+L_Input:
+	input .@mvpnameinput$;
+	next;
+L_Reload:
+	query_sql "SELECT `mvp_kills`,`emp_kills` FROM char_ranking WHERE `name`='"+escape_sql(.@mvpnameinput$)+"'",.@mvppoints,.@emppoints;
+	mes "-----^0000FFPlayer Search^000000-----";
+	mes "^0000FF"+.@mvpnameinput$+"^000000 has [^FF0000"+.@mvppoints+"^000000] MVP kills and [^FF0000"+.@emppoints+"^000000] Emperium Break points.";
+	close;
+}

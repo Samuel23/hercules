@@ -19,7 +19,7 @@
 
 // Information NPC
 //============================================================
-Crystilia,79,92,4	script	WOE Information	835,{
+Crystilia,59,88,4	script	WOE Information	835,{
 	doevent "WOE_CONTROL::OnMenu";
 	end;
 OnAgitStart:
@@ -108,6 +108,7 @@ OnMinute00:
 			OnWOEEnd:
 				announce "The War Of Emperium is over!",bc_all|bc_woe;
 				AgitEnd; AgitEnd2;
+				donpcevent "AGME::OnAGME";
 				sleep 1000;
 				for(set .@j,0; .@j<30; set .@j,.@j+1) {
 					if (.Active[0]&(1<<.@j)) Disp_Owner(.Castles$[.@j],1);
@@ -448,3 +449,9 @@ while(1) {
 		close;
 	} }
 }
+
+//============================================================
+// Custom Guild Flag
+//============================================================
+Crystilia,51,91,4	duplicate(OutsideFlagsPR1)	Kriemhild#Crystilia	722
+Crystilia,56,91,4	duplicate(Ar01_Flag)	Mardol#Crystilia	722

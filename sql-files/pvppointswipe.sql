@@ -1,0 +1,17 @@
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="Kill";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="Death";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="KillingStreak";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="KillingSpree";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="Dominating";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="MegaKill";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="Unstoppable";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="WickedSick";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="MonsterKill";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="Godlike";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="BeyondGodlike";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="MultiKill";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="DoubleKill";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="TripleKill";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="UltraKill";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="Rampage";
+UPDATE `global_reg_value` set `value`=0 WHERE `str`="Ownage";

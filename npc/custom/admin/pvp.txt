@@ -322,7 +322,7 @@ announce "[Anti-Feed] Your kill count has been rollbacked "+.Rollback+" times.",
 return;
 }
 
-prontera,147,170,5	script	Loki	467,{
+Crystilia,43,85,5	script	Loki	467,{
 // Settings
 set .ZenyFee, 5000000;
 

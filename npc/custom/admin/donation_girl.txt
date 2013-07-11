@@ -1,0 +1,1144 @@
+//===== eAthena Script ============================================
+//= Donation NPC
+//===== By: =======================================================
+//= Dj-Yhn
+//===== Current Version: ==========================================
+//= 2.2b (Release)
+//===== Compatible With: ========================================== 
+//= eAthena SVN SQL/TXT (Tested on Stable&Trunk r7900)
+//===== Description: ==============================================
+//= A Donation NPC for people with or without SQL SVN
+//= This used to be a NPC specially made for someone who wanted the
+//= ability to just add items instead of credits, this version now
+//= supports both. In some way, it is a merge of my two versions
+//= and what josh has made. Every GM above a predefined level (see
+//= setting up the NPC) can access a list of functions to manage
+//= the npc. For a full list, see the function list. I left the old
+//= version notes in, so that the history stays written :P
+//===== Install Guide: ============================================
+//= 1) Put this file in a folder in your npc folder
+//= 2) Add a line to the npc/scripts_custom.conf
+//= (npc:npc/path/to/donation_girl.eas) (don't worry about the .eas
+//= 	I just use it for my editor)
+//= 3) Look at 'Customize Stuff' and customize what you like to
+//= 4) Start your server, if you're running SQL athena and haven't
+//=		set this NPC to forcefully use TXT, it will automatically
+//=		install it's databases for use.
+//= 5) Log into the game on your GM, and use the GM Menu to start
+//= 	adding donations and stuff.
+//===== Customize Stuff : =========================================
+//= prontera.gat,150,180,3	script	Donation Girl	891,{
+//= Change that, the header, to whatever you like, but if you
+//= change the name of the npc, also change the value of the
+//= $npc_startname$ variable (this is for future extension)
+//= Just below the header, is the OnInit: part, here is where all
+//= of the simple custom stuff starts:
+//= $forceTXT > This is basically for SQL only, and is used to let
+//= the system use TXT setting at any time (and not the SQL db)
+//= $currency$ > This is where you put the currency you want the
+//= npc to display, since I live in the Netherlands, default is
+//= "Euro".
+//= $don_mingmlevel > Minimal GM level to access the GM part of the
+//= npc.
+//= $npc_startname$ > As said above, this holds the name of the npc
+//= for future features (change name)
+//= $zeny_rate > The value in zeny of 1 credit.
+//= $database_name$ > The name of the SQL database to use
+//= $table_balance$ > Main table, holds AID, DID and balance
+//=		DID = DonationID, used by the donation_item table
+//= $table_items$ > Table to store donated items in
+//= $table_shop$ > Stores the shop items and their prices
+//= >> A more extended guide is posted in the forum topic
+//===== Full Feature List : =======================================
+//= * View Balance
+//= * Buy items (use the credits to buy items from the donation
+//=		shop)
+//= * Claim Items (retrieve items that are donated for)
+//= * Balance to Zeny (Convert credits to zeny)
+//= == GM Functions ==
+//= * Manage Donations
+//= 	+ Add Donation
+//= 	+ Remove Donation
+//= 	+ View Donations
+//= 	+ Add Balance
+//= 	+ Remove Balance
+//= * Manage Donation Shop
+//= 	+ View Items (open the shop or view in text)
+//= 	+ Add Item
+//= 	+ Remove Item
+//= 	+ Replace Item
+//= 	+ Empty Shop (Deletes all items)
+//= 	+ Rebuild Shop (Fix up the shop when things mess up)
+//= * Manage NPC
+//= 	+ Normal menu (open the Normal Player's menu)
+//= 	+ Change Name (Disabled for now)
+//= 	+ ReInstall Database (Deletes and readds the databases)
+//===== Version history : ========================================= 
+//= v1.0 (pre)release, Not fully tested yet =X
+//= - Uses deletearray command
+//= v1.1 release, fully tested and working, added new parts:
+//= - Get items one by one, and don't stop after one
+//= - Gm's can now view all donation items
+//= - Gm's can delete a entry (when mistake etc).
+//= - Overweight Check implemented
+//= - Viewing uses a long select... it's wicked, but it turned 
+//=			out to be the only way >.<
+//= - Added new description.
+//= v2.0 ((re)release):
+//= - Rewritten the full NPC
+//= - Merged TXT and SQL version
+//= - Created automatical installation script
+//= - Uses functions instead of one npc with messy code
+//= - Added lots of new options (See full feature list).
+//= v2.1
+//= - Added the feature to get a part of your donation when it
+//= 	weights too much to carry.
+//= v2.2
+//= - Fixed some TXT related bugs, because of some variables being 
+//=		used twice.
+//= - The previous version accidentally still had the force_txt on. 
+//=		This is reverted.
+//=================================================================
+// ************************* [Yhn] ********************************
+// Main NPC
+// ****************************************************************
+prontera.gat,150,180,3	script	Donation Girl::DonGirl	891,{
+	goto L_Main;
+
+	// ************************* [Yhn] ********************************
+	// OnInit sub, start up settings.
+	// ****************************************************************
+OnInit:
+	waitingroom "Claim your donation here!",0;
+	// Change this to control the GM level access
+	set $don_mingmlevel,99;
+	// Change this to the name you gave the NPC in this file (in the header)
+	set $donation_name$,"Donation Claim";
+	// Below here are SQL only setting
+	// Database name to use:
+	set $database_name$,"ragnarok";
+	// Table name to use for the main table
+	set $table_balance$,"donation";
+	// Table name to use for donated items
+	set $table_items$,"donation_item";
+	// Table for donation log
+	set $table_log$,"donation_log";
+	goto L_Load;
+
+L_Main:
+	mes "["+$donation_name$+"]";
+	mes "Welcome, how may I serve you today?";
+	next;
+	if (getgmlevel() >= $don_mingmlevel) {
+		set @menu,callfunc("DonationGMMenu");
+	} else {
+		set @menu,callfunc("DonationUserMenu");
+	}
+	// ************************* [Yhn] ********************************
+	// Switch the returned menu choise and do what's needed to do.
+	// ****************************************************************
+	switch (@menu) {
+	case 1: // Get Items
+		callfunc "RetrieveDonatedItems";
+		goto L_Main;
+	case 2: // Leave
+	default:
+		close;
+	case 3: // Add Donation
+		if (getgmlevel() >= $don_mingmlevel) {
+			callfunc "AddDonationItem";
+		}
+		goto L_Main;
+	case 4: // Remove Donation
+		if (getgmlevel() >= $don_mingmlevel) {
+			callfunc "RemoveDonationItem";
+		}
+		goto L_Main;
+	case 5: // ReInstall Database
+		if (getgmlevel() >= $don_mingmlevel) {
+			callfunc "ReInstallDatabase";
+		}
+		goto L_Main;
+	case 6: // View Donations
+		if (getgmlevel() >= $don_mingmlevel) {
+			callfunc "ViewDonations";
+		}
+		goto L_Main;
+	case 7: // Show Transactions
+		if (getgmlevel() >= $don_mingmlevel) {
+			callfunc "ShowTransactions";
+		}
+		goto L_Main;
+	}
+	end;
+	
+L_Load:
+	// ************************* [Yhn] ********************************
+	// FakeName Check and set up
+	// ****************************************************************
+	//if ($donation_name$ != "" && $donation_name$ != $npc_startname$)	{
+	//	fakenpcname "DonGirl",$donation_name$,0;
+	//} else {
+	//	set $donation_name$,$npc_startname$;
+	//}
+	// ************************* [Yhn] ********************************
+	// Checking and setting up SQL and the Donation Shop
+	// ****************************************************************
+	callfunc "CheckAndLoadSQL";
+	end;
+}
+// ************************* [Yhn] ********************************
+// User Menu Sub
+// *UserMenu();
+// ****************************************************************
+function	script	DonationUserMenu	{
+	return select("Claim Items","Leave");
+}
+// ************************* [Yhn] ********************************
+// GM Menu Sub
+// *GMMenu();
+// ****************************************************************
+function	script	DonationGMMenu	{
+	L_Main:
+	switch(select("Manage Donations","Manage NPC","Leave")) {
+	case 1:
+		switch(select("Add Donation","Remove Donation","View Donations","Show Transactions","Back")) {
+		case 1:
+			return 3;
+		case 2:
+			return 4;
+		case 3:
+			return 6;
+		case 4:
+			return 7;
+		default:
+			goto L_Main;
+		}
+	case 2:
+		switch(select("Normal Menu","(Re)Install database","Back")) {
+		case 1:
+			return callfunc("DonationUserMenu");
+		case 2:
+			return 5;
+		case 3:
+		default:
+			goto L_Main;
+		}
+	case 3:
+	default:
+		return 2;
+	}
+}
+// ************************* [EXCELSIS] **************************
+// Show Transactions
+// Made by [ADMIN] Excelsis
+// ***************************************************************
+function	script	ShowTransactions	{
+	mes "["+$donation_name$+"]";
+	query_sql "SELECT `time`,`account_id`,`item_id`,`amount` FROM donation_log ORDER BY `donation_log`.`time` ", .@time$, .@account, .@itemid, .@amounts;
+	for(set .@i, 0; .@i < getarraysize(.@time$); set .@i, .@i + 1){
+	mes .@i+1+". Account ["+.@account[.@i]+"] claim last ^0000FF"+.@time$[.@i]+"^000000";
+	}
+	close;
+}
+// ************************* [Yhn] ********************************
+// Print Balance Sub
+// *PrintBalance();
+// ****************************************************************
+function	script	PrintBalance	{
+	mes "["+$donation_name$+"]";
+	mes "**Looks through a few papers**";
+	mes "Ah, found it!";
+	mes "Your current balance is ^FF0000"+callfunc("GetBalance",getcharid(3))+" "+$currency$+"^000000!";
+	next;
+	return;
+}
+// ************************* [Yhn] ********************************
+// NameID to price function
+// *NameID2Price(item id); -> price
+// ****************************************************************
+function	script	NameID2Price	{
+	if ($useSQL) {
+		query_sql "SELECT `price` FROM `"+$database_name$+"`.`"+$table_shop$+"` WHERE `item_id`='"+escape_sql(getarg(0))+"'",@price;
+		if (getarraysize(@price) >= 1) {
+			return @price[0];
+		} else {
+			return -1;
+		}
+	} else {
+		for (set .@i,0; .@i < getarraysize($don_shop_item_id); set .@i,.@i+1) {
+			if ($don_shop_item_id[.@i] == getarg(0)) {
+				return $don_shop_item_price[.@i];
+			}
+		}
+		return -1;
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// Get Balance
+// *GetBalance(account id);
+// ****************************************************************
+function	script	GetBalance	{
+	if ($useSQL) {
+		query_sql "SELECT `balance` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getarg(0)+"'",@balance;
+		return @balance[0];
+	} else {
+		return getd("$don_balance_"+getarg(0));
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// Add Balance, GM interface
+// *AddBalance();
+// ****************************************************************
+function	script	AddBalance	{
+	mes "["+$donation_name$+"]";
+	mes "To add funds to someone's balance, I need to know a few things.";
+	mes "Please input what I ask, and everything will be allright.";
+	next;
+L_Input:
+	mes "["+$donation_name$+"]";
+	mes "What is the ^FF0000account id^000000 I should add the funds to?";
+	input @aid;
+	mes "Now, what is the amount of ^FF0000funds^000000 I should add?";
+	input @fund;
+	next;
+	mes "["+$donation_name$+"]";
+	mes "Please check if the following information is right:";
+	mes "Account id: ^FF0000"+@aid+"^000000";
+	mes "Funds to add: ^FF0000"+@fund+" "+$currency$+"^000000";
+	next;
+	menu "Yes",-,"No, I want to input again",L_Input,"No, bring me back to the GM menu",L_Back;
+	callfunc "AddBalanceSub",@fund,@aid;
+	mes "["+$donation_name$+"]";
+	mes "I have added the ^FF0000"+@fund+" "+$currency$+"^000000 to the balance of the account with id ^FF0000"+@aid+"^000000.";
+	next;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// AddBalance sub
+// *AddBalanceSub(account id,price);
+// ****************************************************************
+function	script	AddBalanceSub	{
+	if ($useSQL) {
+		query_sql "SELECT `balance` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getarg(1)+"'",@test;
+		if (getarraysize(@test) == 1) {
+			query_sql "UPDATE `"+$database_name$+"`.`"+$table_balance$+"` SET `balance` = `balance`+'"+getarg(0)+"' WHERE `account_id`='"+getarg(1)+"'";
+		} else {
+			query_sql "DELETE FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id` = '"+getarg(1)+"'";
+			query_sql "INSERT INTO `"+$database_name$+"`.`"+$table_balance$+"` (`account_id`,`balance`) VALUES ('"+getarg(1)+"','"+getarg(0)+"')";
+		}
+		deletearray @test[0],getarraysize(@test);
+	} else {
+		setd "$don_balance_"+getarg(1),getd("$don_balance_"+getarg(1))+getarg(0);
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// RemoveBalance, GM interface
+// *RemoveBalance();
+// ****************************************************************
+function	script	RemoveBalance	{
+	mes "["+$donation_name$+"]";
+	mes "To remove funds from someone's balance, I need to know a few things.";
+	mes "Please input what I ask, and everything will be allright.";
+	next;
+L_Input:
+	mes "["+$donation_name$+"]";
+	mes "What is the ^FF0000account id^000000 I should remove the funds from?";
+	input @aid;
+	mes "Now, what is the amount of ^FF0000funds^000000 I should remove?";
+	input @fund;
+	next;
+	if (@fund > callfunc("GetBalance",@aid)) {
+		mes "["+$donation_name$+"]";
+		mes "The account given only has ^FF0000"+callfunc("GetBalance",@aid)+" "+$currency$+"^000000.";
+		mes "You entered ^FF0000"+@fund+" "+$currency$+"^000000, which is higher. What should I do?";
+		next;
+		menu "Remove all",-,"Let me input again",L_Input,"Just bring me back to the GM menu",L_Back;
+		set @fund,callfunc("GetBalance",@aid);
+	} else if (@fund <= 0) {
+		mes "["+$donation_name$+"]";
+		mes "I will not remove 0 or less balance from a account.";
+		menu "Try again",L_Input,"Back to GM Menu",L_Back;
+		end;
+	} else {
+		mes "["+$donation_name$+"]";
+		mes "Please check if the following information is right:";
+		mes "Account id: ^FF0000"+@aid+"^000000";
+		mes "Funds to remove: ^FF0000"+@fund+" "+$currency$+"^000000";
+		next;
+		menu "Yes",-,"No, I want to input again",L_Input,"No, bring me back to the GM menu",L_Back;
+	}
+	callfunc "RemoveBalanceSub",@fund,@aid;
+	mes "["+$donation_name$+"]";
+	mes "I have removed the ^FF0000"+@fund+" "+$currency$+"^000000 from the balance of the account with id ^FF0000"+@aid+"^000000.";
+	next;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// Remove Balance sub
+// *RemoveBalanceSub(account id,amount);
+// ****************************************************************	
+function	script	RemoveBalanceSub	{
+	if ($useSQL) {
+		query_sql "UPDATE `"+$database_name$+"`.`"+$table_balance$+"` SET `balance` = `balance`-'"+getarg(0)+"' WHERE `account_id`='"+getarg(1)+"'";
+	} else {
+		setd "$don_balance_"+getarg(1),getd("$don_balance_"+getarg(1))-getarg(0);
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// Add Donation Item
+// *AddDonationItem()
+// ****************************************************************	
+function	script	AddDonationItem	{
+	mes "["+$donation_name$+"]";
+	mes "To add a donated item for someone to collect from this npc, I will need some information.";
+	mes "If you input the information I ask you, then everything should be allright.";
+	next;
+L_Input:
+	mes "["+$donation_name$+"]";
+	mes "Please tell me the ^FF0000account id^000000 of the person to give the item.";
+	input @aid;
+	mes "Now, please input the ^FF0000Item ID^000000 of the item you want to give.";
+	input @itemid;
+	next;
+	mes "["+$donation_name$+"]";
+	mes "Now, finally, tell me ^FF0000how much^000000 of the item I should give the person.";
+	input @amount;
+	next;
+	mes "["+$donation_name$+"]";
+	mes "Please confirm if the following information is ^FF0000correct^000000.";
+	mes "Account ID: ^FF0000"+@aid+"^000000.";
+	mes "Item: ^FF0000"+@itemid+"^000000(^FF0000"+getitemname(@itemid)+"^000000).";
+	mes "Amount: ^FF0000"+@amount+"^000000.";
+	mes "^FF0000Note that when using SQL you can only add unique donations, that means that per account id there cannot be a duplicate item id and amount. By doing this, you will get a SQL error on the mapserver, and the donation will not be added.";
+	next;
+	menu "Yes, correct.",-,"No, please let me input again",L_Input,"No, and take me back to the GM menu",L_Back;
+	callfunc "AddDonationItemSub",@aid,@itemid,@amount;
+	mes "["+$donation_name$+"]"; 
+	mes "It has been done. The person with account id ^FF0000"+@aid+"^000000 can now come to me and get his/her ^FF0000"+getitemname(@itemid)+"(s)^000000.";
+	next;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// RemoveDonationItem
+// *RemoveDonationItem();
+// ****************************************************************	
+function	script	RemoveDonationItem	{
+	mes "["+$donation_name$+"]";
+	mes "To remove a donated item for someone to collect from this npc, I will need some information.";
+	mes "If you input the information I ask you, then everything should be allright.";
+	next;
+L_Input:
+	mes "["+$donation_name$+"]";
+	mes "Please tell me the ^FF0000account id^000000 of the person to remove the item from.";
+	input @aid;
+	mes "Now, please input the ^FF0000Item ID^000000 of the item you want to remove.";
+	input @itemid;
+	next;
+	mes "["+$donation_name$+"]";
+	mes "Now, I need to know how many of the items are meant to be given. This is so that I can delete the righ entry from the system. If you do not know, or want to remove ^FF0000all^000000 the items with the given item id, please put 0.";
+	input @amount;
+	next;
+	mes "["+$donation_name$+"]";
+	mes "Please confirm if the following information is ^FF0000correct^000000.";
+	mes "Account ID: ^FF0000"+@aid+"^000000.";
+	mes "Item: ^FF0000"+@itemid+"^000000(^FF0000"+getitemname(@itemid)+"^000000).";
+	if (@amount > 0) mes "Amount: ^FF0000"+@amount+"^000000.";
+	if (@amount == 0) mes "Amount: ^FF0000ALL^000000.";
+	next;
+	menu "Yes, correct.",-,"No, please let me input again",L_Input,"No, and take me back to the GM menu",L_Back;
+	callfunc "RemoveDonationItemSub",@aid,@itemid,@amount;
+	mes "["+$donation_name$+"]"; 
+	mes "It has been done.";
+	next;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// AddDonationitem sub (account id,item id, amount)
+// ****************************************************************	
+function	script	AddDonationItemSub	{
+	if ($useSQL) {
+		// Check if there is a main entry, if not, lets make one.
+		query_sql "SELECT `donation_id` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getarg(0)+"'",@donid;
+		if (getarraysize(@donid) == 1) {
+			query_sql "INSERT INTO `"+$database_name$+"`.`"+$table_items$+"` (`donation_id`,`item_id`,`amount`) VALUES ('"+@donid[0]+"','"+getarg(1)+"','"+getarg(2)+"')";
+		} else {
+			query_sql "DELETE FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getarg(0)+"'"; //duplicate removal
+			query_sql "INSERT INTO `"+$database_name$+"`.`"+$table_balance$+"` (`account_id`,`balance`) VALUES ('"+getarg(0)+"','0')";
+			query_sql "INSERT INTO `"+$database_name$+"`.`"+$table_items$+"` (`donation_id`,`item_id`,`amount`) VALUES ((SELECT `donation_id` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getarg(0)+"'),'"+getarg(1)+"','"+getarg(2)+"')";
+		}
+		deletearray @donid[0],getarraysize(@donid);
+	} else {
+		setd "$don_item_ids_"+getarg(0)+"["+getarraysize(getd("$don_item_ids_"+getarg(0)))+"]",getarg(1);
+		setd "$don_amount_"+getarg(0)+"["+getarraysize(getd("$don_amount_"+getarg(0)))+"]",getarg(2);
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// RemoveDonationItem Sub 
+// *RemoveDonationItemSub(account id,item_id,amount);
+// ****************************************************************	
+function	script	RemoveDonationItemSub	{
+	if ($useSQL) {
+		if (getarg(2) == 0) {
+			query_sql "DELETE FROM `"+$database_name$+"`.`"+$table_items$+"` WHERE `donation_id`=(SELECT `donation_id` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getarg(0)+"') && `item_id`='"+getarg(1)+"'";
+		} else {
+			query_sql "DELETE FROM `"+$database_name$+"`.`"+$table_items$+"` WHERE `donation_id`=(SELECT `donation_id` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getarg(0)+"') && `item_id`='"+getarg(1)+"' && `amount`='"+getarg(2)+"'";
+		}
+	} else {
+		for (set .@i,0; .@i < getarraysize(getd("$don_item_ids_"+getarg(0))); set .@i,.@i+1) {
+			if (getd("$don_item_ids_"+getarg(0)+"["+.@i+"]") == getarg(1)) {
+				if (getarg(2) == -1) {
+					deletearray getd("$don_item_ids_"+getarg(0)+"["+.@i+"]"),1;
+					deletearray getd("$don_amount_"+getarg(0)+"["+.@i+"]"),1;
+				} else {
+					if (getd("$don_amount_"+getarg(0)+"["+.@i+"]") == getarg(2)) {
+						deletearray getd("$don_item_ids_"+getarg(0)+"["+.@i+"]"),1;
+						deletearray getd("$don_amount_"+getarg(0)+"["+.@i+"]"),1;
+						break;
+					}
+				}
+			}
+		}
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// DecreaseDonationItem
+// *DecreaseDonationItem(account id,item id,origional amount,to remove);
+// ****************************************************************	
+function	script	DecreaseDonationItem	{
+	if ($useSQL) {
+		query_sql "UPDATE `"+$database_name$+"`.`"+$table_items$+"` SET `amount`=`amount`-'"+getarg(3)+"' WHERE `donation_id`=(SELECT `donation_id` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getarg(0)+"') && `item_id`='"+getarg(1)+"'";
+	} else {
+		for (set .@i,0; .@i < getarraysize(getd("$don_item_ids_"+getarg(0))); set .@i,.@i+1) {
+			if (getd("$don_item_ids_"+getarg(0)+"["+.@i+"]") == getarg(1)) {
+				if (getd("$don_amount_"+getarg(0)+"["+.@i+"]") == getarg(2)) {
+					set getd("$don_amount_"+getarg(0)+"["+.@i+"]"),getd("$don_amount_"+getarg(0)+"["+.@i+"]")-getarg(3);
+					break;
+				}
+			}
+		}
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// RetrieveDonatedItems
+// *RetrieveDonatedItems();
+// ****************************************************************	
+function	script	RetrieveDonatedItems	{
+	if ($useSQL) {
+		query_sql "SELECT `item_id`,`amount` FROM `"+$database_name$+"`.`"+$table_items$+"` WHERE `donation_id`=(SELECT `donation_id` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getcharid(3)+"')",@itemid,@amount;
+	} else {
+		copyarray @itemid[0],getd("$don_item_ids_"+getcharid(3)+"[0]"),getarraysize(getd("$don_item_ids_"+getcharid(3)));
+		copyarray @amount[0],getd("$don_amount_"+getcharid(3)+"[0]"),getarraysize(getd("$don_amount_"+getcharid(3)));
+	}
+	if (getarraysize(@itemid) < 1) {
+		mes "["+$donation_name$+"]";
+		mes "There are no items for you at the moment.";
+		mes "If you have donated and haven't got your items yet, please contact a GM or try again later.";
+		next;
+	} else {
+		for (set @i,0; @i < getarraysize(@itemid); set @i,@i+1) {
+			if (checkweight(@itemid[@i],@amount[@i])) {
+				getitem @itemid[@i],@amount[@i];
+				query_sql "SELECT `donation_id` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+getcharid(3)+"'",@donid;
+				query_sql "INSERT INTO `"+$database_name$+"`.`"+$table_log$+"` (`time`,`account_id`,`donation_id`,`item_id`,`amount`) VALUES ('"+gettimestr("%Y-%m-%d %H:%M:%S",21)+"','"+getcharid(3)+"','"+@donid+"','"+@itemid[@i]+"','"+@amount[@i]+"')";
+				callfunc "RemoveDonationItemSub",getcharid(3),@itemid[@i],@amount[@i];
+			} else {
+				mes "["+$donation_name$+"]";
+				mes "You don't have enough free weight to get this donation:";
+				mes "^FF0000"+@amount[@i]+" "+getitemname(@itemid[@i])+"(s)^000000";
+				mes "Please come get this one after you have more free weight.";
+				next;
+				menu "Continue with the other donations",L_Cont,"Give me as much of these items as I can carry.",-,"Bring me back to the menu",L_Back;
+				set @j,0;
+				while (checkweight(@itemid[@i],(@j+1)) && @j < @amount[@i]) {
+					set @j,@j+1;
+				}
+				getitem @itemid[@i],@j;
+				callfunc "DecreaseDonationItem",getcharid(3),@itemid[@i],@amount[@i],@j;
+L_Cont:
+			}
+		}
+		mes "["+$donation_name$+"]";
+		mes "Have fun with your items, and thanks for the donation!";
+		next;
+	}
+L_Back:
+	deletearray @itemid[0],getarraysize(@itemid);
+	deletearray @amount[0],getarraysize(@amount);
+	return;
+}
+// ************************* [Yhn] ********************************
+// View donations (with possible delete/edit)
+// *ViewDonations();
+// ****************************************************************
+function	script	ViewDonations	{
+	deletearray @itemid[0],getarraysize(@itemid);
+	deletearray @amount[0],getarraysize(@amount);
+	mes "["+$donation_name$+"]";
+	mes "I'm going to show you all donations as a list, for a given account.";
+	mes "Each page will conatin 5 donations, and you will get options per list to do work.";
+	next;
+	mes "["+$donation_name$+"]";
+	mes "Now, which ^FF0000account id's^000000 donation entries would you like to see?";
+L_Input:
+	input @aid;
+	next;
+L_Reload:
+	deletearray @itemid[0],getarraysize(@itemid);
+	deletearray @amount[0],getarraysize(@amount);
+	if ($useSQL) {
+		query_sql "SELECT `item_id`,`amount` FROM `"+$database_name$+"`.`"+$table_items$+"` WHERE `donation_id`=(SELECT `donation_id` FROM `"+$database_name$+"`.`"+$table_balance$+"` WHERE `account_id`='"+@aid+"')",@itemid,@amount;
+	} else {
+		copyarray @itemid[0],getd("$don_item_ids_"+@aid+"[0]"),getarraysize(getd("$don_item_ids_"+@aid));
+		copyarray @amount[0],getd("$don_amount_"+@aid+"[0]"),getarraysize(getd("$don_amount_"+@aid));
+	}
+	for (set @i,0; @i < getarraysize(@itemid); set @i,@i+5) {
+		mes (@i+1)+": "+getitemname(@itemid[@i])+"("+@itemid[@i]+") * "+@amount[@i];
+		if (@i+1 < getarraysize(@itemid)) mes (@i+2)+": "+getitemname(@itemid[@i+1])+"("+@itemid[@i+1]+") * "+@amount[@i+1];
+		if (@i+2 < getarraysize(@itemid)) mes (@i+3)+": "+getitemname(@itemid[@i+2])+"("+@itemid[@i+2]+") * "+@amount[@i+2];
+		if (@i+3 < getarraysize(@itemid)) mes (@i+4)+": "+getitemname(@itemid[@i+3])+"("+@itemid[@i+3]+") * "+@amount[@i+3];
+		if (@i+4 < getarraysize(@itemid)) mes (@i+5)+": "+getitemname(@itemid[@i+4])+"("+@itemid[@i+4]+") * "+@amount[@i+4];
+		switch(select("Edit A Donation","Delete A Donation","Next Page")) {
+		case 1:
+			mes "Please input the number of the donation you wish to edit:";
+			input @id;
+			next;
+			mes "["+$donation_name$+"]";
+			mes "Donation "+@id+": "+getitemname(@itemid[@id-1])+" * "+@amount[@id-1];
+			mes "What would you like to edit?";
+			next;
+			switch(select("Item ID","Amount","Nothing, go to the next page","Nothing, reload the list","Nothing, go back to the GM Menu")) {
+			case 1:
+				mes "["+$donation_name$+"]";
+				mes "Please input a new Item ID to replace the current one with:";
+				next;
+			L_Edit_Input:
+				input @iid;
+				if (getitemname(@iid) == "null") {
+					mes "["+$donation_name$+"]";
+					mes "That is a illegal item ID.";
+					next;
+				} else {
+					mes "["+$donation_name$+"]";
+					mes "Is the following correct?";
+					mes "new item: ^FF0000"+getitemname(@iid)+"^000000.";
+					next;
+					menu "Yes",-,"No",L_Edit_Input,"Back to GM Menu",L_Back;
+					if ($useSQL) {
+						query_sql "UPDATE `"+$database_name$+"`.`"+$table_items$+"` SET `item_id`='"+@iid+"' WHERE `item_id`='"+@itemid[@id-1]+"'";
+					} else {
+						set getd("$don_item_ids_"+@aid+"["+(@id-1)+"]"),@iid;
+					}
+					mes "["+$donation_name$+"]";
+					mes "Done, the donation entry has been updated";
+					next;
+				}
+				menu "Reload Donation list",L_Reload,"Open donation list of a other account",L_Input,"Back to GM Menu",L_Back;
+				end;
+			case 2:
+				mes "["+$donation_name$+"]";
+				mes "Please input a new amount:";
+				next;
+			L_Amount_Input:
+				input @am;
+				if (@am <= 0) {
+					mes "["+$donation_name$+"]";
+					mes "You've entered a incorrect amount, not changing the amount.";
+					next;
+				} else {
+					mes "["+$donation_name$+"]";
+					mes "Is the following Correct?";
+					mes "Change amount to ^FF0000"+@am;
+					next;
+					menu "Yes",-,"No",L_Amount_Input,"Back to GM Menu",L_Back;
+					if ($useSQL) {
+						query_sql "UPDATE `"+$database_name$+"`.`"+$table_items$+"` SET `amount`='"+@am+"' WHERE `amount`='"+@amount[@id-1]+"'";
+					} else {
+						set getd("$don_amount_"+@aid+"["+(@id-1)+"]"),@am;
+					}
+					mes "["+$donation_name$+"]";
+					mes "Changed the amount!";
+					next;
+				}
+				menu "Reload donation list",L_Reload,"Open donation list of a other account",L_Input,"Back to GM Menu",L_Back;
+				end;
+			case 3:
+				next;
+				break;
+			case 4:
+				next;
+				goto L_Reload;
+			case 5:
+				next;
+				goto L_Back;
+			}
+			break;
+		case 2:
+			mes "Please input the ^FF0000number^000000 of the donation you wish to delete:";
+			input @id;
+			next;
+			callfunc "RemoveDonationItemSub",@aid,@itemid[@id-1],0;
+			mes "["+$donation_name$+"]";
+			mes "Donation deleted";
+			next;
+			menu "Open the list again",L_Reload,"Open the list for a other account",L_Input,"Back to the GM Menu",L_Back;
+			end;
+		case 3:
+			next;
+			
+		}
+	}
+	mes "["+$donation_name$+"]";
+	mes "Those where all donation for that account.";
+	next;
+	menu "Return to GM menu",-,"Open list of other account",L_Input;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// ChangeNPCName, This function does not work yet.
+// *ChangeNPCName();
+// ****************************************************************
+function	script	ChangeNPCName	{
+	mes "["+$donation_name$+"]";
+	mes "This function is not yet implemented, since the needed command doesn't work as thought =|";
+	return;
+//
+//	mes "["+$donation_name$+"]";
+//	mes "So you are not happy with my current name... :'(";
+//	mes "Then tell me how I should be named from now on.";
+//	next;
+//	input @name$;
+//	if (@name$ != "" && @name$ != $donation_name$) {
+//		fakenpcname "DonGirl",@name$,1;
+//		//fakenpcname $npc_startname$,@name$,1;
+//		set $donation_name$,@name$;
+//	}
+//	mes "["+$donation_name$+"]";
+//	mes "There, I changed my name.";
+//	mes "Remember to walk in and out my vision to see my new name.";
+//	next;
+//	return;
+}
+// ************************* [Yhn] ********************************
+// Balance to Zeny
+// *BalanceToZeny();
+// ****************************************************************
+function	script	BalanceToZeny	{
+	mes "["+$donation_name$+"]";
+	mes "Your current balance is ^FF0000"+callfunc("GetBalance",getcharid(3))+" "+$currency$;
+	mes "^000000The current amount of zeny you can get for ^FF00001 "+$currency$+" ^000000is^FF0000 "+$zeny_rate;
+	mes "^000000How much ^FF0000"+$currency$+"s^000000 would you like to ^FF0000convert^000000?";
+	next;
+	input @zen;
+	if (@zen > 0 && @zen <= callfunc("GetBalance",getcharid(3))) {
+		if (Zeny+(@zen*$zeny_rate) > 1000000000) {
+			set @zen,1000000000-Zeny / $zeny_rate;
+		}
+		callfunc "RemoveBalanceSub",@zen,getcharid(3);
+		set Zeny,Zeny+(@zen*$zeny_rate);
+		mes "["+$donation_name$+"]";
+		mes "Converted ^FF0000"+@zen+" "+$currency$+"^000000 to ^FF0000"+(@zen*$zeny_rate)+" zeny^000000.";
+		mes "There you go, thanks for your donation!";
+	} else if (@zen > callfunc("GetBalance",getcharid(3))) {
+		mes "["+$donation_name$+"]";
+		mes "You don't have "+@zen+" "+$currency$+"!";
+	} else if (@zen <= 0) {}
+	next;
+	return;
+}
+// ************************* [Yhn] ********************************
+// ViewShop (0= text, 1= shop)
+// *ViewShop(<0|1>);
+// ****************************************************************
+function	script	ViewShop	{
+	deletearray @itemid[0],getarraysize(@itemid);
+	deletearray @price[0],getarraysize(@price);
+	if (getarg(0) == 1) {
+		// show à la shop style
+		mes "["+$donation_name$+"]";
+		mes "I will now open the shop.";
+		close2;
+		callshop "Donation_Shop",1;
+		end;
+	} else {
+		mes "["+$donation_name$+"]";
+		mes "I will now give the listed version of the items which are currently in the shop.";
+		mes "I will display 5 lines each time, holding item ids, names and price.";
+		next;
+		if ($useSQL) {
+			query_sql "SELECT `item_id`,`price` FROM `"+$database_name$+"`.`"+$table_shop$+"`",@itemid,@price;
+		} else {
+			copyarray @itemid[0],$don_shop_item_id[0],getarraysize($don_shop_item_id);
+			copyarray @price[0],$don_shop_item_price[0],getarraysize($don_shop_item_price);
+		}
+		for (set @i,0; @i < getarraysize(@itemid); set @i,@i+5) {
+			mes "["+$donation_name$+"]";
+			mes (@i+1)+": "+getitemname(@itemid[@i])+"("+@itemid[@i]+") "+@price[@i]+" "+$currency$;
+			if (getarraysize(@itemid) > @i+1) mes (@i+2)+": "+getitemname(@itemid[@i+1])+"("+@itemid[@i+1]+") "+@price[@i+1]+" "+$currency$;
+			if (getarraysize(@itemid) > @i+2) mes (@i+3)+": "+getitemname(@itemid[@i+2])+"("+@itemid[@i+2]+") "+@price[@i+2]+" "+$currency$;
+			if (getarraysize(@itemid) > @i+3) mes (@i+4)+": "+getitemname(@itemid[@i+3])+"("+@itemid[@i+3]+") "+@price[@i+3]+" "+$currency$;
+			if (getarraysize(@itemid) > @i+4) mes (@i+5)+": "+getitemname(@itemid[@i+4])+"("+@itemid[@i+4]+") "+@price[@i+4]+" "+$currency$;
+			next;
+		}
+		mes "["+$donation_name$+"]";
+		mes "That were all items which are currenly in the shop.";
+		next;
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// Add item to Shop
+// *AddItem2Shop();
+// ****************************************************************
+function	script	AddItem2Shop	{
+	mes "["+$donation_name$+"]";
+	mes "To add items to the shop, please give me the information I need.";
+	mes "If you insert the right stuff, and confirm it when it's ok, everything should be fine.";
+	next;
+L_Input:
+	mes "["+$donation_name$+"]";
+	mes "Please insert the ^FF0000Item ID^000000 you want to add.";
+	input @itemid;
+	mes "Now, please insert the ^FF0000price (in "+$currency$+"s)^000000 for the item.";
+	input @price;
+	next;
+	if (@itemid == 0 || @price == 0 || getitemname(@itemid) == "null") {
+		mes "["+$donation_name$+"]";
+		mes "The item you gave does not exist, or the price is 0.";
+		mes "Please input a valid itemid and price next time.";
+		menu "Try again",L_Input,"Just go back to the GM menu",L_Back;
+		end;
+	}
+	mes "["+$donation_name$+"]";
+	mes "Is the following information ^FF0000correct^000000?";
+	mes "Item: ^FF0000"+getitemname(@itemid)+"^000000 (^FF0000"+@itemid+"^000000).";
+	mes "Price: ^FF0000"+@price+" "+$currency$;
+	next;
+	menu "Yes",-,"No, but I want to input again",L_Input,"No, and take me back to the GM menu",L_Back;
+	callfunc "AddItem2ShopSub",@itemid,@price;
+	mes "["+$donation_name$+"]";
+	mes "I added the item ^FF0000"+getitemname(@itemid)+"^000000 to the shop for ^FF0000"+@price+" "+$currency$+"^000000.";
+	next;
+	menu "Return to the GM menu",-,"Add another Item",L_Input;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// Add Item to Shop Sub
+// *AddItem2ShopSub(itemid,price);
+// ****************************************************************
+function	script	AddItem2ShopSub	{
+	if ($useSQL) {
+		query_sql "INSERT INTO `"+$database_name$+"`.`"+$table_shop$+"` (`item_id`,`price`) VALUES ('"+getarg(0)+"','"+getarg(1)+"')";
+	} else {
+		if (callfunc("CheckItemInShop",getarg(0))) {
+			return;
+		}
+		set $don_shop_item_id[getarraysize($don_shop_item_id)],getarg(0);
+		set $don_shop_item_price[getarraysize($don_shop_item_price)],getarg(1);
+	}
+	npcshopadditem "Donation_Shop",getarg(0),getarg(1);
+	return;
+}
+// ************************* [Yhn] ********************************
+// Check the shop arrays, TXT only useage, SQL is safe anyhoo
+// *CheckItemInShop();
+// ****************************************************************
+function	script	CheckItemInShop	{
+	if ($useSQL) {
+		return 0;
+	} else {
+		for (set @i,0; @i < getarraysize($don_shop_item_id); set @i,@i+1) {
+			if ($don_shop_item_id[@i] == getarg(0)) {
+				return 1;
+			}
+		}
+		return 0;
+	}	
+}
+// ************************* [Yhn] ********************************
+// Remove item from shop
+// *RemoveItemFromShop();
+// ****************************************************************
+function	script	RemoveItemFromShop	{
+	mes "["+$donation_name$+"]";
+	mes "To remove items from the shop, please give me the information I need.";
+	mes "If you insert the right stuff, and confirm it when it's ok, everything should be fine.";
+	next;
+L_Input:
+	mes "["+$donation_name$+"]";
+	mes "Please insert the ^FF0000Item ID^000000 you want to remove.";
+	input @itemid;
+	next;
+	mes "["+$donation_name$+"]";
+	mes "Is the following information ^FF0000correct^000000?";
+	mes "Item: ^FF0000"+getitemname(@itemid)+"^000000 (^FF0000"+@itemid+"^000000).";
+	next;
+	menu "Yes",-,"No, but I want to input again",L_Input,"No, and take me back to the GM menu",L_Back;
+	callfunc "RemoveItemFromShopSub",@itemid;
+	mes "["+$donation_name$+"]";
+	mes "I removed the item ^FF0000"+getitemname(@itemid)+"^000000 from the shop.";
+	next;
+	menu "Return to the GM menu",-,"Remove another Item",L_Input;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// Remove Item From Shop Sub
+// *RemoveItemFromShopSub(itemid);
+// ****************************************************************\
+function	script	RemoveItemFromShopSub	{
+	if ($useSQL) {
+		query_sql "DELETE FROM `"+$database_name$+"`.`"+$table_shop$+"` WHERE `item_id`='"+getarg(0)+"'";
+		npcshopdelitem "Donation_Shop",getarg(0);
+		return;
+	} else {
+		for (set @i,0; @i < getarraysize($don_shop_item_id); set @i,@i+1) {
+			if ($don_shop_item_id[@i] == getarg(0)) {
+				deletearray $don_shop_item_id[@i],1;
+				deletearray $don_shop_item_price[@i],1;
+				npcshopdelitem "Donation_Shop",getarg(0);
+				return;
+			}
+		}
+	}
+}
+// ************************* [Yhn] ********************************
+// Replace Item(s) in shop
+// *ReplaceShopItems();
+// ****************************************************************\
+function	script	ReplaceShopItems	{
+	mes "["+$donation_name$+"]";
+	mes "This function allows you to replace a item in the shop.";
+	mes "Just fill in what I ask, and everything will be fine.";
+	next;
+L_Input:
+	mes "["+$donation_name$+"]";
+	mes "Please input the ^FF0000item id^000000 you wish to replace.";
+	input @itemid1;
+	mes "Please input the ^FF0000item id^000000 which should replace it.";
+	input @itemid2;
+	mes "Please input the new ^FF0000price^000000 or input 0 to keep the current price.";
+	input @price;
+	next;
+	if (@itemid2 == 0 || getitemname(@itemid2) == "null") {
+		mes "["+$donation_name$+"]";
+		mes "The item you gave to replace with, does not exist";
+		mes "Please input a valid itemid next time.";
+		next;
+		menu "Try again",L_Input,"Just go back to the GM menu",L_Back;
+		end;
+	}
+	mes "["+$donation_name$+"]";
+	mes "Is the following correct?";
+	mes "Replace "+getitemname(@itemid1)+"("+@itemid1+") with "+getitemname(@itemid2)+"("+@itemid2+")";
+	if (@price == 0) mes "and use the same price as before.";
+	else mes "and use "+@price+" "+$currency$+" as price.";
+	next;
+	menu "Yes",-,"No and let me input again",L_Input,"No, and take me back to the GM menu",L_Back;
+	callfunc "ReplaceShopItemSub",@itemid1,@itemid2,@price;
+	mes "["+$donation_name$+"]";
+	mes "Ok, I've changed the items";
+	if (@price) mes "and changed the price.";
+	next;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// Replace Shop item Sub
+// *ReplaceShopItemSub(olditem,newitem,newprice);
+// ****************************************************************
+function	script	ReplaceShopItemSub	{
+	if ($useSQL) {
+		if (getarg(2)) {
+			query_sql "UPDATE `"+$database_name$+"`.`"+$table_shop$+"` SET `item_id`='"+getarg(1)+"',`price`='"+getarg(2)+"' WHERE `item_id`='"+getarg(0)+"'";
+		} else {
+			query_sql "UPDATE `"+$database_name$+"`.`"+$table_shop$+"` SET `item_id`='"+getarg(1)+"' WHERE `item_id`='"+getarg(0)+"'";
+		}
+		query_sql "SELECT `price` FROM `"+$database_name$+"`.`"+$table_shop$+"` WHERE `item_id`='"+getarg(1)+"'",@price;
+		npcshopdelitem "Donation_Shop",getarg(0);
+		npcshopadditem "Donation_Shop",getarg(1),@price[0];
+		deletearray @price[0],getarraysize(@price);
+	} else {
+		for (set @i,0; @i < getarraysize($don_shop_item_id); set @i,@i+1) {
+			if ($don_shop_item_id[@i] == getarg(0)) {
+				set $don_shop_item_id[@i],getarg(1);
+				if (getarg(2)) {
+					set $don_shop_item_price[@i],getarg(2);
+				}
+				npcshopdelitem "Donation_Shop",getarg(0);
+				npcshopadditem "Donation_Shop",getarg(1),$don_shop_item_price[@i];
+				return; //skip the rest of the array.
+			}
+		}
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// Remove all the items from the shop
+// *RemoveAllItemsFromShop()
+// ****************************************************************	
+function	script	RemoveAllItemsFromShop	{
+	mes "["+$donation_name$+"]";
+	mes "^FF0000[WARNING]^000000 THIS WILL REMOVE ALL OF THE ITEMS FROM THE SHOP.";
+	next;
+	menu "Back to GM menu",L_Back,"Continue",-;
+	callfunc "RemoveAllItemsFromShopSub",1;
+	mes "["+$donation_name$+"]";
+	mes "It's done. The donation shop is empty now.";
+	next;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// Remove all items from shop sub
+// *RemoveAllItemsFromShop(<1=complete delete>);
+// ****************************************************************	
+function	script	RemoveAllItemsFromShopSub	{
+	if (getarg(0) == 1) {
+		if ($useSQL) {
+			query_sql "DELETE FROM `"+$database_name$+"`.`"+$table_shop$+"` WHERE 1=1";
+		} else {
+			deletearray $don_shop_item_id[0],getarraysize($don_shop_item_id);
+			deletearray $don_shop_item_price[0],getarraysize($don_shop_item_price);
+		}
+	}
+	npcshopitem "Donation_Shop",501,1; // clear the shop out.
+	npcshopdelitem "Donation_Shop",501; // finish clearing
+	return;
+}
+// ************************* [Yhn] ********************************
+// Rebuild the donation shop
+// *RebuildDonationShop();
+// ****************************************************************	
+function	script	RebuildDonationShop	{
+	mes "["+$donation_name$+"]";
+	mes "I will now rebuild the donation shop. Use this if the shop messes up for some reason.";
+	next;
+	menu "Do it",-,"Back to GM Menu",L_Back;
+	callfunc "RemoveAllItemsFromShopSub",0;
+	callfunc "RebuildDonationShopSub";
+	mes "["+$donation_name$+"]";
+	mes "Shop has been rebuild.";
+	next;
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// SubFunction for the Rebuild Shop
+// *RebuildDonationShopSub();
+// ****************************************************************	
+function	script	RebuildDonationShopSub	{
+	if ($useSQL) {
+		query_sql "SELECT `item_id`,`price` FROM `"+$database_name$+"`.`"+$table_shop$+"`",@itemid,@price;
+	} else {
+		copyarray @itemid[0],$don_shop_item_id[0],getarraysize($don_shop_item_id);
+		copyarray @price[0],$don_shop_item_price[0],getarraysize($don_shop_item_price);
+	}
+	for (set @i,0; @i < getarraysize(@itemid); set @i,@i+1) {
+		npcshopadditem "Donation_Shop",@itemid[@i],@price[@i];
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// Function to check and install SQL, using in OnInit
+// *CheckAndLoadSQL();
+// ****************************************************************	
+function	script	CheckAndLoadSQL	{
+	// ************************* [Yhn] ********************************
+	// SQL check and set up
+	// ****************************************************************
+	set $@check,query_sql("SELECT 'test'", .@test$);
+	if ($@check == -1 || $forceTXT == 1) {
+		set $useSQL,0;
+		debugmes "[Donation NPC] SQL returned -1 or forceTXT is activated, using TXT settings.";
+	} else {
+		set $useSQL,1;
+		debugmes "[Donation NPC] SQL check complete, using SQL settings.";
+	}
+	// ************************* [Yhn] ********************************
+	// Check for the databases, any missing databases will be created
+	// ****************************************************************
+	if ($useSQL) {
+		//Database errors, there might be no database. Install the database
+		debugmes "[Donation NPC] SQL option is set active... checking/installing databases";
+		callfunc "InstallDatabase";
+	}
+	return;
+}
+// ************************* [Yhn] ********************************
+// Load Shop Sub
+// ****************************************************************
+function	script	LoadDonationShop	{
+	debugmes "[Donation NPC] Loading shop...";
+	if ($useSQL) {
+		// Load shop data from the MySQL database
+		query_sql "SELECT `item_id`,`price` FROM `"+$database_name$+"`.`"+$table_shop$+"`",$@item_id,$@price;
+		if (getarraysize($@item_id) >= 1) {
+			npcshopitem "Donation_Shop",$@item_id[0],$@price[0];
+			for (set $@i,1; $@i < getarraysize($@item_id); set $@i,$@i+1) {
+				npcshopadditem "Donation_Shop",$@item_id[$@i],$@price[$@i];
+			}
+		} else {
+			npcshopdelitem "Donation_Shop",501;
+		}
+	} else {
+		// Load shop data from donation arrays
+		if (getarraysize($don_shop_item_id) >= 1) {
+			npcshopitem "Donation_Shop",$don_shop_item_id[0],$don_shop_item_price[0];
+			for (set $@i,1; $@i < getarraysize($don_shop_item_id); set $@i,$@i+1) {
+				npcshopadditem "Donation_Shop",$don_shop_item_id[$@i],$don_shop_item_price[$@i];
+			}
+		} else {
+			npcshopdelitem "Donation_Shop",501;
+		}
+	}
+	debugmes "[Donation NPC] Done loading the Donation Shop";
+	return;
+}
+// ************************* [Yhn] ********************************
+// ReInstallDatabase
+// ****************************************************************
+function	script	ReInstallDatabase	{
+	mes "["+$donation_name$+"]";
+	mes "^FF0000[WARNING]^000000: THIS WILL REMOVE ALL CURRENT DONATION DATA, ARE YOU SURE? ^FF0000[WARNING]^000000";
+	menu "No",L_Back,"Yes",-;
+	query_sql "DROP TABLE IF EXISTS `"+$database_name$+"`.`"+$table_balance$+"`";
+	query_sql "CREATE TABLE IF NOT EXISTS `"+$database_name$+"`.`"+$table_balance$+"` (`donation_id` int(10) unsigned NOT NULL auto_increment,`account_id` int(10) unsigned NOT NULL,`balance` int(10) unsigned NOT NULL default '0',PRIMARY KEY (`donation_id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+	query_sql "DROP TABLE IF EXISTS `"+$database_name$+"`.`"+$table_items$+"`";
+	query_sql "CREATE TABLE IF NOT EXISTS `"+$database_name$+"`.`"+$table_items$+"` (`donation_id` int(10) unsigned NOT NULL,`item_id` int(10) unsigned NOT NULL,`amount` int(10) unsigned NOT NULL default '1',PRIMARY KEY (`donation_id`,`item_id`,`amount`)) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+	//query_sql "DROP TABLE IF EXISTS `"+$database_name$+"`.`"+$table_shop$+"`";
+	//query_sql "CREATE TABLE IF NOT EXISTS `"+$database_name$+"`.`"+$table_shop$+"` (`item_id` int(10) unsigned NOT NULL,`price` int(10) unsigned NOT NULL,	PRIMARY KEY (`item_id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+	debugmes "[Donation NPC] SQL database ReInstalled";
+L_Back:
+	return;
+}
+// ************************* [Yhn] ********************************
+// Install Database sub
+// *InstallDatabase();
+// ****************************************************************
+function	script	InstallDatabase	{
+	query_sql "CREATE DATABASE IF NOT EXISTS `"+$database_name$+"`";
+	query_sql "CREATE TABLE IF NOT EXISTS `"+$database_name$+"`.`"+$table_balance$+"` (`donation_id` int(10) unsigned NOT NULL auto_increment,`account_id` int(10) unsigned NOT NULL,`balance` int(10) unsigned NOT NULL default '0',PRIMARY KEY (`donation_id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+	query_sql "CREATE TABLE IF NOT EXISTS `"+$database_name$+"`.`"+$table_items$+"` (`donation_id` int(10) unsigned NOT NULL,`item_id` int(10) unsigned NOT NULL,`amount` int(10) unsigned NOT NULL default '1',PRIMARY KEY (`donation_id`,`item_id`,`amount`)) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+	query_sql "CREATE TABLE IF NOT EXISTS `"+$database_name$+"`.`"+$table_log$+"` ( `donationlog_id` int(11) unsigned NOT NULL auto_increment, `time` datetime NOT NULL default '0000-00-00 00:00:00', `account_id` int(11) NOT NULL default '0', `donation_id` int(10) unsigned NOT NULL default '0', `item_id` int(10) unsigned NOT NULL default '0', `amount` int(10) unsigned NOT NULL default '1', PRIMARY KEY (`donationlog_id`), KEY (`donation_id`) ) ENGINE=MyISAM";
+	//query_sql "CREATE TABLE IF NOT EXISTS `"+$database_name$+"`.`"+$table_shop$+"` (`item_id` int(10) unsigned NOT NULL,`price` int(10) unsigned NOT NULL,	PRIMARY KEY (`item_id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+	debugmes "[Donation NPC] SQL database installed";
+	return;
+}
+// ************************* [Yhn] ********************************
+// Donation Shop NPC
+// ****************************************************************
+-	shop	Donation_Shop	-1,501:-1

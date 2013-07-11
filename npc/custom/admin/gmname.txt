@@ -5,9 +5,9 @@ if (getgmlevel() < 20) end;
 if (gmlvlnamecheck == 1) end;
 if (getgmlevel() == 99) set @gmlvlname$,"[Admin]";
 if (getgmlevel() == 98) set @gmlvlname$,"[Co-Admin]";
-if (getgmlevel() == 95) set @gmlvlname$,"[GM Chief]";
-if (getgmlevel() == 60) set @gmlvlname$,"[Event GM]";
-if (getgmlevel() == 30) set @gmlvlname$,"[GM Police]";
+if (getgmlevel() == 80) set @gmlvlname$,"[GM Chief]";
+if (getgmlevel() == 30) set @gmlvlname$,"[Event GM]";
+if (getgmlevel() == 60) set @gmlvlname$,"[GM Police]";
 if (getgmlevel() == 20) set @gmlvlname$,"[Support GM]";
 callfunc "gmloginchangename";
 }

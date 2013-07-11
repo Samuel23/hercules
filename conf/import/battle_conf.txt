@@ -1,4 +1,16 @@
 /* client.conf */
+// Whether to enable the official packet obfuscation support (good vs WPE)
+// 0: disabled
+// 1: optional (not recommended) -- identifies whether it is required
+// 2: enabled (recommended)
+packet_obfuscation: 2
+
+// Duration of client's self mute in minutes.
+// Note: Do not enable this, if you enabled commands for players,
+// because the client sees multiple commands in succession as spam.
+// Default: 0 (means disabled)
+client_accept_chatdori: 0
+
 // Valid range of dyes and styles on the client.
 min_hair_style: 1
 max_hair_style: 27

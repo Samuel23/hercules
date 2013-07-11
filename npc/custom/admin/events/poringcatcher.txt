@@ -1,10 +1,5 @@
 -	script	poring#announcer	-1,{
 
-OnInit:
-	disablenpc "poringevent";
-	hideonnpc "Poring Catcher#evnt2";
-	end;
-
 OnHour11:
 OnHour20:
 
@@ -60,7 +55,12 @@ OnTimer61000:
 	donpcevent "Poring Catcher#evnt2::OnEnable";
 	stopnpctimer;
 	end;
-	}
+
+OnInit:
+	disablenpc "poringevent";
+	hideonnpc "Poring Catcher#evnt2";
+	end;
+}
 	
 //--------------------------------------------------
 	
@@ -176,35 +176,4 @@ OnMobKilled:
 	warp "Crystilia",93,85;
 	end;
 
-}
-
--	script	events	-1,{
-OnWhisperGlobal:
-	if (getgmlevel() >= 80) {
-	mes "Hi "+strcharinfo(0)+"!";
-	mes "What do you want to do?";
-	switch (select("Start Poring Catcher:Start Disguise:Start Monster Invasion:Start Dice:Start Poring Race:Nothing")) {
-	case 1:
-		donpcevent "poring#announcer::OnHour11";
-		close;
-	case 2:
-		donpcevent "Disguise Event::OnHour00";
-		close;
-	case 3:
-		donpcevent "Monster Invasion Helper::OnEventStart";
-		close;
-	case 4:
-		donpcevent "Dice#announcer::OnHour01";
-		close;
-	case 5:
-		donpcevent "PraceAnnouncer::OnHour18";
-		close;
-	default:
-		close;
-	}
-	}
-	else {
-	mes "Sorry! I'm busy!";
-	close;
-}
 }

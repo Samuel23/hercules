@@ -11133,13 +11133,16 @@ void clif_parse_StopAttack(int fd,struct map_session_data *sd)
 
 /// Request to move an item from inventory to cart (CZ_MOVE_ITEM_FROM_BODY_TO_CART).
 /// 0126 <index>.W <amount>.L
-void clif_parse_PutItemToCart(int fd,struct map_session_data *sd)
-{
+void clif_parse_PutItemToCart(int fd,struct map_session_data *sd) {
+	int flag = 0;
 	if (pc_istrading(sd))
 		return;
 	if (!pc_iscarton(sd))
 		return;
-	pc->putitemtocart(sd,RFIFOW(fd,2)-2,RFIFOL(fd,4));
+	if ( (flag = pc->putitemtocart(sd,RFIFOW(fd,2)-2,RFIFOL(fd,4))) ) {
+		clif->dropitem(sd, RFIFOW(fd,2)-2,0);
+		clif->cart_additem_ack(sd,flag == 1?0x0:0x1);
+	}
 }
 
 
@@ -11859,9 +11862,9 @@ void clif_parse_ResetChar(int fd, struct map_session_data *sd) {
 	char cmd[15];
 
 	if( RFIFOW(fd,2) )
-		sprintf(cmd,"%cresetskill",atcommand->at_symbol);
+		sprintf(cmd,"%cskreset",atcommand->at_symbol);
 	else
-		sprintf(cmd,"%cresetstat",atcommand->at_symbol);
+		sprintf(cmd,"%cstreset",atcommand->at_symbol);
 
 	atcommand->parse(fd, sd, cmd, 1);
 }
@@ -13376,23 +13379,25 @@ void clif_parse_GMRecall2(int fd, struct map_session_data* sd)
 void clif_parse_GM_Monster_Item(int fd, struct map_session_data *sd)
 {
 	char *monster_item_name;
+	struct mob_db *mob_data;
+	struct item_data *item_data;
 	char command[NAME_LENGTH+10];
 
 	monster_item_name = (char*)RFIFOP(fd,2);
 	monster_item_name[NAME_LENGTH-1] = '\0';
 
-	// FIXME: Should look for item first, then for monster.
-	// FIXME: /monster takes mob_db Sprite_Name as argument
-	if( mobdb_searchname(monster_item_name) ) {
-		snprintf(command, sizeof(command)-1, "%cmonster %s", atcommand->at_symbol, monster_item_name);
+	if( (item_data=itemdb->search_name(monster_item_name)) != NULL 
+		&& strcmp(item_data->name, monster_item_name) != 0 ) { // It only accepts aegis name
+		if( item_data->type == IT_WEAPON || item_data->type == IT_ARMOR ) // nonstackable
+			snprintf(command, sizeof(command)-1, "%citem2 %d 1 0 0 0 0 0 0 0", atcommand->at_symbol, item_data->nameid);
+		else
+			snprintf(command, sizeof(command)-1, "%citem %d 20", atcommand->at_symbol, item_data->nameid);
 		atcommand->parse(fd, sd, command, 1);
 		return;
 	}
-	// FIXME: Stackables have a quantity of 20.
-	// FIXME: Equips are supposed to be unidentified.
-
-	if( itemdb->search_name(monster_item_name) ) {
-		snprintf(command, sizeof(command)-1, "%citem %s", atcommand->at_symbol, monster_item_name);
+	if( (mob_data=mob_db(mobdb_searchname(monster_item_name))) 
+		&& strcmp(mob_data->sprite, monster_item_name) != 0 ) { // It only accepts sprite name
+		snprintf(command, sizeof(command)-1, "%cmonster %s", atcommand->at_symbol, mob_data->name);
 		atcommand->parse(fd, sd, command, 1);
 		return;
 	}
@@ -17580,7 +17585,18 @@ void clif_skill_cooldown_list(int fd, struct skill_cd* cd) {
 
 	WFIFOSET(fd,4+(offset*count));
 }
-
+/* [Ind/Hercules] - Data Thanks to Yommy
+ * - ADDITEM_TO_CART_FAIL_WEIGHT = 0x0
+ * - ADDITEM_TO_CART_FAIL_COUNT  = 0x1
+ */
+void clif_cart_additem_ack(struct map_session_data *sd, int flag) {
+	struct packet_cart_additem_ack p;
+	
+	p.PacketType = cart_additem_ackType;
+	p.result = (char)flag;
+	
+	clif->send(&p,sizeof(p), &sd->bl, SELF);
+}
 /* */
 unsigned short clif_decrypt_cmd( int cmd, struct map_session_data *sd ) {
 	if( sd ) {
@@ -17917,6 +17933,7 @@ void clif_defaults(void) {
 	clif->addcards2 = clif_addcards2;
 	clif->item_sub = clif_item_sub;
 	clif->getareachar_item = clif_getareachar_item;
+	clif->cart_additem_ack = clif_cart_additem_ack;
 	/* unit-related */
 	clif->clearunit_single = clif_clearunit_single;
 	clif->clearunit_area = clif_clearunit_area;

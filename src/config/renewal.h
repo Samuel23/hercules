@@ -42,7 +42,7 @@
 ///
 /// leave this line to enable renewal item exp rate algorithms
 /// while enabled a special modified based on the difference between the player and monster level is applied
-//#define RENEWAL_EXP
+#define RENEWAL_EXP
 
 /// renewal level modifier on damage
 /// (disable by commenting the line)

@@ -82,3 +82,27 @@ setarray .@Taekwon[0],1550,2102,2403,2503,2607,2607,2321;
 	}
 	return;
 }
+
+function	script	addcash	{
+set #CASHPOINTS,#CASHPOINTS + getarg(0);
+dispbottom "You have gained "+getarg(0)+" Cash.";
+dispbottom "Total Cash: "+#CASHPOINTS+"";
+return;
+}
+
+-	script	nextlevel	-1,{
+
+OnInit:
+	bindatcmd "nextlevel",strnpcinfo(3)+"::OnAtcommand";
+	end;
+
+OnAtcommand:
+OnNPCKillEvent:
+	if (NextBaseExp > 0) {
+	dispbottom NextBaseExp - BaseExp+" exp needed to level up";
+	}
+	if (NextJobExp > 0) {
+	dispbottom NextJobExp - JobExp+" exp needed to job level up";
+	}
+	end;
+}

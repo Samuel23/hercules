@@ -20,7 +20,7 @@ Crystilia,75,80,4	script	ExhilarateRO Master	108,{
 		mes "[^0000FFExhilarateRO Master^000000]";
 		mes "Where do you want to go?";
 		next;
-		switch(select("Mall:Refiner's Area:Custom Shops Area:Vending Area:Cancel")) {
+		switch(select("Mall:Refiner's Area:Vending Area:Cancel")) {
 			case 1:
 			warp "mall",102,159;
 			close;
@@ -30,10 +30,6 @@ Crystilia,75,80,4	script	ExhilarateRO Master	108,{
 			close;
 
 			case 3:
-			warp "Crystilia",92,39;
-			close;
-
-			case 4:
 			warp "mall",99,117;
 			close;
 

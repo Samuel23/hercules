@@ -114,16 +114,6 @@ OnLoginCmnd:
 	}
 	end;
 OnPCLoginEvent:
-	if(.LogCount){
-		if(.LogCount & 1) set LOGINCOUNT,LOGINCOUNT+1;
-		if(.LogCount & 2) set #LOGINCOUNT,#LOGINCOUNT+1;
-		if(.LogCount & 4) set $LOGINCOUNT,$LOGINCOUNT+1;
-		if( ( LOGINCOUNT + #LOGINCOUNT + $LOGINCOUNT )%.Welcome[1] == 0 || (LOGINCOUNT + #LOGINCOUNT) < .Welcome[0] ){
-			Mes "~Welcome to "+.Servername$+"~";
-			Mes .Message$;
-			close2;
-		}
-	}
 	set .@getAccountType$,query_sql("SELECT `account_type` FROM login WHERE `account_id` = "+getcharid(3)+";",.@accountType$);
 	if(compare (.@accountType$,"NORMAL")) {
 		set .@accountType,0;
@@ -142,25 +132,27 @@ OnPCLoginEvent:
 	set .@min,  .@last % ( 24 * 3600 ) % 3600 / 60;
 	set .@sec,  .@last % ( 24 * 3600 ) % 3600 % 60;
 	if(.DailyPrize){
-		if( #DRewardCon == 0 ) set #DRewardCon,1; 
+		sleep2 1000 + .Rest*60000;
 		set .@i,gettimetick(2) + .MinWait; //24 hours.
 		set .@g,getarraysize(.Rewards);
-		sleep2 .Rest*60000;
 		if(#LastDailyReward < gettimetick(2)) {
-			if(.@i < #LastDailyReward + .MaxWait){ set #DRewardCon,#DRewardCon+1;
-			 } else { set #DRewardCon,1; }
-			if(#DRewardCon*2 > .@g-1){ set .@p,.Rewards[.@g-2]; set .@q,.Rewards[.@g-1];
-			} else { set .@p,.Rewards[#DRewardCon*2-2];  set .@q,.Rewards[#DRewardCon*2-1]*.VIPRewards[.@accountType]; }
+			if(.@i < #LastDailyReward + .MaxWait){
+			set #DRewardCon, #DRewardCon + 1;
+			} else {
+			set #DRewardCon, 1;
+			}
+			if(#DRewardCon*2 > .@g-1){ set .@p,.Rewards[.@g-2]; set .@q,(.Rewards[.@g-1] * .VIPRewards[.@accountType]);
+			} else { set .@p,.Rewards[#DRewardCon*2-2];  set .@q,(.Rewards[#DRewardCon*2-1] * .VIPRewards[.@accountType]); }
 			if(.Mode&1&&.@p){ 
 				if(!checkweight(.@p,.@q)){ dispbottom "You seem to be oveweight, put some stuff away and relog to claim prize"; end;
 				} else { getitem .@p,.@q; dispbottom ""+.@q+" "+getitemname(.@p)+""; }
 			}
-			if(.Mode&2) set .@A,#DRewardCon*.ZMulti;
+			if(.Mode&2) set .@A,#DRewardCon*(.ZMulti * .VIPRewards[.@accountType]);
 			if(.Mode&8) set .@A,.@A+.@q;
-			if(.Mode&2||.Mode&8){  setd .PointType$,getd(.PointType$)+.@A; dispbottom ""+.@A+" "+.PointType$+""; }
+			if(.Mode&2||.Mode&8){  setd .PointType$,getd(.PointType$)+.@A ; dispbottom ""+.@A+" "+.PointType$+""; }
 			if(.Mode&4){ set .@B,#DRewardCon*.XPMulti[0]; set .@C,#DRewardCon*.XPMulti[1]; }
 			if(.Mode&16){ set .@B,.@B+.@q; set .@C,.@C+.@q; }
-			if(.Mode&4||.Mode&16){ getexp .@B,.@C; }
+			if(.Mode&4||.Mode&16){ getexp .@B*.VIPRewards[.@accountType],.@C*.VIPRewards[.@accountType]; }
 			if(.Mode&32){
 				for(set .@x,0; .@x < getarraysize(.BuffInfo); set .@x,.@x+4){
 					if(#DRewardCon % .BuffInfo[.@x+1] == 0) sc_start .BuffInfo[.@x], .BuffInfo[.@x+2]*60000, .BuffInfo[.@x+3];
@@ -175,27 +167,6 @@ OnPCLoginEvent:
 	}
 end;
 OnInit:
-// -----------------------------------------------------------
-//  Login Count & Welcome Message
-// -----------------------------------------------------------
-
-	// Login types to track.
-	//   1: Character | 2: Account | 4: Server
-	// (a bit value, e.g. 5 = character + server)
-	set .LogCount,2;
-
-	// Number of logins to display welcome message.
-	//  [0]: First x Logins, 0 will never give a message
-	//  [1]: Remider message every x Logins (combined server account and character)
-	setarray .Welcome,3,250;
-
-	// Server name to display.
-	set .Servername$,"ExhilarateRO";
-
-	// Login message
-	// * Must have at least 1 Login Count Enabled
-	set .Message$,"Before playing, make sure you've read the rules, located in our forum at ^0000FFboard.exhilarate-ro.com^000000";
-
 // -----------------------------------------------------------
 //  Daily Reward
 // -----------------------------------------------------------
@@ -248,7 +219,7 @@ OnInit:
 	//  [1]: Job
 	// * If players login longer than the last set
 	//   day, they will keep getting a larger Multiplier.
-	setarray .XPMulti,50,50;
+	setarray .XPMulti,100,100;
 
 	// Consecutive Days Buff
 	// Each buff contains 4 variables (32 Total Max)
@@ -281,10 +252,7 @@ OnInit:
 	//   ...;
 	// * If players login longer than the last set
 	//   day, they will keep getting the last prize.
-	setarray .Rewards[0],
-		512,1,		// Day 1
-		513,2,		// Day 2
-		514,3;		// Day 3
+	setarray .Rewards[0],13550,10;		// Fish Slice 10 * VIP Account
 
 	setarray .VIPRewards[0],
 		1,		// NORMAL

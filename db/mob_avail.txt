@@ -41,3 +41,6 @@
 // iRO Halloween Event 2009
 //3014,1179,0
 //3015,1272,0
+
+// Custom Event Monsters
+1857,1084,0

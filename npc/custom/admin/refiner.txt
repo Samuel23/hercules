@@ -4,7 +4,7 @@
 cryst_in01,110,369,0	warp	refinerwarp#1	2,2,Crystilia,85,54
 Crystilia,85,57,0	warp	refinerwarp#2	2,2,cryst_in01,110,373
 
-cryst_in01,107,390,0	warp	refinerwarp#3	2,2,cryst_in01,111,322
+cryst_in01,107,390,0	warp	refinerwarp#3	2,2,cryst_in01,110,322
 cryst_in01,113,322,0	warp	refinerwarp#4	2,2,cryst_in01,111,390
 // ===========================================================
 // Refiner

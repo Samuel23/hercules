@@ -125,6 +125,10 @@ disp_zeny: yes
 
 /* gm.conf */
 
+// (@) @allstats/@str/@agi/@vit/@int/@dex/@luk
+// allow gms to bypass the maximum stat parameter? ( if yes gm stats can go up to 32k ) default: no
+atcommand_max_stat_bypass: yes
+
 // Ignore warpable area configuration.
 // Set the minimum group id to ignore invalid cells when warping.
 // Default group is 2. Use 100 to disable this setting.

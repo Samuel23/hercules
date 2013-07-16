@@ -13,10 +13,8 @@ L_JumpAdmin:
 	mes "[Manager]";
 	mes "^FF0000~Hi GM " + strcharinfo(0) + "!~^000000";
 	mes "^FF0000The Current Prize is:^000000";
-	mes "^FF00001. Random Prize:^000000 ^008000"+$jmp_item_amount1+" "+getitemname($jmp_item_id1)+"^000000";
-	mes "^FF00002. Random Prize:^000000 ^008000"+$jmp_item_amount2+" "+getitemname($jmp_item_id2)+"^000000";
-	mes "^FF00003. Random Prize:^000000 ^008000"+$jmp_item_amount3+" "+getitemname($jmp_item_id3)+"^000000";
-	switch(select("Start Jump Event?:Set Prize:Not today Fellas!")){
+	mes "^008000"+getvariableofnpc(.jumper,"Event Manager")+" "+getitemname(getvariableofnpc(.eventprize,"Event Manager"))+"^000000";
+	switch(select("Start Jump Event?:Not today Fellas!")){
 
 	case 1:
 	next;
@@ -36,78 +34,34 @@ L_JumpAdmin:
 	case 2:
 	next;
 	mes "[Manager]";
-	mes "^FF0000~What should the prize for winning be? Please input the ID.~^000000";
-	menu "Set Prize 1",SP1,"Set Prize 2",SP2,"Set Prize 3",SP3,"Go Back to main",L_JumpAdmin;
-
-	SP1:
-	next;
-	mes "[Manager]";
-	mes "^FF0000~What should the prize for winning be? Please input the ID.~^000000";
-	input $jmp_item_id1;
-	next;
-	mes "[Manager]";
-	mes "^FF0000~How many if this item should I give away?~^000000";
-	input $jmp_item_amount1;
-	next;
-	mes "[Manager]";
-	mes "^FF0000~So, the prize is^000000 ^008000"+ $jmp_item_amount1 +" "+ getitemname($jmp_item_id1) +"^000000? ^FF0000Great.~^000000";
-	next;
-	goto L_JumpAdmin;
-
-	SP2:
-	next;
-	mes "[Manager]";
-	mes "^FF0000~What should the prize for winning be? Please input the ID.~^000000";
-	input $jmp_item_id2;
-	next;
-	mes "[Manager]";
-	mes "^FF0000~How many if this item should I give away?~^000000";
-	input $jmp_item_amount2;
-	next;
-	mes "[Manager]";
-	mes "^FF0000~So, the prize is^000000 ^008000"+ $jmp_item_amount2 +" "+ getitemname($jmp_item_id2) +"^000000? ^FF0000Great.~^000000";
-	next;
-	goto L_JumpAdmin;
-
-	SP3:
-	next;
-	mes "[Manager]";
-	mes "^FF0000~What should the prize for winning be? Please input the ID.~^000000";
-	input $jmp_item_id3;
-	next;
-	mes "[Manager]";
-	mes "^FF0000~How many if this item should I give away?~^000000";
-	input $jmp_item_amount3;
-	next;
-	mes "[Manager]";
-	mes "^FF0000~So, the prize is^000000 ^008000"+ $jmp_item_amount3 +" "+ getitemname($jmp_item_id3) +"^000000? ^FF0000Great.~^000000";
-	next;
-	goto L_JumpAdmin;
-
-	case 3:
-	next;
-	mes "[Manager]";
 	mes "Bye!!";
 	close;
 
 }// End Admin Manager...
 
-OnMinute25:
+//Tuesday
+OnTue0430:
+OnTue1230:
+OnTue2030:
+//Thursday
+OnThu0430:
+OnThu1230:
+OnThu2030:
+//Saturday
+OnSat0430:
+OnSat1230:
+OnSat2030:
+OnAdminStart:
 L_StartJmp:
 announce "Jumper Event : will begin in 20 seconds",bc_blue;
-sleep2 5000;
+sleep 5000;
 announce "Jumper Event : I'm Going to JUMP somewhere..!!",bc_blue;
-sleep2 5000;
+sleep 5000;
 announce "Jumper Event : By the way I'm going to disguise into a random monster.!!",bc_blue;
-sleep2 10000;
+sleep 10000;
 announce "Jumper Event : Last 10 seconds",bc_blue;
-sleep2 10000;
-set $@ran, rand(1,10);
-if ($@ran == 10) set $@jmpmap$,"hugel";
-if ($@ran == 9) set $@jmpmap$,"yuno";
-if ($@ran == 8) set $@jmpmap$,"comodo";
-if ($@ran == 7) set $@jmpmap$,"xmas";
-if ($@ran == 6) set $@jmpmap$,"aldebaran";
+sleep 10000;
+set $@ran, rand(1,5);
 if ($@ran == 5) set $@jmpmap$,"izlude";
 if ($@ran == 4) set $@jmpmap$,"payon";
 if ($@ran == 3) set $@jmpmap$,"geffen";
@@ -121,9 +75,9 @@ OnStart:
 if ($@JmpRnd == 0){
 stopnpctimer;
 set $@JumpStart,0;
-sleep2 3000;
+sleep 3000;
 announce "Jumper Event : is now OVER!!",bc_blue;
-sleep2 15000;
+sleep 15000;
 movenpc "Jumper"+$@ran+"",1,1; //move the NPC
 setnpcdisplay "Jumper"+$@ran+"",1002;
 end;
@@ -132,9 +86,9 @@ if ($@JmpRnd == 10){
 goto OnStart2;
 }
 stopnpctimer;
-sleep2 3000;
+sleep 3000;
 announce "Jumper Event : Next Round will begin in 15 seconds...",bc_blue;
-sleep2 15000;
+sleep 15000;
 setnpcdisplay "Jumper"+$@ran+"",1002;
 movenpc "Jumper"+$@ran+"",1,1; //move the NPC
 set $@ran, rand(1,5);
@@ -164,7 +118,7 @@ end;
 OnTimer120000:
 set $@JumpStart,0;
 announce "Jumper Event : WOW no One Found ME!! I'm here in "+$@jmpmap$+" "+$@jx+" "+$@jy+"!!",bc_blue;
-sleep2 3000;
+sleep 3000;
 donpcevent "jumpevent::OnStart";
 end;
 
@@ -176,45 +130,20 @@ mes "[Jumper]";
 mes "I'm sorry, Someone Found me..";
 close;
 }
-set $@prize, rand(1,100);
-if ( $@prize <= 50 ){
 set $@JumpStart,0;
-getitem $jmp_item_id1,$jmp_item_amount1;
+/* Item Prize */
+	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.jumper,"Event Manager");
+		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
+		getexp rand(1000,10000),rand(100,1000);
+		}
 announce "Jumper Event : "+strcharinfo(0)+" is the WINNER!! I'm here in "+$@jmpmap$+" "+$@jx+" "+$@jy+"!!",bc_blue;
 donpcevent "jumpevent::OnStart";
 mes "[Jumper]";
 mes "WOW you found me!!";
 mes "Take this as a REWARD!!";
-mes "You got ^008000"+ $jmp_item_amount1 +" "+ getitemname($jmp_item_id1) +"^000000";
+mes "You got ^008000"+ getvariableofnpc(.jumper,"Event Manager") +" "+ getitemname(getvariableofnpc(.eventprize,"Event Manager")) +"^000000";
 close;
 end;
-}
-set $@prize, rand(1,100);
-if ( $@prize <= 49 ){
-set $@JumpStart,0;
-getitem $jmp_item_id2,$jmp_item_amount2;
-announce "Jumper Event : "+strcharinfo(0)+" is the WINNER!! I'm here in "+$@jmpmap$+" "+$@jx+" "+$@jy+"!!",bc_blue;
-donpcevent "jumpevent::OnStart";
-mes "[Jumper]";
-mes "WOW you found me!!";
-mes "Take this as a REWARD!!";
-mes "You got ^008000"+ $jmp_item_amount2 +" "+ getitemname($jmp_item_id2) +"^000000";
-close;
-end;
-}
-set $@prize, rand(1,100);
-if ( $@prize <= 48 ){
-set $@JumpStart,0;
-getitem $jmp_item_id3,$jmp_item_amount3;
-announce "Jumper Event : "+strcharinfo(0)+" is the WINNER!! I'm here in "+$@jmpmap$+" "+$@jx+" "+$@jy+"!!",bc_blue;
-donpcevent "jumpevent::OnStart";
-mes "[Jumper]";
-mes "WOW you found me!!";
-mes "Take this as a REWARD!!";
-mes "You got ^008000"+ $jmp_item_amount3 +" "+ getitemname($jmp_item_id3) +"^000000";
-close;
-end;
-}
 }
 //End Script
 

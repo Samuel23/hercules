@@ -63,7 +63,7 @@
 //7170,Tuxedo,Tuxedo,5,43000,,10,,0,,0,0xFFFFFFFE,7,1,16,,0,1,0,{},{ sc_start SC_WEDDING,-1,0; },{ sc_end SC_WEDDING; }
 
 // Donation Promo
-17500,Donation_Box_I,Donation Box I,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 675,5; getitem 12103,3; getitem 14232,5; getitem 12912,1; getitem 31013,5; getitem 31014,5; getitem 31001,1; },{},{}
+17500,Donation_Box_I,Donation Box I,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ callfunc "addcash",20; getitem 675,5; getitem 12103,3; getitem 14232,5; getitem 12912,1; getitem 31013,5; getitem 31014,5; getitem 31001,1; },{},{}
 17501,Donation_Box_II,Donation Box II,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 675,12; getitem 12103,6; getitem 14232,12; getitem 12912,2; getitem 31013,11; getitem 31014,11; getitem 31003,1; },{},{}
 17502,Donation_Box_III,Donation Box III,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 675,19; getitem 12103,12; getitem 14232,19; getitem 12912,3; getitem 31013,23; getitem 31014,23; getitem 31006,1; },{},{}
 17503,Donation_Box_IV,Donation Box IV,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 675,25; getitem 12103,18; getitem 14232,25; getitem 12912,4; getitem 31013,34; getitem 31014,34; getitem 31008,1; },{},{}

@@ -26,13 +26,25 @@ OnInit:
 	hideonnpc "Dice#evnt1";
 	end;
 
-OnMinute00:
+//Tuesday
+OnTue0030:
+OnTue0830:
+OnTue1630:
+//Thursday
+OnThu0030:
+OnThu0830:
+OnThu1630:
+//Saturday
+OnSat0030:
+OnSat0830:
+OnSat1630:
+OnStart:
 	announce "Dice: We are going to have a Dice event.",0;
-	sleep2 10000;
+	sleep 10000;
 	announce "Dice: For those who wants to join, Please proceed to Crystilia 105 81 and enter the Warp Portal.",0;
-	sleep2 10000;
+	sleep 10000;
 	announce "Dice: After 1 Minute the Portal will close. Please proceed to Crystilia 105 81 and enter the Warp Portal.",0;
-	sleep2 10000;
+	sleep 10000;
 	announce "Dice: So please go to Crystilia 105 81 and enter the Warp Portal now if you want to join.",0;
 	enablenpc "prtevent";
 	initnpctimer;
@@ -40,7 +52,7 @@ OnMinute00:
 
 OnTimer30000:
 	announce "Dice: Last 30 seconds.",0;
-	sleep2 5000;
+	sleep 5000;
 	announce "Dice: If you want to join please enter the Warp Portal beside me here in Crystilia 105 81.",0;
 	end;
 	
@@ -106,30 +118,34 @@ quiz_01,204,93,6	script	Dice#evnt1	715,{
 	mes "Congrats. You've won.";
 	close2;
 	announce "Dice: We have a winner, "+.@name$+".",0;
-	getitem 675,2;	// Silver Coin
+	/* Item Prize */
+	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.dice,"Event Manager");
+		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
+		getexp rand(2000,20000),rand(1000,10000);
+		}
 	warp "Crystilia",91,82;
 	hideonnpc "Dice#evnt1";
 	end;
 	
 OnEnable:
 	mapannounce "quiz_01","Dice: We are about to start the Dice event.",0;
-	sleep2 10000;
+	sleep 10000;
 	mapannounce "quiz_01","Dice: But before we start the event here's how to play the game. . .",0;
-	sleep2 10000;
+	sleep 10000;
 	mapannounce "quiz_01","Dice: I'm only gonna say this once so read carefully.",0;
-	sleep2 10000;
+	sleep 10000;
 	mapannounce "quiz_01","Dice: I'm going to pick a number, 1 to 4. Then I'll do a count down from 5 to 0.",0;
-	sleep2 10000;
+	sleep 10000;
 	mapannounce "quiz_01","Dice: All you have to do is go to the box of the number you want.",0;
-	sleep2 10000;
+	sleep 10000;
 	mapannounce "quiz_01","Dice: Example, If I get the number of 4, All the players standing on numbers 1 to 3 will be warped back to town.",0;
-	sleep2 10000;
+	sleep 10000;
 	mapannounce "quiz_01","Dice: We will do it again and again until we only have 1 player left on the map.",0;
-	sleep2 10000;
+	sleep 10000;
 	mapannounce "quiz_01","Dice: Oh yeah! Before I forget you MUST GO INSIDE THE BOX, because if you're caught standing on the stairs you'll be automatically disqualified.",0;
-	sleep2 10000;
+	sleep 10000;
 	mapannounce "quiz_01","Dice: That's that.. Now let's play...",0;
-	sleep2 10000;
+	sleep 10000;
 	goto L_Start;
 	end;
 	
@@ -139,19 +155,19 @@ L_Start:
 	if(getmapusers("quiz_01") > 1) {
 	announce "Dice: . . . . .",0;
 	set $@number, rand(1,4);
-	sleep2 10000;
+	sleep 10000;
 	announce "Dice: I have a number now. Please go to the box of the number you want.... GO!",0;
-	sleep2 10000;
+	sleep 10000;
 	announce "Dice: 5",0;
-	sleep2 5000;
+	sleep 5000;
 	announce "Dice: 4",0;
-	sleep2 4000;
+	sleep 4000;
 	announce "Dice: 3",0;
-	sleep2 3000;
+	sleep 3000;
 	announce "Dice: 2",0;
-	sleep2 2000;
+	sleep 2000;
 	announce "Dice: 1",0;
-	sleep2 1000;
+	sleep 1000;
 	announce "Dice: Time's up.",0;
 	donpcevent "evnt#1::OnEnable";
 	announce "Dice: Winning number "+$@number+".",0;

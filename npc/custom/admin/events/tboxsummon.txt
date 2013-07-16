@@ -1,0 +1,44 @@
+//==========================================================//
+//========= Script by [ADMIN] Excelsis             =========//
+//========= http://exelsis-ro.com                  =========//
+//==========================================================//
+
+-	script	TBox Summoner	-1,{
+
+OnInit:
+	//setarray .Maps$[0],"prontera"; // Possible maps
+	set .Map$,"prontera";
+	bindatcmd "checktreasure",strnpcinfo(3)+"::OnAtcommand";
+	end;
+
+OnMinute00:	// Start time (every hour)
+OnAdminStart:
+	set .Spawn,rand(1,10);	// How many Mushrooms should spawn?
+	set .Spawntotal, .Spawn + .Spawnleft;
+	//set .Map$,.Maps$[rand(getarraysize(.Maps$))];
+	announce .Spawn+" rare Treasure Box will be spawned in 30 seconds at "+.Map$+"!",0;
+	sleep 30000;	// 30 secs
+	monster .Map$,0,0,"Treasure Box",1845,.Spawn,"TBox Summoner::OnTBoxKilled";
+	end;
+
+OnTBoxKilled:
+	set .Spawnleft, .Spawntotal - 1;
+	set .Spawntotal, .Spawnleft;
+	/* Item Prize */
+	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.tbox,"Event Manager");
+		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
+		getexp rand(1000,10000),rand(100,1000);
+		}
+	if (.Spawn) announce "The rare Treasure Box has been founded and destroyed by "+strcharinfo(0)+"! There are now "+.Spawntotal+" Treasure Box left in "+.Map$+".",bc_all;
+	end;
+
+OnAtcommand:
+	dispbottom "There are now "+.Spawntotal+" Treasure Box left in "+.Map$+".";
+	end;
+}
+
+-	script	Punching Bag	-1,{
+	OnInit: 
+	OnDeath:
+	monster "prontera",156,170,"Punching Bag",1905,1,strnpcinfo(0)+"::OnDeath";
+}

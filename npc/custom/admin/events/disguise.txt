@@ -50,7 +50,7 @@ menu "Turn ON/OFF Event",iEvent,"Event Settings",iSettings;
     next;
     mes .@npcname$;
     mes "Please select a setting to modify.";
-    menu "Monster Display",iMonster,"Number of Rounds",iRounds,"Prize Settings",iPrize;
+    menu "Monster Display",iMonster,"Number of Rounds",iRounds;
       iMonster:
       callfunc "Monster_Display";
       iRounds:
@@ -73,18 +73,23 @@ set $Rule,1;
 setarray $@MVP[0],1511,1674,1785,1039,1874,1272,1719,1046,1389,1112,1115,1658,1957,1418,1871,1252,1786,1086,1885,1649,1651,1832,1492,1734,1251,1779,1688,1646,1373,1147,1059,1150,1956,1087,1190,1038,1157,1159,1052,1623,1916,1650,1583,1389,1312,1751,1685,1630,1648,1797,1796,1975,1867,1980,1988,2015,1995,1987,1994,1989,1986,1992,1993,1769,1770,1632,1773,1774,1838,1830,1829,1829,1839,1620,1616,1621,1753,1752,1754,2087,2068,2022;
 setarray $@BlackList[0],1003,1006,1017,1021,1022,1027,1043,1075,1136,1137,1168,1171,1172,1173,1181,1210,1217,1218,1222,1223,1224,1225,1226,1227,1228,1284,1407,1411,1414,1496,1501,1900;
 end;
-OnClock0000:
-OnClock0200:
-OnClock0400:
-OnClock0600:
-OnClock0800:
-OnClock1000:
-OnClock1200:
-OnClock1400:
-OnClock1600:
-OnClock1800:
-OnClock2000:
-OnClock2200:
+//Monday
+OnMon0430:
+OnMon1230:
+OnMon2030:
+//Wednesday
+OnWed0430:
+OnWed1230:
+OnWed2030:
+//Friday
+OnFri0430:
+OnFri1230:
+OnFri2030:
+//Sunday
+OnSun0430:
+OnSun1230:
+OnSun2030:
+OnStart:
 set $@ResetCounter,$@ResetCounter+1;
 set $@EventON,1;
 set $@Timer,1;
@@ -168,7 +173,11 @@ set $@RoundCount,$@RoundCount+1;
 deletepset 1;
 defpattern 1,"([^:]+):.*\\sOMFGBBQLEETSAUCEGMOCEANRULESHAI!!.*", "iFailCheater";
 activatepset 1;
-getitem $Prize,$PrizeAmt;
+/* Item Prize*/
+	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.disguise,"Event Manager");
+		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
+		getexp rand(1000,10000),rand(100,1000);
+		}
 announce ""+strcharinfo(0)+" is correct! I was disguised as: "+$MonsterName$+"",bc_map | bc_blue;
 if ($@RoundCount>=$Rounds)
   {setnpcdisplay "Disguise Event",795;
@@ -192,25 +201,6 @@ next;
 mes "The number of rounds has been changed successfully.";
 mes "Number of Rounds: [^0000FF"+$Rounds+"^000000]";
 mes "Come again.";
-close;
-}
-function	script	Prizer	{
-next;
-mes "Please Input the ItemID of the prize that will be given each round.";
-mes "Current Items is: [^0000FF"+getitemname($Prize)+"^000000] ItemID - ^0000FF"+$Prize+"^000000";
-input .@Prize;
-if (getitemname(.@Prize)=="" || getitemname(.@Prize)=="null")
-{next; mes "That item does not exist. Please try again."; close;}
-set $Prize,.@Prize;
-next;
-mes "Please Input the Ammount that is to be given.";
-input .@Ammount;
-if (.@Ammount<=0 || .@Ammount>=10000)
-{next; mes "That ammount is invalid. Using default ammount of 1.";}
-set $PrizeAmt,.@Ammount;
-next;
-mes "The Prize has been changed successfully.";
-mes "Prize: [^0000FF"+getitemname($Prize)+"^000000]x(^0000FF"+$PrizeAmt+"^000000)";
 close;
 }
 function	script	Monster_Display	{

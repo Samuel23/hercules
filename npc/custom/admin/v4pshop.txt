@@ -24,7 +24,7 @@ mes "So,Which shop you would like to look at it";
 next;
 // Menu Selection
 //select("Shop 1","Shop 2","Shop 3");
-select("Consumables");
+select("Consumables","Costume Equipments","Headgears");
 
 ClearData();
 ShopSettings( @menu );
@@ -47,9 +47,25 @@ function	ShopSettings	{
 			// Currency [ Item ID / Variable Name ]
 			set @Currency$,"31050";
 			// Item ID Lists
-			setarray @ItemLists[0],12208,14592,7621,12103,12210;
+			setarray @ItemLists[0],12208,13548,13549,14592,7621,13550,12103,12210,14602,13749,13755,14109;
 			// Item Price
-			setarray @ItemCost[0],3,4,5,15,15;
+			setarray @ItemCost[0],3,3,3,4,5,5,15,15,20,20,20,30;
+			break;
+		Case 2:
+			// Currency [ Item ID / Variable Name ]
+			set @Currency$,"31050";
+			// Item ID Lists
+			setarray @ItemLists[0],19507,19520,19519,19518,19510;
+			// Item Price
+			setarray @ItemCost[0],100,100,100,100,50;
+			break;
+		Case 3:
+			// Currency [ Item ID / Variable Name ]
+			set @Currency$,"31050";
+			// Item ID Lists
+			setarray @ItemLists[0],19542,19534,19529,19553,19550;
+			// Item Price
+			setarray @ItemCost[0],300,200,50,50,50;
 			break;
 		default:
 			ErrorNotice( "Invalid Menu Selection for Menu "+@menu+"." );

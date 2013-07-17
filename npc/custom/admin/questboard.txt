@@ -18,7 +18,7 @@
 //============================================================
 
 Crystilia,74,50,4	script	Questboard	111,{
-		
+
 	if(c_run==1){
 		mes "[^FF7700Questboard^000000]";
 		mes "^0000FF"+getd("." + currentquest$ + "_collectionname$")+"^000000";
@@ -264,6 +264,10 @@ OnInit:
 	//24 hours = 86400 seconds
 	set .quest_delay, 86400;
 	
+	//To Enable @ Command '@quest' unslash next lines
+	// * Needs extra commands for typos
+	bindatcmd("quest",strnpcinfo(3)+"::OnAtCommand");
+	
 	//Checks if quests are loaded (prevents out of index)
 	if(.questsloaded==1) end;
 		set .questsloaded, 1;
@@ -282,6 +286,25 @@ OnInit:
 
 		end;
 		
+
+OnAtCommand:
+	if(c_run==1){
+	dispbottom "Current Quest: "+getd("." + currentquest$ + "_collectionname$")+"^000000";
+	for( set .@j, 0; .@j < getarraysize(getd("."+ currentquest$ + "_collectionitem")); set .@j,.@j+2) {
+			dispbottom getitemname(getd("."+currentquest$+"_collectionitem["+.@j+"]"))+" - "+countitem(getd("."+currentquest$+"_collectionitem["+.@j+"]"))+"/"+getd("."+currentquest$+"_collectionitem["+(.@j+1)+"]")+" ea.^000000";
+		}
+	}
+	if(h_run==1){
+	dispbottom "Current Quest: "+getd("." + currentquest$ + "_huntingname$")+"^000000";
+	for( set .@j, 0; .@j < getarraysize(getd("."+ currentquest$ + "_huntingmob")); set .@j,.@j+2) {
+			set .@currentmob, getd("."+currentquest$+"_huntingmob["+(.@j)+"]");
+			dispbottom strmobinfo(1,getd("."+currentquest$+"_huntingmob["+.@j+"]"))+" - "+getd(currentquest$+"_"+.@currentmob+"_"+(.@j+1)+"_killcount")+"/"+getd("."+currentquest$+"_huntingmob["+(.@j+1)+"]")+" ea.^000000";
+		}
+	}
+	else {
+		dispbottom "You don't have a quest right now.";
+	}
+	end;
 
 function AddCollection {
 	set .collectionquestcount,.collectionquestcount+1;

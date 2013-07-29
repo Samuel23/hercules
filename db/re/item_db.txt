@@ -6314,7 +6314,7 @@
 13289,Petti_Noodle_To_Throw,Throwing Petite Tail Soup,10,100,,50,0,,,,0x00040000,8,2,32768,,99,,9,{ sc_start SC_PUTTI_TAILS_NOODLES,300000,20; },{},{}
 13290,Black_Thing_To_Throw,Throwing Black Mass,10,100,,50,0,,,,0x00040000,8,2,32768,,99,,9,{ sc_start SC_STOMACHACHE,60000,rand(5,10); },{},{}
 // More Shurikens & Kunais
-13291,Starfish,Starfish,10,0,,5,110,,,,0x02000000,7,2,32768,,50,,7,{ bonus bAtkEle,Ele_Neutral; /*bonus2 bAddEff,Eff_Stun,?;*/ },{},{}
+13291,Starfish,Starfish,10,10,,5,110,,,,0x02000000,7,2,32768,,50,,7,{ bonus bAtkEle,Ele_Neutral; /*bonus2 bAddEff,Eff_Stun,?;*/ },{},{}
 13292,Dried_Squid,Dried Squid,10,10,,20,50,,,,0x02000000,7,2,32768,,1,,7,{ bonus bAtkEle,Ele_Neutral; /*bonus2 bAddEff,Eff_Blind,?;*/ },{},{}
 13293,Flying_Fish,Flying Fish,10,10,,20,50,,,,0x02000000,7,2,32768,,1,,6,{ bonus bAtkEle,Ele_Neutral; /*bonus2 bAddEff,Eff_Bleeding,?;*/ },{},{}
 13294,Explosive_Kunai,Explosive Kunai,10,100,,30,50,,,,0x02000000,7,2,32768,,100,,7,{ bonus bAtkEle,Ele_Neutral; },{},{}

@@ -1958,4 +1958,8 @@
 4544,457,100	// Sealed Evil Snake Lord Card
 
 // Custom Items
-30010,511,100	// Starting Gear Box
+30010,511,99	// Starting Gear Box
+30011,511,99	// ExhilarateRO Freebies
+14524,15,99		// Fish Slice
+13550,15,99		// Fish Slice Box of 10
+30003,15,99		// Fish Slice Box of 50

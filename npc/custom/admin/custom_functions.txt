@@ -94,6 +94,7 @@ return;
 
 OnInit:
 	bindatcmd "nextlevel",strnpcinfo(3)+"::OnAtcommand",0;
+	bindatcmd "commands2",strnpcinfo(3)+"::OnNewCommands",0;
 	end;
 
 OnAtcommand:
@@ -117,5 +118,9 @@ OnNPCKillEvent:
 	//dispbottom NextJobExp - JobExp+" exp needed to job level up";
 	announce "["+(NextJobExp - JobExp)+"] exp needed to job level up",bc_self;
 	}
+	end;
+
+OnNewCommands:
+	dispbottom "checktreasure   checkmushroom   loginreward   quest   nextlevel";
 	end;
 }

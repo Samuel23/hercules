@@ -44,8 +44,13 @@
 const short dirx[8]={0,-1,-1,-1,0,1,1,1};
 const short diry[8]={1,1,0,-1,-1,-1,0,1};
 
-struct unit_data* unit_bl2ud(struct block_list *bl)
-{
+/**
+ * Returns the unit_data for the given block_list. If the object is using
+ * shared unit_data (i.e. in case of BL_NPC), it returns the shared data.
+ * @param bl block_list to process
+ * @return a pointer to the given object's unit_data
+ **/
+struct unit_data* unit_bl2ud(struct block_list *bl) {
 	if( bl == NULL) return NULL;
 	if( bl->type == BL_PC)  return &((struct map_session_data*)bl)->ud;
 	if( bl->type == BL_MOB) return &((struct mob_data*)bl)->ud;
@@ -55,6 +60,23 @@ struct unit_data* unit_bl2ud(struct block_list *bl)
 	if( bl->type == BL_MER) return &((struct mercenary_data*)bl)->ud;
 	if( bl->type == BL_ELEM) return &((struct elemental_data*)bl)->ud;
 	return NULL;
+}
+
+/**
+ * Returns the unit_data for the given block_list. If the object is using
+ * shared unit_data (i.e. in case of BL_NPC), it recreates a copy of the
+ * data so that it's safe to modify.
+ * @param bl block_list to process
+ * @return a pointer to the given object's unit_data
+ */
+struct unit_data* unit_bl2ud2(struct block_list *bl) {
+	if( bl && bl->type == BL_NPC && ((struct npc_data*)bl)->ud == &npc_base_ud ) {
+		struct npc_data *nd = (struct npc_data *)bl;
+		nd->ud = NULL;
+		CREATE(nd->ud, struct unit_data, 1);
+		unit_dataset(&nd->bl);
+	}
+	return unit_bl2ud(bl);
 }
 
 static int unit_attack_timer(int tid, unsigned int tick, int id, intptr_t data);
@@ -85,9 +107,9 @@ int unit_walktoxy_sub(struct block_list *bl)
 		   ud->walkpath.path_len--;
 			dir = ud->walkpath.path[ud->walkpath.path_len];
 			if(dir&1)
-				i-=14;
+				i -= MOVE_DIAGONAL_COST;
 			else
-				i-=10;
+				i -= MOVE_COST;
 			ud->to_x -= dirx[dir];
 			ud->to_y -= diry[dir];
 		}
@@ -104,7 +126,7 @@ int unit_walktoxy_sub(struct block_list *bl)
 	if(ud->walkpath.path_pos>=ud->walkpath.path_len)
 		i = -1;
 	else if(ud->walkpath.path[ud->walkpath.path_pos]&1)
-		i = iStatus->get_speed(bl)*14/10;
+		i = iStatus->get_speed(bl)*MOVE_DIAGONAL_COST/MOVE_COST;
 	else
 		i = iStatus->get_speed(bl);
 	if( i > 0)
@@ -324,14 +346,16 @@ int unit_walktoxy( struct block_list *bl, short x, short y, int flag)
 
 	if( ud == NULL) return 0;
 
-	path_search(&wpd, bl->m, bl->x, bl->y, x, y, flag&1, CELL_CHKNOPASS); // Count walk path cells
+	if (!path_search(&wpd, bl->m, bl->x, bl->y, x, y, flag&1, CELL_CHKNOPASS)) // Count walk path cells
+		return 0;
+
 #ifdef OFFICIAL_WALKPATH
 	if( !path_search_long(NULL, bl->m, bl->x, bl->y, x, y, CELL_CHKNOPASS) // Check if there is an obstacle between
 		&& (wpd.path_len > (battle_config.max_walk_path/17)*14) // Official number of walkable cells is 14 if and only if there is an obstacle between. [malufett]
 		&& (bl->type != BL_NPC) ) // If type is a NPC, please disregard.
 		return 0;
 #endif
-	if( (battle_config.max_walk_path < wpd.path_len) && (bl->type != BL_NPC) )
+	if ((wpd.path_len > battle_config.max_walk_path) && (bl->type != BL_NPC))
 		return 0;
 
 	if (flag&4 && DIFF_TICK(ud->canmove_tick, iTimer->gettick()) > 0 &&
@@ -2107,7 +2131,7 @@ int unit_remove_map_(struct block_list *bl, clr_type clrtype, const char* file, 
 			}
 			//Leave/reject all invitations.
 			if(sd->chatID)
-				chat_leavechat(sd,0);
+				chat->leavechat(sd,0);
 			if(sd->trade_partner)
 				trade->cancel(sd);
 			buyingstore->close(sd);
@@ -2143,7 +2167,7 @@ int unit_remove_map_(struct block_list *bl, clr_type clrtype, const char* file, 
 				sd->pvp_rank = 0;
 			}
 			if(sd->duel_group > 0)
-				duel_leave(sd->duel_group, sd);
+				iDuel->leave(sd->duel_group, sd);
 
 			if(pc_issit(sd)) {
 				pc->setstand(sd);
@@ -2228,7 +2252,7 @@ int unit_remove_map_(struct block_list *bl, clr_type clrtype, const char* file, 
 		case BL_MER: {
 			struct mercenary_data *md = (struct mercenary_data *)bl;
 			ud->canact_tick = ud->canmove_tick;
-			if( mercenary_get_lifetime(md) <= 0 && !(md->master && !md->master->state.active) )
+			if( mercenary->get_lifetime(md) <= 0 && !(md->master && !md->master->state.active) )
 			{
 				clif->clearunit_area(bl,clrtype);
 				iMap->delblock(bl);
@@ -2241,7 +2265,7 @@ int unit_remove_map_(struct block_list *bl, clr_type clrtype, const char* file, 
 		case BL_ELEM: {
 			struct elemental_data *ed = (struct elemental_data *)bl;
 			ud->canact_tick = ud->canmove_tick;
-			if( elemental_get_lifetime(ed) <= 0 && !(ed->master && !ed->master->state.active) )
+			if( elemental->get_lifetime(ed) <= 0 && !(ed->master && !ed->master->state.active) )
 			{
 				clif->clearunit_area(bl,clrtype);
 				iMap->delblock(bl);
@@ -2319,7 +2343,7 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 				pc->stop_following(sd);
 
 			if( sd->duel_invite > 0 )
-				duel_reject(sd->duel_invite, sd);
+				iDuel->reject(sd->duel_invite, sd);
 
 			// Notify friends that this char logged out. [Skotlex]
 			iMap->map_foreachpc(clif->friendslist_toggle_sub, sd->status.account_id, sd->status.char_id, 0);
@@ -2345,7 +2369,7 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 				sd->regstr_num = 0;
 			}
 			if( sd->st && sd->st->state != RUN ) {// free attached scripts that are waiting
-				script_free_state(sd->st);
+				script->free_state(sd->st);
 				sd->st = NULL;
 				sd->npc_id = 0;
 			}
@@ -2419,10 +2443,10 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 				pd->loot = NULL;
 			}
 			if( pd->pet.intimate > 0 )
-				intif_save_petdata(pd->pet.account_id,&pd->pet);
+				intif->save_petdata(pd->pet.account_id,&pd->pet);
 			else
 			{	//Remove pet.
-				intif_delete_petdata(pd->pet.pet_id);
+				intif->delete_petdata(pd->pet.pet_id);
 				if (sd) sd->status.pet_id = 0;
 			}
 			if( sd )
@@ -2495,7 +2519,7 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 			if( hd->homunculus.intimacy > 0 )
 				homun->save(hd);
 			else {
-				intif_homunculus_requestdelete(hd->homunculus.hom_id);
+				intif->homunculus_requestdelete(hd->homunculus.hom_id);
 				if( sd )
 					sd->status.hom_id = 0;
 			}
@@ -2507,34 +2531,34 @@ int unit_free(struct block_list *bl, clr_type clrtype)
 		{
 			struct mercenary_data *md = (TBL_MER*)bl;
 			struct map_session_data *sd = md->master;
-			if( mercenary_get_lifetime(md) > 0 )
-				mercenary_save(md);
+			if( mercenary->get_lifetime(md) > 0 )
+				mercenary->save(md);
 			else
 			{
-				intif_mercenary_delete(md->mercenary.mercenary_id);
+				intif->mercenary_delete(md->mercenary.mercenary_id);
 				if( sd )
 					sd->status.mer_id = 0;
 			}
 			if( sd )
 				sd->md = NULL;
 
-			merc_contract_stop(md);
+			mercenary->contract_stop(md);
 			break;
 		}
 		case BL_ELEM: {
 			struct elemental_data *ed = (TBL_ELEM*)bl;
 			struct map_session_data *sd = ed->master;
-			if( elemental_get_lifetime(ed) > 0 )
-				elemental_save(ed);
+			if( elemental->get_lifetime(ed) > 0 )
+				elemental->save(ed);
 			else {
-				intif_elemental_delete(ed->elemental.elemental_id);
+				intif->elemental_delete(ed->elemental.elemental_id);
 				if( sd )
 					sd->status.ele_id = 0;
 			}
 			if( sd )
 				sd->ed = NULL;
 
-			elemental_summon_stop(ed);
+			elemental->summon_stop(ed);
 			break;
 		}
 	}

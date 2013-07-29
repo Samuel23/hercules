@@ -158,13 +158,14 @@ struct map_session_data {
 		unsigned short autolootid[AUTOLOOTITEM_SIZE]; // [Zephyrus]
 		unsigned int autolooting : 1; //performance-saver, autolooting state for @alootid
 		unsigned short autobonus; //flag to indicate if an autobonus is activated. [Inkfish]
-		struct guild *gmaster_flag;
+		unsigned int gmaster_flag : 1;
 		unsigned int prevend : 1;//used to flag wheather you've spent 40sp to open the vending or not.
 		unsigned int warping : 1;//states whether you're in the middle of a warp processing
 		unsigned int permanent_speed : 1; // When 1, speed cannot be changed through status_calc_pc().
 		unsigned int dialog : 1;
 		unsigned int prerefining : 1;
 		unsigned int workinprogress : 3; // 1 = disable skill/item, 2 = disable npc interaction, 3 = disable both
+		unsigned int hold_recalc : 1;
 	} state;
 	struct {
 		unsigned char no_weapon_damage, no_magic_damage, no_misc_damage;

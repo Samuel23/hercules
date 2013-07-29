@@ -1242,8 +1242,8 @@ int status_damage(struct block_list *src,struct block_list *target,int hp, int s
 	case BL_PC:  pc->damage((TBL_PC*)target,src,hp,sp); break;
 	case BL_MOB: mob_damage((TBL_MOB*)target, src, hp); break;
 	case BL_HOM: homun->damaged((TBL_HOM*)target); break;
-	case BL_MER: mercenary_heal((TBL_MER*)target,hp,sp); break;
-	case BL_ELEM: elemental_heal((TBL_ELEM*)target,hp,sp); break;
+	case BL_MER: mercenary->heal((TBL_MER*)target,hp,sp); break;
+	case BL_ELEM: elemental->heal((TBL_ELEM*)target,hp,sp); break;
 	}
 
 	if( src && target->type == BL_PC && (((TBL_PC*)target)->disguise) > 0 ) {// stop walking when attacked in disguise to prevent walk-delay bug
@@ -1267,8 +1267,8 @@ int status_damage(struct block_list *src,struct block_list *target,int hp, int s
 	case BL_PC:  flag = pc->dead((TBL_PC*)target,src); break;
 	case BL_MOB: flag = mob_dead((TBL_MOB*)target, src, flag&4?3:0); break;
 	case BL_HOM: flag = homun->dead((TBL_HOM*)target); break;
-	case BL_MER: flag = mercenary_dead((TBL_MER*)target); break;
-	case BL_ELEM: flag = elemental_dead((TBL_ELEM*)target); break;
+	case BL_MER: flag = mercenary->dead((TBL_MER*)target); break;
+	case BL_ELEM: flag = elemental->dead((TBL_ELEM*)target); break;
 	default:	//Unhandled case, do nothing to object.
 		flag = 0;
 		break;
@@ -1413,8 +1413,8 @@ int status_heal(struct block_list *bl,int hp,int sp, int flag)
 	case BL_PC:  pc->heal((TBL_PC*)bl,hp,sp,flag&2?1:0); break;
 	case BL_MOB: mob_heal((TBL_MOB*)bl,hp); break;
 	case BL_HOM: homun->healed((TBL_HOM*)bl); break;
-	case BL_MER: mercenary_heal((TBL_MER*)bl,hp,sp); break;
-	case BL_ELEM: elemental_heal((TBL_ELEM*)bl,hp,sp); break;
+	case BL_MER: mercenary->heal((TBL_MER*)bl,hp,sp); break;
+	case BL_ELEM: elemental->heal((TBL_ELEM*)bl,hp,sp); break;
 	}
 
 	return hp+sp;
@@ -2491,7 +2491,7 @@ int status_calc_pc_(struct map_session_data* sd, bool first)
 
 		if(first && sd->inventory_data[index]->equip_script)
 		{	//Execute equip-script on login
-			run_script(sd->inventory_data[index]->equip_script,0,sd->bl.id,0);
+			script->run(sd->inventory_data[index]->equip_script,0,sd->bl.id,0);
 			if (!calculating)
 				return 1;
 		}
@@ -2532,11 +2532,11 @@ int status_calc_pc_(struct map_session_data* sd, bool first)
 			if(sd->inventory_data[index]->script) {
 				if (wd == &sd->left_weapon) {
 					sd->state.lr_flag = 1;
-					run_script(sd->inventory_data[index]->script,0,sd->bl.id,0);
+					script->run(sd->inventory_data[index]->script,0,sd->bl.id,0);
 					sd->state.lr_flag = 0;
 				} else
-					run_script(sd->inventory_data[index]->script,0,sd->bl.id,0);
-				if (!calculating) //Abort, run_script retriggered this. [Skotlex]
+					script->run(sd->inventory_data[index]->script,0,sd->bl.id,0);
+				if (!calculating) //Abort, script->run retriggered this. [Skotlex]
 					return 1;
 			}
 
@@ -2558,10 +2558,10 @@ int status_calc_pc_(struct map_session_data* sd, bool first)
 			if(sd->inventory_data[index]->script) {
 				if( i == EQI_HAND_L ) //Shield
 					sd->state.lr_flag = 3;
-				run_script(sd->inventory_data[index]->script,0,sd->bl.id,0);
+				script->run(sd->inventory_data[index]->script,0,sd->bl.id,0);
 				if( i == EQI_HAND_L ) //Shield
 					sd->state.lr_flag = 0;
-				if (!calculating) //Abort, run_script retriggered this. [Skotlex]
+				if (!calculating) //Abort, script->run retriggered this. [Skotlex]
 					return 1;
 			}
 		}
@@ -2573,9 +2573,9 @@ int status_calc_pc_(struct map_session_data* sd, bool first)
 			sd->bonus.arrow_atk += sd->inventory_data[index]->atk;
 			sd->state.lr_flag = 2;
 			if( !itemdb_is_GNthrowable(sd->inventory_data[index]->nameid) ) //don't run scripts on throwable items
-				run_script(sd->inventory_data[index]->script,0,sd->bl.id,0);
+				script->run(sd->inventory_data[index]->script,0,sd->bl.id,0);
 			sd->state.lr_flag = 0;
-			if (!calculating) //Abort, run_script retriggered status_calc_pc. [Skotlex]
+			if (!calculating) //Abort, script->run retriggered status_calc_pc. [Skotlex]
 				return 1;
 		}
 	}
@@ -2583,8 +2583,8 @@ int status_calc_pc_(struct map_session_data* sd, bool first)
 	/* we've got combos to process */
 	if( sd->combos.count ) {
 		for( i = 0; i < sd->combos.count; i++ ) {
-			run_script(sd->combos.bonus[i],0,sd->bl.id,0);
-			if (!calculating) //Abort, run_script retriggered this.
+			script->run(sd->combos.bonus[i],0,sd->bl.id,0);
+			if (!calculating) //Abort, script->run retriggered this.
 				return 1;
 		}
 	}
@@ -2632,7 +2632,7 @@ int status_calc_pc_(struct map_session_data* sd, bool first)
 					continue;
 
 				if(first && data->equip_script) {//Execute equip-script on login
-					run_script(data->equip_script,0,sd->bl.id,0);
+					script->run(data->equip_script,0,sd->bl.id,0);
 					if (!calculating)
 						return 1;
 				}
@@ -2642,11 +2642,11 @@ int status_calc_pc_(struct map_session_data* sd, bool first)
 
 				if(i == EQI_HAND_L && sd->status.inventory[index].equip == EQP_HAND_L) { //Left hand status.
 					sd->state.lr_flag = 1;
-					run_script(data->script,0,sd->bl.id,0);
+					script->run(data->script,0,sd->bl.id,0);
 					sd->state.lr_flag = 0;
 				} else
-					run_script(data->script,0,sd->bl.id,0);
-				if (!calculating) //Abort, run_script his function. [Skotlex]
+					script->run(data->script,0,sd->bl.id,0);
+				if (!calculating) //Abort, script->run his function. [Skotlex]
 					return 1;
 			}
 		}
@@ -2655,13 +2655,13 @@ int status_calc_pc_(struct map_session_data* sd, bool first)
 	if( sc->count && sc->data[SC_ITEMSCRIPT] ) {
 		struct item_data *data = itemdb->exists(sc->data[SC_ITEMSCRIPT]->val1);
 		if( data && data->script )
-			run_script(data->script,0,sd->bl.id,0);
+			script->run(data->script,0,sd->bl.id,0);
 	}
 
 	if( sd->pd ) { // Pet Bonus
 		struct pet_data *pd = sd->pd;
 		if( pd && pd->petDB && pd->petDB->equip_script && pd->pet.intimate >= battle_config.pet_equip_min_friendly )
-			run_script(pd->petDB->equip_script,0,sd->bl.id,0);
+			script->run(pd->petDB->equip_script,0,sd->bl.id,0);
 		if( pd && pd->pet.intimate > 0 && (!battle_config.pet_equip_required || pd->pet.equip > 0) && pd->state.skillbonus == 1 && pd->bonus )
 			pc->bonus(sd,pd->bonus->type, pd->bonus->val);
 	}
@@ -3929,19 +3929,24 @@ void status_calc_bl_(struct block_list* bl, enum scb_flag flag, bool first)
 	struct status_data b_status; // previous battle status
 	struct status_data* status; // pointer to current battle status
 
+	if( bl->type == BL_PC && ((TBL_PC*)bl)->delayed_damage != 0 ) {
+		((TBL_PC*)bl)->state.hold_recalc = 1;
+		return;
+	}
+	
 	// remember previous values
 	status = iStatus->get_status_data(bl);
 	memcpy(&b_status, status, sizeof(struct status_data));
 
 	if( flag&SCB_BASE ) {// calculate the object's base status too
 		switch( bl->type ) {
-		case BL_PC:  iStatus->calc_pc_(BL_CAST(BL_PC,bl), first);          break;
-		case BL_MOB: iStatus->calc_mob_(BL_CAST(BL_MOB,bl), first);        break;
-		case BL_PET: iStatus->calc_pet_(BL_CAST(BL_PET,bl), first);        break;
-		case BL_HOM: iStatus->calc_homunculus_(BL_CAST(BL_HOM,bl), first); break;
-		case BL_MER: iStatus->calc_mercenary_(BL_CAST(BL_MER,bl), first);  break;
-		case BL_ELEM: iStatus->calc_elemental_(BL_CAST(BL_ELEM,bl), first);  break;
-		case BL_NPC: status_calc_npc_(BL_CAST(BL_NPC,bl), first); break;
+			case BL_PC:  iStatus->calc_pc_(BL_CAST(BL_PC,bl), first);          break;
+			case BL_MOB: iStatus->calc_mob_(BL_CAST(BL_MOB,bl), first);        break;
+			case BL_PET: iStatus->calc_pet_(BL_CAST(BL_PET,bl), first);        break;
+			case BL_HOM: iStatus->calc_homunculus_(BL_CAST(BL_HOM,bl), first); break;
+			case BL_MER: iStatus->calc_mercenary_(BL_CAST(BL_MER,bl), first);  break;
+			case BL_ELEM: iStatus->calc_elemental_(BL_CAST(BL_ELEM,bl), first);  break;
+			case BL_NPC: status_calc_npc_(BL_CAST(BL_NPC,bl), first); break;
 		}
 	}
 
@@ -6050,10 +6055,10 @@ void status_set_viewdata(struct block_list *bl, int class_)
 		vd = npc_get_viewdata(class_);
 	else if (homdb_checkid(class_))
 		vd = homun->get_viewdata(class_);
-	else if (merc_class(class_))
-		vd = merc_get_viewdata(class_);
-	else if (elemental_class(class_))
-		vd = elemental_get_viewdata(class_);
+	else if (mercenary->class(class_))
+		vd = mercenary->get_viewdata(class_);
+	else if (elemental->class(class_))
+		vd = elemental->get_viewdata(class_);
 	else
 		vd = NULL;
 
@@ -6706,17 +6711,17 @@ int status_change_start(struct block_list* bl,enum sc_type type,int rate,int val
 		if(sc->data[SC_DEC_AGI])
 			return 0;
 
-	case SC_INC_AGI:
 	case SC_CONCENTRATION:
 	case SC_SPEARQUICKEN:
 	case SC_TRUESIGHT:
 	case SC_WINDWALK:
 	case SC_CARTBOOST:
 	case SC_ASSNCROS:
-		if (sc->data[SC_QUAGMIRE])
-			return 0;
 		if(sc->option&OPTION_MADOGEAR)
-			return 0;//Mado is immune to increase agi, wind walk, cart boost, etc (others above) [Ind]
+			return 0;//Mado is immune to wind walk, cart boost, etc (others above) [Ind]
+	case SC_INC_AGI:	
+		if (sc->data[SC_QUAGMIRE])
+			return 0;		
 		break;
 	case SC_CLOAKING:
 		//Avoid cloaking with no wall and low skill level. [Skotlex]
@@ -6865,11 +6870,11 @@ int status_change_start(struct block_list* bl,enum sc_type type,int rate,int val
 	case SC__STRIPACCESSARY:
 		if( sd ) {
 			int i = -1;
-			if( !(sd->bonus.unstripable_equip&EQI_ACC_L) ) {
+			if( !(sd->bonus.unstripable_equip&EQP_ACC_L) ) {
 				i = sd->equip_index[EQI_ACC_L];
 				if( i >= 0 && sd->inventory_data[i] && sd->inventory_data[i]->type == IT_ARMOR )
 					pc->unequipitem(sd,i,3); //L-Accessory
-			} if( !(sd->bonus.unstripable_equip&EQI_ACC_R) ) {
+			} if( !(sd->bonus.unstripable_equip&EQP_ACC_R) ) {
 				i = sd->equip_index[EQI_ACC_R];
 				if( i >= 0 && sd->inventory_data[i] && sd->inventory_data[i]->type == IT_ARMOR )
 					pc->unequipitem(sd,i,3); //R-Accessory
@@ -6939,6 +6944,14 @@ int status_change_start(struct block_list* bl,enum sc_type type,int rate,int val
 		case SC_WUGBITE:
 		case SC_ELECTRICSHOCKER:
 		case SC_MAGNETICFIELD:
+
+			// Masquerades
+		case SC__ENERVATION:
+		case SC__GROOMY:
+		case SC__LAZINESS:
+		case SC__UNLUCKY:
+		case SC__WEAKNESS:
+		case SC__IGNORANCE:
 
 			return 0;
 		}
@@ -8318,7 +8331,7 @@ int status_change_start(struct block_list* bl,enum sc_type type,int rate,int val
 				if( pc_isfalcon(sd) ) pc->setoption(sd, sd->sc.option&~OPTION_FALCON);
 				if( sd->status.pet_id > 0 ) pet_menu(sd, 3);
 				if( homun_alive(sd->hd) ) homun->vaporize(sd,1);
-				if( sd->md ) merc_delete(sd->md,3);
+				if( sd->md ) mercenary->delete(sd->md,3);
 			}
 			break;
 		case SC__LAZINESS:
@@ -8336,7 +8349,6 @@ int status_change_start(struct block_list* bl,enum sc_type type,int rate,int val
 			// bypasses coating protection and MADO
 			sc_start(bl,SC_NOEQUIPWEAPON,100,val1,tick);
 			sc_start(bl,SC_NOEQUIPSHIELD,100,val1,tick);
-			break;
 			break;
 		case SC_GN_CARTBOOST:
 			if( val1 < 3 )

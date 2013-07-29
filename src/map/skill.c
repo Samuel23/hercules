@@ -2954,24 +2954,6 @@ int skill_check_unit_range2 (struct block_list *bl, int x, int y, uint16 skill_i
 		type, skill_id);
 }
 
-int skill_guildaura_sub (struct map_session_data* sd, int id, int strvit, int agidex)
-{
-	if(id == sd->bl.id && battle_config.guild_aura&16)
-		return 0;  // Do not affect guild leader
-
-	if (sd->sc.data[SC_GUILDAURA]) {
-		struct status_change_entry *sce = sd->sc.data[SC_GUILDAURA];
-		if( sce->val3 != strvit || sce->val4 != agidex ) {
-			sce->val3 = strvit;
-			sce->val4 = agidex;
-			status_calc_bl(&sd->bl, iStatus->sc2scb_flag(SC_GUILDAURA));
-		}
-		return 0;
-	}
-	sc_start4(&sd->bl, SC_GUILDAURA,100, 1, id, strvit, agidex, 1000);
-	return 1;
-}
-
 /*==========================================
  * Checks that you have the requirements for casting a skill for homunculus/mercenary.
  * Flag:
@@ -4499,7 +4481,7 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 				clif->skill_nodamage(src,battle->get_master(src),skill_id,skill_lv,1);
 				clif->skill_damage(src, src, tick, status_get_amotion(src), 0, -30000, 1, skill_id, skill_lv, 6);
 				if( (sc && sc->data[type2]) || (tsc && tsc->data[type]) ) {
-					elemental_clean_single_effect(ele, skill_id);
+					elemental->clean_single_effect(ele, skill_id);
 				}
 				if( rnd()%100 < 50 )
 					skill->attack(skill->get_type(skill_id),src,src,bl,skill_id,skill_lv,tick,flag);
@@ -4975,15 +4957,21 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 				break ;
 			}
  		case AL_HEAL:
-		case ALL_RESURRECTION:
-		case PR_ASPERSIO:
+
 		/**
 		 * Arch Bishop
 		 **/
 		case AB_RENOVATIO:
 		case AB_HIGHNESSHEAL:
+		case AL_INCAGI:	
+			if( sd && dstsd && pc_ismadogear(dstsd) ){
+				clif->skill_fail(sd,skill_id,USESKILL_FAIL_TOTARGET,0);
+				return 0;
+			}
+		case ALL_RESURRECTION:
+		case PR_ASPERSIO:
 			//Apparently only player casted skills can be offensive like this.
-			if (sd && battle->check_undead(tstatus->race,tstatus->def_ele)) {
+			if (sd && battle->check_undead(tstatus->race,tstatus->def_ele) && skill_id != AL_INCAGI) {
 				if (battle->check_target(src, bl, BCT_ENEMY) < 1) {
 				  	//Offensive heal does not works on non-enemies. [Skotlex]
 					clif->skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
@@ -5055,8 +5043,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 					heal = heal * ( 15 + 5 * skill_lv ) / 10;
 				}
 				if( iStatus->isimmune(bl) ||
-						(dstmd && (dstmd->class_ == MOBID_EMPERIUM || mob_is_battleground(dstmd))) ||
-						(dstsd && pc_ismadogear(dstsd)) )//Mado is immune to heal
+						(dstmd && (dstmd->class_ == MOBID_EMPERIUM || mob_is_battleground(dstmd))) )
 					heal=0;
 
 				if( sd && dstsd && sd->status.partner_id == dstsd->status.char_id && (sd->class_&MAPID_UPPERMASK) == MAPID_SUPER_NOVICE && sd->status.sex == 0 )
@@ -6507,29 +6494,29 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 							return 1;
 						}
 					}
-					potion_flag = 1;
-					potion_hp = potion_sp = potion_per_hp = potion_per_sp = 0;
-					potion_target = bl->id;
-					run_script(sd->inventory_data[i]->script,0,sd->bl.id,0);
-					potion_flag = potion_target = 0;
+					script->potion_flag = 1;
+					script->potion_hp = script->potion_sp = script->potion_per_hp = script->potion_per_sp = 0;
+					script->potion_target = bl->id;
+					script->run(sd->inventory_data[i]->script,0,sd->bl.id,0);
+					script->potion_flag = script->potion_target = 0;
 					if( sd->sc.data[SC_SOULLINK] && sd->sc.data[SC_SOULLINK]->val2 == SL_ALCHEMIST )
 						bonus += sd->status.base_level;
-					if( potion_per_hp > 0 || potion_per_sp > 0 ) {
-						hp = tstatus->max_hp * potion_per_hp / 100;
+					if( script->potion_per_hp > 0 || script->potion_per_sp > 0 ) {
+						hp = tstatus->max_hp * script->potion_per_hp / 100;
 						hp = hp * (100 + pc->checkskill(sd,AM_POTIONPITCHER)*10 + pc->checkskill(sd,AM_LEARNINGPOTION)*5)*bonus/10000;
 						if( dstsd ) {
-							sp = dstsd->status.max_sp * potion_per_sp / 100;
+							sp = dstsd->status.max_sp * script->potion_per_sp / 100;
 							sp = sp * (100 + pc->checkskill(sd,AM_POTIONPITCHER)*10 + pc->checkskill(sd,AM_LEARNINGPOTION)*5)*bonus/10000;
 						}
 					} else {
-						if( potion_hp > 0 ) {
-							hp = potion_hp * (100 + pc->checkskill(sd,AM_POTIONPITCHER)*10 + pc->checkskill(sd,AM_LEARNINGPOTION)*5)*bonus/10000;
+						if( script->potion_hp > 0 ) {
+							hp = script->potion_hp * (100 + pc->checkskill(sd,AM_POTIONPITCHER)*10 + pc->checkskill(sd,AM_LEARNINGPOTION)*5)*bonus/10000;
 							hp = hp * (100 + (tstatus->vit<<1)) / 100;
 							if( dstsd )
 								hp = hp * (100 + pc->checkskill(dstsd,SM_RECOVERY)*10) / 100;
 						}
-						if( potion_sp > 0 ) {
-							sp = potion_sp * (100 + pc->checkskill(sd,AM_POTIONPITCHER)*10 + pc->checkskill(sd,AM_LEARNINGPOTION)*5)*bonus/10000;
+						if( script->potion_sp > 0 ) {
+							sp = script->potion_sp * (100 + pc->checkskill(sd,AM_POTIONPITCHER)*10 + pc->checkskill(sd,AM_LEARNINGPOTION)*5)*bonus/10000;
 							sp = sp * (100 + (tstatus->int_<<1)) / 100;
 							if( dstsd )
 								sp = sp * (100 + pc->checkskill(dstsd,MG_SRECOVERY)*10) / 100;
@@ -6652,7 +6639,9 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 				if(iStatus->isimmune(bl) || !tsc || !tsc->count)
 					break;
 				
-				if( sd && dstsd && !map_flag_vs(sd->bl.m) && sd->status.guild_id == dstsd->status.guild_id ) {
+				if( sd && dstsd && !map_flag_vs(sd->bl.m)
+						&& (sd->status.party_id == 0 || sd->status.party_id != dstsd->status.party_id) ) {
+					// Outside PvP it should only affect party members
 					clif->skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
 					break;
 				}
@@ -7242,8 +7231,8 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 			// Updated to block Slim Pitcher from working on barricades and guardian stones.
 			if( dstmd && (dstmd->class_ == MOBID_EMPERIUM || (dstmd->class_ >= MOBID_BARRICADE1 && dstmd->class_ <= MOBID_GUARIDAN_STONE2)) )
 				break;
-			if (potion_hp || potion_sp) {
-				int hp = potion_hp, sp = potion_sp;
+			if (script->potion_hp || script->potion_sp) {
+				int hp = script->potion_hp, sp = script->potion_sp;
 				hp = hp * (100 + (tstatus->vit<<1))/100;
 				sp = sp * (100 + (tstatus->int_<<1))/100;
 				if (dstsd) {
@@ -7521,7 +7510,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 				int j = 0;
 				struct guild *g;
 				// i don't know if it actually summons in a circle, but oh well. ;P
-				g = sd?sd->state.gmaster_flag:guild->search(iStatus->get_guild_id(src));
+				g = sd ? sd->guild : guild->search(iStatus->get_guild_id(src));
 				if (!g)
 					break;
 				clif->skill_nodamage(src,bl,skill_id,skill_lv,1);
@@ -8896,10 +8885,10 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 
 				// Remove previous elemental fisrt.
 				if( sd->ed )
-					elemental_delete(sd->ed,0);
+					elemental->delete(sd->ed,0);
 
 				// Summoning the new one.
-				if( !elemental_create(sd,elemental_class,skill->get_time(skill_id,skill_lv)) ) {
+				if( !elemental->create(sd,elemental_class,skill->get_time(skill_id,skill_lv)) ) {
 					clif->skill_fail(sd,skill_id,0,0);
 					break;
 				}
@@ -8914,14 +8903,14 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 				if( !sd->ed )	break;
 
 				if( skill_lv == 4 ) {// At level 4 delete elementals.
-					elemental_delete(sd->ed, 0);
+					elemental->delete(sd->ed, 0);
 					break;
 				}
 				switch( skill_lv ) {// Select mode bassed on skill level used.
 					case 2: mode = EL_MODE_ASSIST; break;
 					case 3: mode = EL_MODE_AGGRESSIVE; break;
 				}
-				if( !elemental_change_mode(sd->ed,mode) ) {
+				if( !elemental->change_mode(sd->ed,mode) ) {
 					clif->skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
 					break;
 				}
@@ -8934,7 +8923,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 				int duration = 3000;
 				if( !sd->ed )	break;
 				sd->skill_id_old = skill_id;
-				elemental_action(sd->ed, bl, tick);
+				elemental->action(sd->ed, bl, tick);
 				clif->skill_nodamage(src,bl,skill_id,skill_lv,1);
 					switch(sd->ed->db->class_){
 						case 2115:case 2124:
@@ -8970,7 +8959,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 
 		case SO_ELEMENTAL_SHIELD:
 			if( !sd->ed )	break;
-			elemental_delete(sd->ed, 0);
+			elemental->delete(sd->ed, 0);
 			if( sd == NULL || sd->status.party_id == 0 || flag&1 )
 				skill->unitsetting(src,MG_SAFETYWALL,skill_lv,bl->x,bl->y,0);
 			else if( sd )
@@ -9033,13 +9022,13 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 					} else //Otherwise, it fails, shows animation and removes items.
 						clif->skill_fail(sd,GN_SLINGITEM_RANGEMELEEATK,0xa,0);
 				} else if( itemdb_is_GNthrowable(ammo_id) ){
-					struct script_code *script = sd->inventory_data[i]->script;
+					struct script_code *scriptroot = sd->inventory_data[i]->script;
 					if( !script )
 						break;
 					if( dstsd )
-						run_script(script,0,dstsd->bl.id,fake_nd->bl.id);
+						script->run(scriptroot,0,dstsd->bl.id,fake_nd->bl.id);
 					else
-						run_script(script,0,src->id,0);
+						script->run(scriptroot,0,src->id,0);
 				}
 			}
 			clif->skill_nodamage(src,bl,skill_id,skill_lv,1);
@@ -9084,7 +9073,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 					struct status_change *sc = iStatus->get_sc(&ele->bl);
 
 					if( (sc && sc->data[type2]) || (tsc && tsc->data[type]) ) {
-						elemental_clean_single_effect(ele, skill_id);
+						elemental->clean_single_effect(ele, skill_id);
 					} else {
 						clif->skill_nodamage(src,src,skill_id,skill_lv,1);
 						clif->skill_damage(src, ( skill_id == EL_GUST || skill_id == EL_BLAST || skill_id == EL_WILD_STORM )?src:bl, tick, status_get_amotion(src), 0, -30000, 1, skill_id, skill_lv, 6);
@@ -9114,7 +9103,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 
 					clif->skill_nodamage(src,src,skill_id,skill_lv,1);
 					if( (sc && sc->data[type2]) || (tsc && tsc->data[type]) ) {
-						elemental_clean_single_effect(ele, skill_id);
+						elemental->clean_single_effect(ele, skill_id);
 					} else {
 						// This not heals at the end.
 						clif->skill_damage(src, src, tick, status_get_amotion(src), 0, -30000, 1, skill_id, skill_lv, 6);
@@ -10014,21 +10003,21 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 					clif->skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
 					return 1;
 				}
-				potion_flag = 1;
-				potion_hp = 0;
-				potion_sp = 0;
-				run_script(sd->inventory_data[j]->script,0,sd->bl.id,0);
-				potion_flag = 0;
+				script->potion_flag = 1;
+				script->potion_hp = 0;
+				script->potion_sp = 0;
+				script->run(sd->inventory_data[j]->script,0,sd->bl.id,0);
+				script->potion_flag = 0;
 				//Apply skill bonuses
 				i = pc->checkskill(sd,CR_SLIMPITCHER)*10
 					+ pc->checkskill(sd,AM_POTIONPITCHER)*10
 					+ pc->checkskill(sd,AM_LEARNINGPOTION)*5
 					+ pc->skillheal_bonus(sd, skill_id);
 
-				potion_hp = potion_hp * (100+i)/100;
-				potion_sp = potion_sp * (100+i)/100;
+				script->potion_hp = script->potion_hp * (100+i)/100;
+				script->potion_sp = script->potion_sp * (100+i)/100;
 
-				if(potion_hp > 0 || potion_sp > 0) {
+				if(script->potion_hp > 0 || script->potion_sp > 0) {
 					i = skill->get_splash(skill_id, skill_lv);
 					iMap->foreachinarea(skill->area_sub,
 						src->m,x-i,y-i,x+i,y+i,BL_CHAR,
@@ -10040,17 +10029,17 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 				struct item_data *item;
 				i = skill_db[skill_id].itemid[i];
 				item = itemdb->search(i);
-				potion_flag = 1;
-				potion_hp = 0;
-				potion_sp = 0;
-				run_script(item->script,0,src->id,0);
-				potion_flag = 0;
+				script->potion_flag = 1;
+				script->potion_hp = 0;
+				script->potion_sp = 0;
+				script->run(item->script,0,src->id,0);
+				script->potion_flag = 0;
 				i = skill->get_max(CR_SLIMPITCHER)*10;
 
-				potion_hp = potion_hp * (100+i)/100;
-				potion_sp = potion_sp * (100+i)/100;
+				script->potion_hp = script->potion_hp * (100+i)/100;
+				script->potion_sp = script->potion_sp * (100+i)/100;
 
-				if(potion_hp > 0 || potion_sp > 0) {
+				if(script->potion_hp > 0 || script->potion_sp > 0) {
 					i = skill->get_splash(skill_id, skill_lv);
 					iMap->foreachinarea(skill->area_sub,
 						src->m,x-i,y-i,x+i,y+i,BL_CHAR,
@@ -13900,7 +13889,7 @@ int skill_vfcastfix (struct block_list *bl, double time, uint16 skill_id, uint16
 
 	if (sc && sc->count && !(skill->get_castnodex(skill_id, skill_lv)&2) ) {
 		// All variable cast additive bonuses must come first
-		if (sc->data[SC_MAGICPOWER] )
+		if ( sc->data[SC_MAGICPOWER] && !( sd && time == 0 && sd->skillitem == skill_id ))
 			time += 700;
 		if (sc->data[SC_SLOWCAST])
 			VARCAST_REDUCTION(-sc->data[SC_SLOWCAST]->val2);
@@ -18209,7 +18198,6 @@ void skill_defaults(void) {
 	skill->unit_onleft = skill_unit_onleft;
 	skill->unit_onout = skill_unit_onout;
 	skill->unit_move_unit_group = skill_unit_move_unit_group;
-	skill->guildaura_sub = skill_guildaura_sub;
 	skill->sit = skill_sit;
 	skill->brandishspear = skill_brandishspear;
 	skill->repairweapon = skill_repairweapon;

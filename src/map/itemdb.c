@@ -900,7 +900,7 @@ bool itemdb_read_cached_packages(const char *config_filename) {
 	
 	fclose(file);
 	
-	ShowStatus("Done reading '"CL_WHITE"%lu"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"'.\n", pcount, config_filename);
+	ShowStatus("Done reading '"CL_WHITE"%lu"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"' ("CL_GREEN"C"CL_RESET").\n", pcount, config_filename);
 
 	return true;
 }
@@ -1470,7 +1470,7 @@ void itemdb_read_combos() {
 			
 			id->combos[idx]->nameid = aMalloc( retcount * sizeof(unsigned short) );
 			id->combos[idx]->count = retcount;
-			id->combos[idx]->script = parse_script(str[1], path, lines, 0);
+			id->combos[idx]->script = script->parse(str[1], path, lines, 0);
 			id->combos[idx]->id = count;
 			id->combos[idx]->isRef = false;
 			/* populate ->nameid field */
@@ -1674,24 +1674,24 @@ int itemdb_parse_dbrow(char** str, const char* source, int line, int scriptopt) 
 	id->sex = itemdb_gendercheck(id); //Apply gender filtering.
 
 	if (id->script) {
-		script_free_code(id->script);
+		script->free_code(id->script);
 		id->script = NULL;
 	}
 	if (id->equip_script) {
-		script_free_code(id->equip_script);
+		script->free_code(id->equip_script);
 		id->equip_script = NULL;
 	}
 	if (id->unequip_script) {
-		script_free_code(id->unequip_script);
+		script->free_code(id->unequip_script);
 		id->unequip_script = NULL;
 	}
 
 	if (*str[19+offset])
-		id->script = parse_script(str[19+offset], source, line, scriptopt);
+		id->script = script->parse(str[19+offset], source, line, scriptopt);
 	if (*str[20+offset])
-		id->equip_script = parse_script(str[20+offset], source, line, scriptopt);
+		id->equip_script = script->parse(str[20+offset], source, line, scriptopt);
 	if (*str[21+offset])
-		id->unequip_script = parse_script(str[21+offset], source, line, scriptopt);
+		id->unequip_script = script->parse(str[21+offset], source, line, scriptopt);
 
 	return id->nameid;
 }
@@ -1920,15 +1920,21 @@ int itemdb_uid_load() {
  *------------------------------------*/
 static void itemdb_read(void) {
 	int i;
+	DBData prev;
 	
 	if (iMap->db_use_sql_item_db)
 		itemdb_read_sqldb();
 	else
 		itemdb_readdb();
 	
-	for( i = 0; i < ARRAYLENGTH(itemdb_array); ++i )
-		if( itemdb_array[i] )
-			strdb_put(itemdb->names, itemdb_array[i]->name, itemdb_array[i]);
+	for( i = 0; i < ARRAYLENGTH(itemdb_array); ++i ) {
+		if( itemdb_array[i] ) {
+			if( itemdb->names->put(itemdb->names,DB->str2key(itemdb_array[i]->name),DB->ptr2data(itemdb_array[i]),&prev) ) {
+				struct item_data *data = DB->data2ptr(&prev);
+				ShowError("itemdb_read: duplicate AegisName '%s' in item ID %d and %d\n",itemdb_array[i]->name,itemdb_array[i]->nameid,data->nameid);
+			}
+		}
+	}
 	
 	itemdb_read_combos();
 	itemdb->read_groups();
@@ -1941,9 +1947,6 @@ static void itemdb_read(void) {
 	sv->readdb(iMap->db_path, "item_stack.txt",         ',', 3, 3, -1, &itemdb_read_stack);
 	sv->readdb(iMap->db_path, DBPATH"item_buyingstore.txt",   ',', 1, 1, -1, &itemdb_read_buyingstore);
 	sv->readdb(iMap->db_path, "item_nouse.txt",		 ',', 3, 3, -1, &itemdb_read_nouse);
-	
-	
-	itemdb->name_constants();
 	
 	itemdb_uid_load();
 }
@@ -1959,17 +1962,17 @@ static void destroy_item_data(struct item_data* self, int free_self)
 		return;
 	// free scripts
 	if( self->script )
-		script_free_code(self->script);
+		script->free_code(self->script);
 	if( self->equip_script )
-		script_free_code(self->equip_script);
+		script->free_code(self->equip_script);
 	if( self->unequip_script )
-		script_free_code(self->unequip_script);
+		script->free_code(self->unequip_script);
 	if( self->combos_count ) {
 		int i;
 		for( i = 0; i < self->combos_count; i++ ) {
 			if( !self->combos[i]->isRef ) {
 				aFree(self->combos[i]->nameid);
-				script_free_code(self->combos[i]->script);
+				script->free_code(self->combos[i]->script);
 			}
 			aFree(self->combos[i]);
 		}
@@ -2111,6 +2114,16 @@ void itemdb_name_constants(void) {
 
 	dbi_destroy(iter);	
 }
+/* used to clear conflicts during script reload */
+void itemdb_force_name_constants(void) {
+	DBIterator *iter = db_iterator(itemdb->names);
+	struct item_data *data;
+	
+	for( data = dbi_first(iter); dbi_exists(iter); data = dbi_next(iter) )
+		script->set_constant_force(data->name,data->nameid,0);
+	
+	dbi_destroy(iter);
+}
 void do_final_itemdb(void) {
 	int i;
 
@@ -2168,6 +2181,7 @@ void itemdb_defaults(void) {
 	itemdb->final = do_final_itemdb;
 	itemdb->reload = itemdb_reload;//incomplete
 	itemdb->name_constants = itemdb_name_constants;
+	itemdb->force_name_constants = itemdb_force_name_constants;
 	/* */
 	itemdb->groups = NULL;
 	itemdb->group_count = 0;

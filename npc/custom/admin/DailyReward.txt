@@ -252,7 +252,7 @@ OnInit:
 	//   ...;
 	// * If players login longer than the last set
 	//   day, they will keep getting the last prize.
-	setarray .Rewards[0],13550,10;		// Fish Slice 10 * VIP Account
+	setarray .Rewards[0],14524,10;		// Fish Slice 10 * VIP Account
 
 	setarray .VIPRewards[0],
 		1,		// NORMAL

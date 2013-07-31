@@ -447,8 +447,9 @@ CREATE TABLE IF NOT EXISTS `ipbanlist` (
 --
 
 DROP TABLE IF EXISTS `login`;
-CREATE TABLE IF NOT EXISTS `login` (
+CREATE TABLE `login` (
   `account_id` int(11) unsigned NOT NULL auto_increment,
+  `account_type` enum('NORMAL','SILVER','GOLD','PLATINUM') NOT NULL default 'NORMAL',
   `userid` varchar(23) NOT NULL default '',
   `user_pass` varchar(32) NOT NULL default '',
   `sex` enum('M','F','S') NOT NULL default 'M',
@@ -460,8 +461,8 @@ CREATE TABLE IF NOT EXISTS `login` (
   `logincount` mediumint(9) unsigned NOT NULL default '0',
   `lastlogin` datetime NOT NULL default '0000-00-00 00:00:00',
   `last_ip` varchar(100) NOT NULL default '',
-  `birthdate` DATE NOT NULL DEFAULT '0000-00-00',
-  `character_slots` TINYINT( 3 ) unsigned NOT NULL default '0',
+  `birthdate` date NOT NULL default '0000-00-00',
+  `character_slots` tinyint(3) unsigned NOT NULL default '0',
   `pincode` varchar(4) NOT NULL default '',
   `pincode_change` int(11) unsigned NOT NULL default '0',
   PRIMARY KEY  (`account_id`),
@@ -776,9 +777,6 @@ CREATE TABLE IF NOT EXISTS `pvp_rank` (
 --
 -- VIP SYSTEM
 --
-
-ALTER TABLE `login`
-ADD `account_type` enum('NORMAL','SILVER','GOLD','PLATINUM') NOT NULL DEFAULT 'NORMAL' AFTER `account_id`;
 
 DROP TABLE IF EXISTS `vip_gold`;
 CREATE TABLE `vip_gold` (

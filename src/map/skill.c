@@ -485,7 +485,7 @@ int skillnotok (uint16 skill_id, struct map_session_data *sd)
 	if (idx == 0)
 		return 1; // invalid skill id
 
-	if (pc_has_permission(sd, PC_PERM_SKILL_UNCONDITIONAL))
+	if (pc->has_permission(sd, PC_PERM_SKILL_UNCONDITIONAL))
 		return 0; // can do any damn thing they want
 
 	if( skill_id == AL_TELEPORT && sd->skillitem == skill_id && sd->skillitemlv > 2 )
@@ -3207,6 +3207,11 @@ int skill_timerskill(int tid, unsigned int tick, int id, intptr_t data) {
 					break;
 				case LG_OVERBRAND_BRANDISH:
 				case LG_OVERBRAND_PLUSATK:
+					if( iStatus->check_skilluse(src, target, skl->skill_id, 1) )
+						skill->attack(BF_WEAPON, src, src, target, skl->skill_id, skl->skill_lv, tick, skl->flag|SD_LEVEL);
+					else
+						clif->skill_damage(src, target, tick, status_get_amotion(src), status_get_dmotion(target), 0, 1, skl->skill_id, skl->skill_lv, skill->get_hit(skl->skill_id));
+					break;
 				case SR_KNUCKLEARROW:
 					skill->attack(BF_WEAPON, src, src, target, skl->skill_id, skl->skill_lv, tick, skl->flag|SD_LEVEL);
 					break;
@@ -4350,7 +4355,10 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 			break;
 
 		case LG_OVERBRAND:
-			skill->attack(BF_WEAPON, src, src, bl, skill_id, skill_lv, tick, flag|SD_LEVEL);
+				if( iStatus->check_skilluse(src, bl, skill_id, 1) )
+					skill->attack(BF_WEAPON, src, src, bl, skill_id, skill_lv, tick, flag|SD_LEVEL);
+				else
+					clif->skill_damage(src, bl, tick, status_get_amotion(src), status_get_dmotion(bl), 0, 1, skill_id, skill_lv, skill->get_hit(skill_id));
 			break;
 
 		case LG_OVERBRAND_BRANDISH:
@@ -12235,7 +12243,7 @@ int skill_check_pc_partner (struct map_session_data *sd, uint16 skill_id, uint16
 	int i;
 	bool is_chorus = ( skill->get_inf2(skill_id)&INF2_CHORUS_SKILL );
 
-	if (!battle_config.player_skill_partner_check || pc_has_permission(sd, PC_PERM_SKILL_UNCONDITIONAL))
+	if (!battle_config.player_skill_partner_check || pc->has_permission(sd, PC_PERM_SKILL_UNCONDITIONAL))
 		return is_chorus ? MAX_PARTY : 99; //As if there were infinite partners.
 
 	if (cast_flag) {	//Execute the skill on the partners.
@@ -12332,7 +12340,7 @@ int skill_check_condition_castbegin(struct map_session_data* sd, uint16 skill_id
 
 	if (sd->chatID) return 0;
 
-	if( pc_has_permission(sd, PC_PERM_SKILL_UNCONDITIONAL) && sd->skillitem != skill_id )
+	if( pc->has_permission(sd, PC_PERM_SKILL_UNCONDITIONAL) && sd->skillitem != skill_id )
 	{	//GMs don't override the skillItem check, otherwise they can use items without them being consumed! [Skotlex]
 		sd->state.arrow_atk = skill->get_ammotype(skill_id)?1:0; //Need to do arrow state check.
 		sd->spiritball_old = sd->spiritball; //Need to do Spiritball check.
@@ -13217,7 +13225,7 @@ int skill_check_condition_castend(struct map_session_data* sd, uint16 skill_id, 
 	if( sd->chatID )
 		return 0;
 
-	if( pc_has_permission(sd, PC_PERM_SKILL_UNCONDITIONAL) && sd->skillitem != skill_id ) {
+	if( pc->has_permission(sd, PC_PERM_SKILL_UNCONDITIONAL) && sd->skillitem != skill_id ) {
 		//GMs don't override the skillItem check, otherwise they can use items without them being consumed! [Skotlex]
 		sd->state.arrow_atk = skill->get_ammotype(skill_id)?1:0; //Need to do arrow state check.
 		sd->spiritball_old = sd->spiritball; //Need to do Spiritball check.
@@ -16229,11 +16237,11 @@ int skill_produce_mix (struct map_session_data *sd, uint16 skill_id, int nameid,
 			 **/
 			case GC_CREATENEWPOISON:
 				{
-					const int min[] = {2, 2, 3, 3, 4, 4, 5, 5, 6, 6};
-					const int max[] = {4, 5, 5, 6, 6, 7, 7, 8, 8, 9};
-					uint16 lv = pc->checkskill(sd,GC_RESEARCHNEWPOISON);
-					make_per = 3000 + 500 * lv ;
-					qty = min[lv] + rand()%(max[lv] - min[lv]);
+					const int min[10] = {2, 2, 3, 3, 4, 4, 5, 5, 6, 6};
+					const int max[10] = {4, 5, 5, 6, 6, 7, 7, 8, 8, 9};
+					int lv = max(0, pc->checkskill(sd,GC_RESEARCHNEWPOISON) - 1);
+					qty = min[lv] + rnd()%(max[lv] - min[lv]);
+					make_per = 3000 + 500 * (lv+1);
 				}
 				break;
 			case GN_CHANGEMATERIAL:

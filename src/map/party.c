@@ -365,7 +365,7 @@ int party_invite(struct map_session_data *sd,struct map_session_data *tsd)
 	}
 
 	// confirm whether the account has the ability to invite before checking the player
-	if( !pc_has_permission(sd, PC_PERM_PARTY) || (tsd && !pc_has_permission(tsd, PC_PERM_PARTY)) ) {
+	if( !pc->has_permission(sd, PC_PERM_PARTY) || (tsd && !pc->has_permission(tsd, PC_PERM_PARTY)) ) {
 		clif->message(sd->fd, msg_txt(81)); // "Your GM level doesn't authorize you to preform this action on the specified player."
 		return 0;
 	}
@@ -963,7 +963,9 @@ int party_exp_share(struct party_data* p, struct block_list* src, unsigned int b
 	for (i = 0; i < c; i++) {
 #ifdef RENEWAL_EXP
 		if( !(src && src->type == BL_MOB && ((TBL_MOB*)src)->db->mexp) ){
-			int rate = pc->level_penalty_mod(sd[i], (TBL_MOB*)src, 1);
+			struct mob_data *md = (TBL_MOB*)src;
+			int rate = pc->level_penalty_mod(md->level - (sd[i])->status.base_level, md->status.race, md->status.mode, 1);
+			
 			base_exp = (unsigned int)cap_value(base_exp_bonus * rate / 100, 1, UINT_MAX);
 			job_exp = (unsigned int)cap_value(job_exp_bonus * rate / 100, 1, UINT_MAX);
 		}

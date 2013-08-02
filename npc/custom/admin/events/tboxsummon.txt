@@ -33,7 +33,7 @@ OnTBoxKilled:
 	end;
 
 OnAtcommand:
-	dispbottom "There are now "+.Spawntotal+" Treasure Box left in "+.Map$+".";
+	dispbottom "There are now "+.Spawnleft+" Treasure Box left in "+.Map$+".";
 	end;
 }
 

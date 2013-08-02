@@ -23,27 +23,24 @@ OnInit:
 
 OnMinute00:	// Start time (every hour)
 OnAdminStart:
-	set .Spawn,rand(1,10);	// How many Mushrooms should spawn?
-	set .Spawntotal, .Spawn + .Spawnleft;
+	set .Spawn,rand(1,3);	// How many Mushrooms should spawn?
 	//set .Map$,.Maps$[rand(getarraysize(.Maps$))];
-	monster .Map$,0,0,"Please don't kill me!",1857,.Spawn,strnpcinfo(0)+"::OnMobKilled";
+	monster .Map$,0,0,"Please don't kill me!",1857,.Spawn,strnpcinfo(0)+"::OnMushroomKilled";
 	announce "Find the Mushroom : Total of "+.Spawn+" Mushrooms have been spawned in "+.Map$+"!",0;
 	sleep 2500;
 	announce "Find the Mushroom : Every Mushroom you kill will give you "+getitemname(getvariableofnpc(.eventprize,"Event Manager"))+"!",0;
 	end;
 
-OnMobKilled:
-	set .Spawnleft, .Spawntotal - 1;
-	set .Spawntotal, .Spawnleft;
+OnMushroomKilled:
 	/* Item Prize */
 	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.mushroom,"Event Manager");
 		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
 		getexp rand(1000,10000),rand(100,1000);
 		}
-	if (.Spawn) announce "[ "+strcharinfo(0)+" ] has killed a Mushroom. There are now "+.Spawntotal+" Mushroom(s) left in "+.Map$+".",bc_map;
+	if (.Spawn) announce "[ "+strcharinfo(0)+" ] has killed a Mushroom. There are now "+mobcount(.Map$,strnpcinfo(0)+"::OnMushroomKilled")+" Mushroom(s) left in "+.Map$+".",bc_map;
 	end;
 
 OnAtcommand:
-	dispbottom "There are now "+.Spawntotal+" Mushroom(s) left in "+.Map$+".";
+	dispbottom "There are now "+mobcount(.Map$,strnpcinfo(0)+"::OnMushroomKilled")+" Mushroom(s) left in "+.Map$+".";
 	end;
 }

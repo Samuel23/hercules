@@ -36,6 +36,9 @@ OnMushroomKilled:
 	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.mushroom,"Event Manager");
 		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
 		getexp rand(1000,10000),rand(100,1000);
+		set .@AddZeny,rand(1000,50000);
+		set Zeny, Zeny + .@AddZeny;
+		dispbottom "You have gained "+.@AddZeny+"z.";
 		}
 	if (.Spawn) announce "[ "+strcharinfo(0)+" ] has killed a Mushroom. There are now "+mobcount(.Map$,strnpcinfo(0)+"::OnMushroomKilled")+" Mushroom(s) left in "+.Map$+".",bc_map;
 	end;

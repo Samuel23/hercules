@@ -135,6 +135,9 @@ set $@JumpStart,0;
 	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.jumper,"Event Manager");
 		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
 		getexp rand(1000,10000),rand(100,1000);
+		set .@AddZeny,rand(1000,50000);
+		set Zeny, Zeny + .@AddZeny;
+		dispbottom "You have gained "+.@AddZeny+"z.";
 		}
 announce "Jumper Event : "+strcharinfo(0)+" is the WINNER!! I'm here in "+$@jmpmap$+" "+$@jx+" "+$@jy+"!!",bc_blue;
 donpcevent "jumpevent::OnStart";

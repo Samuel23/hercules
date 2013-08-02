@@ -122,6 +122,9 @@ quiz_01,204,93,6	script	Dice#evnt1	715,{
 	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.dice,"Event Manager");
 		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
 		getexp rand(2000,20000),rand(1000,10000);
+		set .@AddZeny,rand(1000,50000);
+		set Zeny, Zeny + .@AddZeny;
+		dispbottom "You have gained "+.@AddZeny+"z.";
 		}
 	warp "Crystilia",91,82;
 	hideonnpc "Dice#evnt1";

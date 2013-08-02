@@ -18,7 +18,7 @@ if(compare (.@atcmd_parameters$[0],"list")) { dispbottom "Usage: @go #";
 	dispbottom "20=Lighthalzen     21=Einbech      22=Hugel      23=Rachel    24=Veins";
 	dispbottom "25=Moscovia        26=Midgard Camp 27=Manuk      28=Splendide 29=Brasilis";
 	dispbottom "30=El Dicastes     31=Mora         32=Dewata     33=Malangdo  34=Port Malaya";
-	dispbottom "35=Eclage          36=Crystilia    37=Mall";
+	dispbottom "35=Eclage          36=Crystilia(Main Town)       37=Mall";
 	end;
 }
 

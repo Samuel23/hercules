@@ -22,7 +22,7 @@ Crystilia,75,80,4	script	ExhilarateRO Master	108,{
 		next;
 		switch(select("Mall:Refiner's Area:Vending Area:Cancel")) {
 			case 1:
-			warp "mall",102,159;
+			warp "mall",83,129;
 			close;
 
 			case 2:

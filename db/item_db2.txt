@@ -63,24 +63,24 @@
 //7170,Tuxedo,Tuxedo,5,43000,,10,,0,,0,0xFFFFFFFE,7,1,16,,0,1,0,{},{ sc_start SC_WEDDING,-1,0; },{ sc_end SC_WEDDING; }
 
 // Donation Promo
-17500,Donation_Box_I,Donation Box I,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ callfunc "addcash",20; getitem 675,5; getitem 12103,3; getitem 14232,5; getitem 12912,1; getitem 31013,5; getitem 31014,5; getitem 31001,1; },{},{}
-17501,Donation_Box_II,Donation Box II,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 675,12; getitem 12103,6; getitem 14232,12; getitem 12912,2; getitem 31013,11; getitem 31014,11; getitem 31003,1; },{},{}
-17502,Donation_Box_III,Donation Box III,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 675,19; getitem 12103,12; getitem 14232,19; getitem 12912,3; getitem 31013,23; getitem 31014,23; getitem 31006,1; },{},{}
-17503,Donation_Box_IV,Donation Box IV,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 675,25; getitem 12103,18; getitem 14232,25; getitem 12912,4; getitem 31013,34; getitem 31014,34; getitem 31008,1; },{},{}
-17504,Donation_Box_V,Donation Box V,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 674,8; getitem 12103,25; getitem 14232,32; getitem 12912,5; getitem 31013,45; getitem 31014,45; getitem 31012,1; },{},{}
-17505,Donation_Box_VI,Donation Box VI,18,0,,200,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 674,12; getitem 12103,33; getitem 14232,40; getitem 12912,6; getitem 31013,56; getitem 31014,56; getitem 31012,3; },{},{}
+17500,Donation_Box_I,Donation Box I,18,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",20; getitem 675,5; getitem 12103,3; getitem 14232,5; getitem 12912,1; getitem 31013,5; getitem 31014,5; getitem 31001,1; },{},{}
+17501,Donation_Box_II,Donation Box II,18,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 675,12; getitem 12103,6; getitem 14232,12; getitem 12912,2; getitem 31013,11; getitem 31014,11; getitem 31003,1; },{},{}
+17502,Donation_Box_III,Donation Box III,18,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 675,19; getitem 12103,12; getitem 14232,19; getitem 12912,3; getitem 31013,23; getitem 31014,23; getitem 31006,1; },{},{}
+17503,Donation_Box_IV,Donation Box IV,18,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 675,25; getitem 12103,18; getitem 14232,25; getitem 12912,4; getitem 31013,34; getitem 31014,34; getitem 31008,1; },{},{}
+17504,Donation_Box_V,Donation Box V,18,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 674,8; getitem 12103,25; getitem 14232,32; getitem 12912,5; getitem 31013,45; getitem 31014,45; getitem 31012,1; },{},{}
+17505,Donation_Box_VI,Donation Box VI,18,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 674,12; getitem 12103,33; getitem 14232,40; getitem 12912,6; getitem 31013,56; getitem 31014,56; getitem 31012,3; },{},{}
 
 // Custom Items
-30000,Acid_Bomb_Box_100,Acid Bomb Box II,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 7135,100; getitem 7136,100; },{},{}
-30001,Yggdrasil_Berry_Box_20,Yggdrasil Berry Box II,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 607,20; },{},{}
-30002,Poison_Bottle_Box_40,Poison Bottle Box II,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 678,40; },{},{}
-30003,Fish_Slice_Box_50,Fish Slice Box II,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ getitem 14524,50; },{},{}
-30004,Premium_Wing_Of_Fly,Premium Fly Wing,11,60,,50,,,,,0xFFFFFFFF,7,2,,,,,,{ if (getmapflag(strcharinfo(3),mf_noteleport)) { dispbottom "You cannot warp here"; end; } else warp strcharinfo(3),0,0; end; },{},{}
-30005,Premium_Fish_Slice,Premium Fish Slice,11,60,,50,,,,,0xFFFFFFFF,7,2,,,,,,{ if (getmapflag(strcharinfo(3),mf_pvp)) || (getmapflag(strcharinfo(3),mf_gvg)) || (getmapflag(strcharinfo(3),mf_gvg_castle)) || (getmapflag(strcharinfo(3),mf_battleground)) { dispbottom "You cannot use it in this map"; end; } else itemeffect 607; specialeffect2 211; },{},{}
-30006,Premium_Field_Manual,Premium Field Manual,11,60,,50,,,,,0xFFFFFFFF,7,2,,,,,,{ itemeffect 12208; },{},{}
-30007,Premium_Bubble_Gum,Premium Bubble Gum,11,60,,50,,,,,0xFFFFFFFF,7,2,,,,,,{ itemeffect 12210; },{},{}
-30008,Premium_Green_Potion,Premium Green Potion,11,60,,50,,,,,0xFFFFFFFF,7,2,,,,,,{ if (getmapflag(strcharinfo(3),mf_pvp)) || (getmapflag(strcharinfo(3),mf_gvg)) || (getmapflag(strcharinfo(3),mf_gvg_castle)) || (getmapflag(strcharinfo(3),mf_battleground)) { dispbottom "You cannot use it in this map"; end; } else itemeffect 506; specialeffect2 209; },{},{}
-30009,Premium_Life_Insurance,Premium Life Insurance,11,60,,50,,,,,0xFFFFFFFF,7,2,,,,,,{ itemeffect 12209; },{},{}
-30010,Starting_Gear_Box,Starting Gear Box,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ callfunc "startingbox"; },{},{}
-30011,ExhilarateRO's_Freebies,ExhilarateRO's_Freebies,18,20,,10,,,,,0xFFFFFFFF,7,2,,,,,,{ rentitem 30004,604800; rentitem 30005,259200; rentitem 30006,259200; rentitem 30007,259200; rentitem 30008,259200; rentitem 30009,259200; getitem 12622,1; },{},{}
-31050,Vote_Coin,Vote Coin,3,0,,0,,,,,0xFFFFFFFF,7,2,,,,,,{},{},{}
+30000,Acid_Bomb_Box_100,Acid Bomb Box II,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 7135,100; getitem 7136,100; },{},{}
+30001,Yggdrasil_Berry_Box_20,Yggdrasil Berry Box II,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 607,20; },{},{}
+30002,Poison_Bottle_Box_40,Poison Bottle Box II,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 678,40; },{},{}
+30003,Fish_Slice_Box_50,Fish Slice Box II,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 14524,50; },{},{}
+30004,Premium_Wing_Of_Fly,Premium Fly Wing,11,60,,50,,,,,0xFFFFFFFF,63,2,,,,,,{ if (getmapflag(strcharinfo(3),mf_noteleport)) { dispbottom "You cannot warp here"; end; } else warp strcharinfo(3),0,0; end; },{},{}
+30005,Premium_Fish_Slice,Premium Fish Slice,11,60,,50,,,,,0xFFFFFFFF,63,2,,,,,,{ if (getmapflag(strcharinfo(3),mf_pvp)) || (getmapflag(strcharinfo(3),mf_gvg)) || (getmapflag(strcharinfo(3),mf_gvg_castle)) || (getmapflag(strcharinfo(3),mf_battleground)) { dispbottom "You cannot use it in this map"; end; } else itemeffect 607; specialeffect2 211; },{},{}
+30006,Premium_Field_Manual,Premium Field Manual,11,60,,50,,,,,0xFFFFFFFF,63,2,,,,,,{ itemeffect 12208; },{},{}
+30007,Premium_Bubble_Gum,Premium Bubble Gum,11,60,,50,,,,,0xFFFFFFFF,63,2,,,,,,{ itemeffect 12210; },{},{}
+30008,Premium_Green_Potion,Premium Green Potion,11,60,,50,,,,,0xFFFFFFFF,63,2,,,,,,{ if (getmapflag(strcharinfo(3),mf_pvp)) || (getmapflag(strcharinfo(3),mf_gvg)) || (getmapflag(strcharinfo(3),mf_gvg_castle)) || (getmapflag(strcharinfo(3),mf_battleground)) { dispbottom "You cannot use it in this map"; end; } else itemeffect 506; specialeffect2 209; },{},{}
+30009,Premium_Life_Insurance,Premium Life Insurance,11,60,,50,,,,,0xFFFFFFFF,63,2,,,,,,{ itemeffect 12209; },{},{}
+30010,Starting_Gear_Box,Starting Gear Box,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "startingbox"; },{},{}
+30011,ExhilarateRO's_Freebies,ExhilarateRO's_Freebies,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ rentitem 30004,604800; rentitem 30005,259200; rentitem 30006,259200; rentitem 30007,259200; rentitem 30008,259200; rentitem 30009,259200; getitem 12622,1; },{},{}
+31050,Vote_Coin,Vote Coin,3,0,,0,,,,,0xFFFFFFFF,63,2,,,,,,{},{},{}

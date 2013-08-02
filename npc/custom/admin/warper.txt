@@ -72,7 +72,7 @@ function Pick {
 // --------------------------------------------------
 	Towns:
 // --------------------------------------------------
-menu	"Prontera",T1, "Alberta",T2, "Aldebaran",T3, "Amatsu",T4, "Ayothaya",T5,
+menu	"Crystilia(Main Town)",Maintown,"Prontera",T1, "Alberta",T2, "Aldebaran",T3, "Amatsu",T4, "Ayothaya",T5,
 	"Brasilis",T6, "Comodo",T7, "Dewata",T33, "Eclage",T34, "Einbech",T8, 
 	"Einbroch",T9, "El Dicastes",T10, "Geffen",T11, "Gonryun",T12, "Hugel",T13,
 	"Izlude",T14, "Jawaii",T15, "Lighthalzen",T16, "Louyang",T17, "Lutie",T18,
@@ -81,6 +81,7 @@ menu	"Prontera",T1, "Alberta",T2, "Aldebaran",T3, "Amatsu",T4, "Ayothaya",T5,
 	"Niflheim",T25, "Payon",T26, "Rachel",T27, "Splendide",T28, "Thor Camp",T29,
 	"Umbala",T30, "Veins",T31, "Yuno",T32;
 
+Maintown: Go("Crystilia",70,65);
 T1: Go("prontera",155,183);
 T2: Go("alberta",28,234);
 T3: Go("aldebaran",140,131);

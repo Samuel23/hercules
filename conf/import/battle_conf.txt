@@ -222,3 +222,7 @@ max_third_aspd: 196
 
 // Display the drained hp/sp values from normal attacks? (Ie: Hunter Fly card)
 show_hp_sp_drain: yes
+
+// When set to yes, forces skill points gained from 1st class to be put into 1st class
+// skills, and forces novice skill points to be put into the basic skill. (Note 1)
+player_skillup_limit: no

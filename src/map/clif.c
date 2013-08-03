@@ -930,7 +930,7 @@ void clif_set_unit_idle(struct block_list* bl, struct map_session_data *tsd, enu
 #else
 		p.GID = -bl->id;
 #endif
-		clif->send(&p,sizeof(p),tsd?&tsd->bl:bl,SELF);
+		clif->send(&p,sizeof(p),bl,SELF);
 	}
 	
 }
@@ -1127,7 +1127,7 @@ void clif_set_unit_walking(struct block_list* bl, struct map_session_data *tsd, 
 #else
 		p.GID = -bl->id;
 #endif 
-		clif->send(&p,sizeof(p),tsd?&tsd->bl:bl,SELF);
+		clif->send(&p,sizeof(p),bl,SELF);
 	}
 }
 
@@ -9209,8 +9209,11 @@ void clif_parse_WantToConnection(int fd, struct map_session_data* sd) {
 
 	CREATE(sd, TBL_PC, 1);
 	sd->fd = fd;
-	sd->cryptKey = (( clif->cryptKey[0] * clif->cryptKey[1] ) + clif->cryptKey[2]) & 0xFFFFFFFF;
-	
+
+	sd->cryptKey = (( ((( clif->cryptKey[0] * clif->cryptKey[1] ) + clif->cryptKey[2]) & 0xFFFFFFFF)
+						* clif->cryptKey[1] ) + clif->cryptKey[2]) & 0xFFFFFFFF;
+	sd->parse_cmd_func = clif->parse_cmd;
+
 	session[fd]->session_data = sd;
 
 	pc->setnewpc(sd, account_id, char_id, login_id1, client_tick, sex, fd);
@@ -17481,42 +17484,41 @@ void clif_cart_additem_ack(struct map_session_data *sd, int flag) {
 /* */
 unsigned short clif_decrypt_cmd( int cmd, struct map_session_data *sd ) {
 	if( sd ) {
-		sd->cryptKey = (( sd->cryptKey * clif->cryptKey[1] ) + clif->cryptKey[2]) & 0xFFFFFFFF;
 		return (cmd ^ ((sd->cryptKey >> 16) & 0x7FFF));
 	}
 	return (cmd ^ (((( clif->cryptKey[0] * clif->cryptKey[1] ) + clif->cryptKey[2]) >> 16) & 0x7FFF));
 }
-unsigned short clif_parse_cmd_normal ( int fd, struct map_session_data *sd ) {
+unsigned short clif_parse_cmd_normal( int fd, struct map_session_data *sd ) {
 	unsigned short cmd = RFIFOW(fd,0);
+
 	// filter out invalid / unsupported packets
-	if (cmd > MAX_PACKET_DB || packet_db[cmd].len == 0)
+	if( cmd > MAX_PACKET_DB || cmd < MIN_PACKET_DB || packet_db[cmd].len == 0 )
 		return 0;
 
 	return cmd;
 }
-unsigned short clif_parse_cmd_optional ( int fd, struct map_session_data *sd ) {
+unsigned short clif_parse_cmd_decrypt( int fd, struct map_session_data *sd ) {
+	unsigned short cmd = RFIFOW(fd,0);
+
+	cmd = clif->decrypt_cmd(cmd, sd);
+
+	// filter out invalid / unsupported packets
+	if( cmd > MAX_PACKET_DB || cmd < MIN_PACKET_DB || packet_db[cmd].len == 0 )
+		return 0;
+
+	return cmd;
+}
+unsigned short clif_parse_cmd_optional( int fd, struct map_session_data *sd ) {
 	unsigned short cmd = RFIFOW(fd,0);
 
 	// filter out invalid / unsupported packets
-	if (cmd > MAX_PACKET_DB || packet_db[cmd].len == 0) {
-		cmd = clif->decrypt_cmd( cmd, sd );
-		if( cmd > MAX_PACKET_DB || packet_db[cmd].len == 0 )
-			return 0;
-		RFIFOW(fd, 0) = cmd;
+	if( cmd > MAX_PACKET_DB || cmd < MIN_PACKET_DB || packet_db[cmd].len == 0 ) {
+		if( sd )
+			sd->parse_cmd_func = clif_parse_cmd_decrypt;
+		return clif_parse_cmd_decrypt(fd, sd);
+	} else if( sd ) {
+		sd->parse_cmd_func = clif_parse_cmd_normal;
 	}
-
-	return cmd;
-}
-unsigned short clif_parse_cmd_decrypt ( int fd, struct map_session_data *sd ) {
-	unsigned short cmd = RFIFOW(fd,0);
-
-	cmd = clif->decrypt_cmd( cmd, sd );
-	
-	// filter out invalid / unsupported packets
-	if (cmd > MAX_PACKET_DB || packet_db[cmd].len == 0 )
-		return 0;
-	
-	RFIFOW(fd, 0) = cmd;
 
 	return cmd;
 }
@@ -17533,9 +17535,11 @@ int clif_parse(int fd) {
 	// Note: "click masters" can do 80+ clicks in 10 seconds
 	
 	for( pnum = 0; pnum < 3; ++pnum ) { // Limit max packets per cycle to 3 (delay packet spammers) [FlavioJS]  -- This actually aids packet spammers, but stuff like /str+ gets slow without it [Ai4rei]
+		unsigned short (*parse_cmd_func)(int fd, struct map_session_data *sd);
 		// begin main client packet processing loop
 		
 		sd = (TBL_PC *)session[fd]->session_data;
+
 		if (session[fd]->flag.eof) {
 			if (sd) {
 				if (sd->state.autotrade) {
@@ -17563,8 +17567,13 @@ int clif_parse(int fd) {
 		if (RFIFOREST(fd) < 2)
 			return 0;
 		
-		if( !( cmd = clif->parse_cmd(fd,sd) ) ) {
-			ShowWarning("clif_parse: Received unsupported packet (packet 0x%04x, %d bytes received), disconnecting session #%d.\n", RFIFOW(fd,0), RFIFOREST(fd), fd);
+		if( sd )
+			parse_cmd_func = sd->parse_cmd_func;
+		else
+			parse_cmd_func = clif->parse_cmd;
+
+		if( !( cmd = parse_cmd_func(fd,sd) ) ) {
+			ShowWarning("clif_parse: Received unsupported packet (packet 0x%04x (0x%04x), %d bytes received), disconnecting session #%d.\n", cmd, RFIFOW(fd,0), RFIFOREST(fd), fd);
 #ifdef DUMP_INVALID_PACKET
 			ShowDump(RFIFOP(fd,0), RFIFOREST(fd));
 #endif
@@ -17592,6 +17601,13 @@ int clif_parse(int fd) {
 
 		if ((int)RFIFOREST(fd) < packet_len)
 			return 0; // not enough data received to form the packet
+
+		if( cmd != RFIFOW(fd, 0) ) {
+			RFIFOW(fd, 0) = cmd;
+			if( sd ) {
+				sd->cryptKey = (( sd->cryptKey * clif->cryptKey[1] ) + clif->cryptKey[2]) & 0xFFFFFFFF; // Update key for the next packet
+			}
+		}
 
 		if( packet_db[cmd].func == clif->pDebug )
 			packet_db[cmd].func(fd, sd);

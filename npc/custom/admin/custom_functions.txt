@@ -110,7 +110,7 @@ OnAtcommand:
 		}
 	else {
 		dispbottom "Usage: @nextlevel on/off";
-		end;
+		break;
 	}
 OnNPCKillEvent:
 	if (NextBaseExp > 0 && Nextlevel) {

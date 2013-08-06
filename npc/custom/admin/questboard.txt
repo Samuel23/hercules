@@ -197,6 +197,7 @@ L_checkitems:
 	mes "Congratulation! Here is your Reward.";
 	if(getd("." +currentquest$+"_collectionprize")!=0) getitem(getd("." +currentquest$+"_collectionprize"),getd("." +currentquest$+"_collectionamount"));
 	set Zeny,Zeny+getd("." +currentquest$+"_collectionzeny");
+	dispbottom "You have gained "+getd("." +currentquest$+"_collectionzeny")+"z";
 	getexp getd("." +currentquest$+"_collectionexp["+0+"]"),getd("." +currentquest$+"_collectionexp["+1+"]");
 	setd(currentquest$ + "_collection_delay"),gettimetick(2)+getd("." +currentquest$+"_collectiondelay");
 	set currentquest$, "";
@@ -231,6 +232,7 @@ L_checkmobs2:
 	}
 	if(getd("." +currentquest$+"_huntingprize")!=0) getitem(getd("." +currentquest$+"_huntingprize"),getd("." +currentquest$+"_huntingamount"));
 	set Zeny, Zeny+getd("." +currentquest$+"_huntingzeny");
+	dispbottom "You have gained "+getd("." +currentquest$+"_huntingzeny")+"z quest reward";
 	getexp getd("." +currentquest$+"_huntingexp["+0+"]"),getd("." +currentquest$+"_huntingexp["+1+"]");
 	setd(currentquest$ + "_hunting_delay"),gettimetick(2)+getd("." +currentquest$+"_huntingdelay");
 	set currentquest$, "";
@@ -274,15 +276,18 @@ OnInit:
 		
 		//Add Collection Quests here
 		//AddCollection("<Quest Name>",<Min Lvl>,<Max Lvl>,<Reward|Item ID>,<Reward|Item Amount>,<Zeny Reward>,<Quest Delay>,<Base EXP>,<Job EXP>,<Item ID>,<Item Amount>,...);
-		AddCollection("Dental Care",1,80,0,0,10000,3600,1500,800,909,5);
-		AddCollection("Dental Care 2",1,80,0,0,10000,86400,1500,800,713,5);
 
 		//Add Hunting Quests here
 		//AddHunting("<Quest Name>",<Min Lvl>,<Max Lvl>,<Reward|Item ID>,<Reward|Item Amount>,<Zeny Reward>,<Quest Delay>,<Base EXP>,<Job EXP>,<Monster ID>,<Monster Amount>,...);
-		AddHunting("Chilling Me Softly",100,150,0,0,100000,0,100000,10000,1775,20,1777,5,1776,10); //Repeatable
-		AddHunting("Chilling Me Softly 2",100,150,0,0,100000,0,100000,10000,1775,10,1777,10,1789,10); //Repeatable
-		AddHunting("For The Glory",1,150,0,0,100000,3600,1000,1000,1002,5);
-		AddHunting("For The Glory 2",1,150,0,0,100000,86400,1000,1000,1031,2);
+		AddHunting("Chilling Me Softly",1,150,0,0,0,0,200000,10000,1775,10,1777,10,1776,10); //Repeatable
+		AddHunting("Chilling Me Softly 2",1,150,0,0,0,0,400000,30000,1775,20,1777,20,1776,20); //Repeatable
+		AddHunting("Chilling Me Softly 3",1,150,0,0,0,0,600000,50000,1775,30,1777,30,1789,30); //Repeatable
+		AddHunting("It's Getting Hot in Here",1,150,0,0,0,0,175000,7500,1366,10,1367,10,1383,10); //Repeatable
+		AddHunting("It's Getting Hot in Here 2",1,150,0,0,0,0,350000,15000,1366,20,1367,20,1383,20); //Repeatable
+		AddHunting("It's Getting Hot in Here 3",1,150,0,0,0,0,525000,22500,1366,30,1367,30,1383,30); //Repeatable
+		AddHunting("Into the Deep",1,150,0,0,0,0,200000,20000,2204,10,2203,10,2201,10); //Repeatable
+		AddHunting("Into the Deep 2",1,150,0,0,0,0,400000,30000,2204,20,2203,20,2201,20); //Repeatable
+		AddHunting("Into the Deep 3",1,150,0,0,0,0,600000,40000,2204,30,2203,30,2201,30); //Repeatable
 
 		end;
 		

@@ -108,7 +108,10 @@ OnAtcommand:
 		dispbottom "Next Level Experience will be not be shown everytime you kill a monster.";
 		end;
 		}
-
+	else {
+		dispbottom "Usage: @nextlevel on/off";
+		end;
+	}
 OnNPCKillEvent:
 	if (NextBaseExp > 0 && Nextlevel) {
 	//dispbottom NextBaseExp - BaseExp+" exp needed to level up";

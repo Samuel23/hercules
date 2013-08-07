@@ -29,9 +29,11 @@ mall,115,139,4	script	Hat Maker	408,{
 				set .@shopitems,0;
 				set .@i,0;
 				set .itemtype,256;
+				set .itemtype2,768;
+				set .itemtype3,767;
 				while(.@i < .items) {
 				set .@item,.item[.@i];
-					if(getiteminfo(.item[.@i], 5) == .itemtype) {
+					if(getiteminfo(.item[.@i], 5) == .itemtype || getiteminfo(.item[.@i], 5) == .itemtype2 || getiteminfo(.item[.@i], 5) == .itemtype3) {
 						if(.@shopitems == 0) {
 							npcshopitem "questshop",.@item,getiteminfo(@item,0);
 							set .@shopitems,1;
@@ -48,9 +50,10 @@ mall,115,139,4	script	Hat Maker	408,{
 				set .@shopitems,0;
 				set .@i,0;
 				set .itemtype,512;
+				set .itemtype2,513;
 				while(.@i < .items) {
 				set .@item,.item[.@i];
-					if(getiteminfo(.item[.@i], 5) == .itemtype) {
+					if(getiteminfo(.item[.@i], 5) == .itemtype || getiteminfo(.item[.@i], 5) == .itemtype2) {
 						if(.@shopitems == 0) {
 							npcshopitem "questshop",.@item,getiteminfo(@item,0);
 							set .@shopitems,1;

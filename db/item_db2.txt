@@ -63,8 +63,8 @@
 //7170,Tuxedo,Tuxedo,5,43000,,10,,0,,0,0xFFFFFFFE,7,1,16,,0,1,0,{},{ sc_start SC_WEDDING,-1,0; },{ sc_end SC_WEDDING; }
 
 // Item Fix
-18641,Ribbon_Magic_Hat,Ribbon Magic Hat,5,20,,200,,2,,1,0xFFFFFFFE,63,2,256,,0,1,794,{ bonus bInt,3; bonus bMatkRate,5; bonus bMaxSP,50; ,{},{}
-18657,Pegasus_Wing_Ears,Pegasus Ear Wing,5,20,,500,,1,,0,0xFFFFFFFF,63,2,512,,80,0,568,{ bonus bAspdRate,1; if (BaseLevel >= 100 & BaseLevel < 150( { bonus bAspdRate,2; } else if (BaseLevel >= 150) { bonus bAspdRate,3; } },{},{}
+18641,Ribbon_Magic_Hat,Ribbon Magic Hat,5,20,,200,,2,,1,0xFFFFFFFE,63,2,256,,0,1,794,{ bonus bInt,3; bonus bMatkRate,5; bonus bMaxSP,50; },{},{}
+18657,Pegasus_Wing_Ears,Pegasus Ear Wing,5,20,,500,,1,,0,0xFFFFFFFF,63,2,512,,80,0,568,{ bonus bAspdRate,1; if (BaseLevel >= 100 & BaseLevel < 150) { bonus bAspdRate,2; } else if (BaseLevel >= 150) { bonus bAspdRate,3; } },{},{}
 18566,Nut_Donut_In_Mouth,Nut Donut In Mouth,5,20,,0,,1,,0,0xFFFFFFFF,63,2,1,,0,0,736,{ bonus bAtk,5; bonus bMatk,5; },{},{}
 
 // Donation Promo

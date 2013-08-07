@@ -12,6 +12,29 @@ Crystilia,75,80,4	script	ExhilarateRO Master	108,{
 			mes "[^0000FFExhilarateRO Master^000000]";
 			mes "The server has 150x/100x/custom drop rates.";
 			close;
+		case 2:
+			mes "[^0000FFExhilarateRO Master^000000]";
+			mes "You can also use ^0000FF@commands2^000000 to see custom commands.";
+			mes "You can also visit <URL>this Link<INFO>http://wiki.exhilarate-ro.com/index.php?title=Custom_@commands</INFO></URL>.";
+			close;
+		case 3:
+			mes "[^0000FFExhilarateRO Master^000000]";
+			mes "Feeling lost? Can't find NPCs? You can always use the navigation system.";
+			mes "You can also visit <URL>this Link<INFO>http://wiki.exhilarate-ro.com/index.php?title=Non-Playable_Characters</INFO></URL>.";
+			close;
+		case 4:
+			mes "[^0000FFExhilarateRO Master^000000]";
+			mes "Want to know more about the events in game?";
+			mes "You can visit <URL>this Link<INFO>http://wiki.exhilarate-ro.com/index.php?title=Category:Events</INFO></URL>.";
+			mes "Event Shop located at <NAVI>[Event Manager]<INFO>Crystilia,43,79,</INFO></NAVI>";
+			close;
+		case 5:
+			mes "[^0000FFExhilarateRO Master^000000]";
+			mes "This happens when KRO updates and overwrite our files.";
+			mes "We uploaded our server's item files in the website.";
+			mes "Just download it and extract to your RO folder.";
+			mes "You can visit <URL>this Link<INFO>http://exhilarate-ro.com/?module=main&action=downloads</INFO></URL>. other tab";
+			close;
 		default:
 			close;
 		}
@@ -728,7 +751,7 @@ L_No:
 OnInit:
 	set .menu$,"FAQ's:Special Rooms:Job Changer:Reset NPC:Card Remover:Platinum Skills:Rental NPC:Stylist:Build Manager:Kafra:Coin Exchanger";
 
-	set .faqmenu$,"Server Rates";
+	set .faqmenu$,"Server Rates:Custom Commands:Custom NPCs:Events:Korean Items";
 
 	setarray .Rebirth[0],99,50;	// Minimum base level, job level to rebirth OR change to third class
 	setarray .JobReq[0],10,40;	// Minimum job level to turn into 1st class, 2nd class

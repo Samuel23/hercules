@@ -13,6 +13,7 @@ OnInit:
 
 OnMinute00:	// Start time (every hour)
 OnAdminStart:
+	if (mobcount(.Map$,strnpcinfo(0)+"::OnTBoxKilled") >= 25) { end; }
 	set .Spawn,rand(1,3);	// How many Mushrooms should spawn?
 	//set .Map$,.Maps$[rand(getarraysize(.Maps$))];
 	announce .Spawn+" rare Treasure Box will be spawned in 30 seconds at "+.Map$+"!",0;

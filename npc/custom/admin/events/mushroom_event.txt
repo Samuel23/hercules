@@ -23,6 +23,7 @@ OnInit:
 
 OnMinute00:	// Start time (every hour)
 OnAdminStart:
+	if (mobcount(.Map$,strnpcinfo(0)+"::OnMushroomKilled") >= 25) { end; }
 	set .Spawn,rand(1,3);	// How many Mushrooms should spawn?
 	//set .Map$,.Maps$[rand(getarraysize(.Maps$))];
 	monster .Map$,0,0,"Please don't kill me!",1857,.Spawn,strnpcinfo(0)+"::OnMushroomKilled";

@@ -19,7 +19,7 @@ Crystilia,75,80,4	script	ExhilarateRO Master	108,{
 			close;
 		case 3:
 			mes "[^0000FFExhilarateRO Master^000000]";
-			mes "Feeling lost? Can't find NPCs? You can always use the navigation system.";
+			mes "Feeling lost? Can't find NPCs? You can always use the Navigation System.";
 			mes "You can also visit <URL>this Link<INFO>http://wiki.exhilarate-ro.com/index.php?title=Non-Playable_Characters</INFO></URL>.";
 			close;
 		case 4:

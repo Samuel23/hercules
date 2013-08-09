@@ -114,6 +114,7 @@ L_displayInfo:
 	dispbottom "Status:                     "+.@vipStatus$;
 	dispbottom "Expiration date: "+.@expirationDate$;
 	dispbottom "----------------------------------------------------------------------";
+	atcommand "@join #main";
 	end;
 	
 OnWhisperGlobal:

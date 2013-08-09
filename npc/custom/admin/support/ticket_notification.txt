@@ -8,7 +8,7 @@
 		set .@unreadmsg$, "You have %d unread support tickets.";
 		set .@sql$, "SELECT id, department, ticket_read FROM cp_support_tickets WHERE ";
 		
-		if (getgmlevel() > 0) {
+		if (getgmlevel() >= 20) {
 			set .@sql$, .@sql$ + "1";
 		} else {
 			set .@sql$, .@sql$ + "account_id = " + getcharid(3) + " AND unread = 1";

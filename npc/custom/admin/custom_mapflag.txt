@@ -66,6 +66,6 @@ train	mapflag	nowarp	20
 train	mapflag	nowarpto	20
 train	mapflag	noreturn	20
 train	mapflag	nomemo	20
-train	mapflag	noteleport
+train	mapflag	noteleport	20
 train	mapflag	novending
 train	mapflag	nosave	SavePoint

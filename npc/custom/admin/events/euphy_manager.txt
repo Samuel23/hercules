@@ -1,0 +1,890 @@
+	      /*          -------------------------          *
+	       *            Euphy's Event Manager            *
+	       *          -------------------------          *
+	       *            This is a paid script.           *
+	       *             Do not redistribute.            */
+
+Crystilia,43,79,4	script	Event Manager	109,{
+function SetDefault; function ShowStatus; function Event; function Etc;
+while(1) {
+	mes "[Event Manager]";
+	if (ShowStatus(.Active,1)) switch(.Active) {
+		case 6: break;	// No warps necessary for Disguise event.
+		case 4: case 7: if (!.Waiting) break;	// Warp only before the event begins.
+		default: set .@warp,1;
+	} else mes "There is no ongoing event.";
+	next;
+	switch(select(
+	  ((getgmlevel() < .GMBasic)?":":" > ^FF0000GM Menu^000000:")+
+	  ((.@warp)?" > ^0055FFWarp to event^000000:":":")+
+	  " > Event Information:"+
+	  (($0_auto)?" > Event Schedule:":":")+
+	  " > Event Rewards (^FF0000"+#Event_Points+"^000000):"+
+	  " > ^777777Close^000000"
+	)) {
+		case 1: break;
+		case 2: warp getd("."+.Active+"_map$"),0,0; close;
+		case 3:
+			if (.Active) set .@i, .Active;	// Only show information for active event if one is ongoing.
+			else set .@i, select(.Menu$);
+			mes "[Event Manager]";
+			mes "^0055FF ~ "+.Events$[.@i]+" ~^000000";
+			switch(.@i) {
+				case 1:
+					mes "A group of monsters will randomly";
+					mes "spawn on a map. Some are normal";
+					mes "monsters, and some are not. ";
+					mes "Kill the special ones for prizes!";
+					break;
+				case 2:
+					mes "A random MVP will spawn each";
+					mes "round of the event. Whoever finds";
+					mes "and kills it will be rewarded, and";
+					mes "the next round will begin.";
+					break;
+				case 3:
+					mes "A few monsters will spawn";
+					mes "randomly on a map. Find";
+					mes "and kill them for rewards!";
+					break;
+				case 4:
+					mes "When the event starts, 100";
+					mes "Porings will spawn. Only 1";
+					mes "is a real Poring, and 99";
+					mes "are fakes. The event ends";
+					mes "when the real Poring is killed.";
+					break;
+				case 5:
+					mes "Thousands of zombies spawn";
+					mes "on a map. Most are normal";
+					mes "monsters, but some will give";
+					mes "prizes. The invasion ends when";
+					mes "all special zombies are killed.";
+					break;
+				case 6:
+					mes "I will disguise as a random";
+					mes "monster. The first player to";
+					mes "guess my name correctly";
+					mes "will receive a prize.";
+					break;
+				case 7:
+					mes "When the event starts,";
+					mes "free-for-all PVP will be";
+					mes "turned on. The last player";
+					mes "alive is the winner.";
+					break;
+			}
+			close;
+		case 4:
+			mes "[Event Manager]";
+			set .@k, getarraysize(.Events$);
+			freeloop(1);	// Just in case. :D
+			for(set .@i,0; .@i<24; set .@i,.@i+1) if ($0_auto&(1<<.@i))
+				for(set .@j,1; .@j<.@k; set .@j,.@j+1) if (getd("$"+.@j+"_auto")&(1<<.@i)) {
+					mes ((.@i < 10)?"0":"")+.@i+".00: ^0055FF"+.Events$[.@j]+"^000000";
+					break;
+				}
+			freeloop(0);
+			close;
+		case 5:
+			mes "[Event Manager]";
+			mes "You have ^0055FF"+#Event_Points+"^000000 Event Points.";
+			mes "Spend them wisely!";
+			callshop "event_shop2",1;
+			npcshopattach "event_shop2";
+			end;
+		case 6: close;
+	}
+	while(1) {
+		mes "[Event Manager]";
+		mes "Select an event to manage.";
+		next;
+		set .@i, select(.Menu$+" ~ Automated events: ~ Set values to default: ~ ^777777Back to main menu...^000000");
+		if (.@i == 10) break;
+		if (.@i < 8) {
+			mes "["+.Events$[.@i]+"]";
+			if (!ShowStatus(.@i)) mes "Status: ^777777Inactive^000000";
+			next;
+		}
+		switch(.@i) {
+			case 1:
+				while(1) {
+					set .@j, select(
+					  "Monster ["+getmonsterinfo(.1_mobID,0)+"]:"+
+					  "Normal Monsters ["+.1_mobNum+"]:"+
+					  "Special Monsters ["+.1_mobNumS+"]:"+
+					  "Points per kill ["+.1_points+"]:"+
+					  "Map ["+.1_map$+"]:"+
+					  ((!.Active)?"^0055FFStart Event^000000:":":")+
+					  ((.Active == 1)?"^FF0000End Event^000000:":":")+
+					  "^777777Back to event menu...^000000"
+					);
+					if (.@j == 8) break;
+					else if (.@j > 5) Event(1,7-.@j,1);
+					if (Etc(1,1)) switch(.@j) {
+						case 1:
+							input .@s;
+							if (Etc(255,.@s)) set .1_mobID, .@s;
+							break;
+						case 2: input .1_mobNum; break;
+						case 3: if (Etc()) input .1_mobNumS,1; break;
+						case 4: if (Etc()) input .1_points; break;
+						case 5: Etc(1); break;
+					}
+				}
+				break;
+			case 2:
+				while(1) {
+					set .@j, select(
+					  "MVP List ["+getarraysize(.2_mvp)+" total]:"+
+					  "Number of Rounds ["+.2_rounds+"]:"+
+					  "Points per kill ["+.2_points+"]:"+
+					  "Map ["+.2_map$+"]:"+
+					  ((!.Active)?"^0055FFStart Event^000000:":":")+
+					  ((.Active == 2)?"^FF0000End Event^000000:":":")+
+					  "^777777Back to event menu...^000000"
+					);
+					if (.@j == 7) break;
+					else if (.@j > 4) Event(2,6-.@j,1);
+					if (Etc(1,2)) switch(.@j) {
+						case 1:
+							message strcharinfo(0),"Select an MVP to remove it.";
+							while(1) {
+								set .@list$,"^0055FFAdd a monster...:^777777Go back...^000000:";
+								for(set .@k,0; .@k<getarraysize(.2_mvp); set .@k,.@k+1)
+									set .@list$, .@list$+getmonsterinfo(.2_mvp[.@k],0)+":";
+								set .@k, select(.@list$);
+								if (.@k == 1) {
+									input .@s;
+									if (Etc(255,.@s)) {
+										message strcharinfo(0),"Added mob '"+getmonsterinfo(.@s,0)+"'.";
+										set .2_mvp[getarraysize(.2_mvp)], .@s;
+									}
+								} else if (.@k == 2) break;
+								else {
+									if (getarraysize(.2_mvp) == 1) message strcharinfo(0),"The list cannot be empty.";
+									else {
+										message strcharinfo(0),"Deleted '"+getmonsterinfo(.2_mvp[.@k-3],0)+"' from the list.";
+										deletearray .2_mvp[.@k-3],1;
+									}
+								}
+							}
+							break;
+						case 2: input .2_rounds,1; break;
+						case 3: if (Etc()) input .2_points; break;
+						case 4: Etc(2); break;
+					}
+				}
+				break;
+			case 3:
+				while(1) {
+					set .@j, select(
+					  "Monster ["+getmonsterinfo(.3_mobID,0)+"]:"+
+					  "Number of Monsters ["+.3_mobNum+"]:"+
+					  "Points per kill ["+.3_points+"]:"+
+					  "Map ["+.3_map$+"]:"+
+					  ((!.Active)?"^0055FFStart Event^000000:":":")+
+					  ((.Active == 3)?"^FF0000End Event^000000:":":")+
+					  "^777777Back to event menu...^000000"
+					);
+					if (.@j == 7) break;
+					else if (.@j > 4) Event(3,6-.@j,1);
+					if (Etc(1,3)) switch(.@j) {
+						case 1:
+							set .@list$,"";
+							for(set .@k,0; .@k<getarraysize(.3_pre); set .@k,.@k+1)
+								set .@list$, .@list$+getmonsterinfo(.3_pre[.@k],0)+":";
+							set .@k, select(.@list$+"^0055FFInput monster...:^777777Cancel^000000");
+							if (.@k == getarraysize(.3_pre)+1) {
+								input .@s;
+								if (Etc(255,.@s)) set .3_mobID, .@s;
+							} else if (.@k <= getarraysize(.3_pre))
+								set .3_mobID, .3_pre[.@k-1];
+							break;
+						case 2: if (Etc()) input .3_mobNum,1; break;
+						case 3: if (Etc()) input .3_points; break;
+						case 4: Etc(3); break;
+					}
+				}
+				break;
+			case 4:
+				while(1) {
+					set .@j, select(
+					  "Wait time ["+.4_wait+" minute"+((.4_wait == 1)?"":"s")+"]:"+
+					  "Points for Winning ["+.4_points+"]:"+
+					  "Map ["+.4_map$+"]:"+
+					  ((!.Active)?"^0055FFStart Event^000000:":":")+
+					  ((.Active == 4)?"^FF0000End Event^000000:":":")+
+					  "^777777Back to event menu...^000000"
+					);
+					if (.@j == 6) break;
+					else if (.@j > 3) Event(4,5-.@j,1);
+					if (Etc(1,4)) switch(.@j) {
+						case 1: input .4_wait,0,60; break;
+						case 2: if (Etc()) input .4_points; break;
+						case 3: Etc(4); break;
+					}
+				}
+				break;
+			case 5:
+				while(1) {
+					set .@j, select(
+					  "Number of Special Zombies ["+.5_mobNum+"]:"+
+					  "Points per kill ["+.5_points+"]:"+
+					  "MVP Spawn ["+((.5_mvp[0])?"on":"off")+"]:"+
+					  "Map ["+.5_map$+"]:"+
+					  ((!.Active)?"^0055FFStart Event^000000:":":")+
+					  ((.Active == 5)?"^FF0000End Event^000000:":":")+
+					  "^777777Back to event menu...^000000"
+					);
+					if (.@j == 7) break;
+					else if (.@j > 4) Event(5,6-.@j,1);
+					if (Etc(1,5)) switch(.@j) {
+						case 1: if (Etc()) input .5_mobNum,1; break;
+						case 2: if (Etc()) input .5_points; break;
+						case 3: set .5_mvp[0], !.5_mvp[0]; break;
+						case 4: Etc(5); break;
+					}
+				}
+				break;
+			case 6:
+				while(1) {
+					set .@j, select(
+					  "Wait time ["+.6_wait+" minute"+((.6_wait == 1)?"":"s")+"]:"+
+					  "Seconds per round ["+.6_time+"]:"+
+					  "Number of Rounds ["+.6_rounds+"]:"+
+					  "Points per answer ["+.6_points+"]:"+
+					  ((!.Active)?"^0055FFStart Event^000000:":":")+
+					  ((.Active == 6)?"^FF0000End Event^000000:":":")+
+					  "^777777Back to event menu...^000000"
+					);
+					if (.@j == 7) break;
+					else if (.@j > 4) Event(6,6-.@j,1);
+					if (Etc(1,6)) switch(.@j) {
+						case 1: input .6_wait,0,60; break;
+						case 2: input .6_time,1,60; break;
+						case 3: input .6_rounds,1; break;
+						case 4: if (Etc()) input .6_points,0; break;
+					}
+				}
+				break;
+			case 7:
+				while(1) {
+					set .@j, select(
+					  "Wait time ["+.7_wait+" minute"+((.7_wait == 1)?"":"s")+"]:"+
+					  "Minimum Players ["+.7_min+"]:"+
+					  "Points for Winning ["+.7_points+"]:"+
+					  "Map ["+.7_map$+"]:"+
+					  ((!.Active)?"^0055FFStart Event^000000:":":")+
+					  ((.Active == 7)?"^FF0000End Event^000000:":":")+
+					  "^777777Back to event menu...^000000"
+					);
+					if (.@j == 7) break;
+					else if (.@j > 4) Event(7,6-.@j,1);
+					if (Etc(1,7)) switch(.@j) {
+						case 1:
+							message strcharinfo(0),"Players must register during this time.";
+							input .7_wait,1,60;
+							break;
+						case 2:
+							message strcharinfo(0),"Event requires at least 2 players to start.";
+							input .7_min,2;
+							break;
+						case 3: if (Etc()) input .7_points; break;
+						case 4: Etc(7); break;
+					}
+				}
+				break;
+			case 8:
+				while(1) {
+					mes "[Automated Events]";
+					if (getgmlevel() < .GMFull) {
+						mes "You aren't authorized";
+						mes "to change this!";
+						next;
+						break;
+					}
+					if (!$0_auto) mes "No events are automated.";
+					else for(set .@i,1; .@i<getarraysize(.Events$); set .@i,.@i+1)
+						if (getd("$"+.@i+"_auto")) mes .Events$[.@i]+": ^0055FFautomated^000000";
+					next;
+					set .@i, select("Edit times...:Turn off all automated events:^777777Back to event menu...^000000");
+					if (.@i == 1) {
+						set .@i, select(.Menu$+" > ^777777Cancel^000000");
+						if (.@i < getarraysize(.Events$)) while(1) {
+							set .@var$, "$"+.@i+"_auto";
+							set .@menu$," ~ ^FF0000Finished...^000000:";
+							for(set .@j,0; .@j<24; set .@j,.@j+1)
+								set .@menu$, .@menu$+" ~ "+((getd(.@var$)&(1<<.@j))?"^0055FF":"^777777")+((.@j < 10)?"0":"")+.@j+".00^000000:";
+							set .@j, select(.@menu$)-1;
+							if (.@j) {
+								set .@k,(1<<(.@j-1));
+								if (getd(.@var$)&.@k) set $0_auto, $0_auto^.@k;
+								else {
+									if ($0_auto&.@k) {
+										message strcharinfo(0),"Another event is already scheduled for hour "+(.@j-1)+".";
+										set .@k,255;
+									} else set $0_auto, $0_auto|.@k;
+								}
+								if (.@k != 255) setd .@var$, getd(.@var$)^.@k;
+							}
+							else break;
+						}
+					} else if (.@i == 2) {
+						mes "[Automated Events]";
+						mes "Do you really want to turn off";
+						mes "all automated event settings?";
+						mes "This action cannot be reversed.";
+						next;
+						if (select(" > ^0055FFYes^000000: > ^777777No^000000") == 1) {
+							for(set .@i,1; .@i<getarraysize(.Events$); set.@i,.@i+1)
+								setd "$"+.@i+"_auto",0;
+							set $0_auto,0;
+						}
+					} else break;
+				}
+				break;
+			case 9:
+				mes "[Event Manager]";
+				if (.Active) {
+					mes "You can't change settings";
+					mes "while an event is active.";
+				} else {
+					SetDefault(.@EventOption);
+					mes "Defaults set.";
+				}
+				next;
+				break;
+		}
+	}
+}
+close;
+
+OnMinute00:	// Automated events at the hour.
+	if (.Active) end;	// Stop if an event is already active.
+	set .@i, (1<<gettime(3));
+	if ($0_auto&.@i) for(set .@j,1; .@j<getarraysize(.Events$); set .@j,.@j+1)
+		if (getd("$"+.@j+"_auto")&.@i) {
+			SetDefault(1<<(.@j-1));	// Use default values for automated events.
+			Event(.@j,1,0);
+			set .Active[1], .@j;
+			break;
+		}
+	end;
+OnMinute59:	// Automated events can only last 59 minutes before they are forced to end.
+	if (.Active[1]) Event(.Active[1],0,0);
+	end;
+
+OnBuyItem:
+	set @cost,0;
+	for(set .@i,0; .@i<getarraysize(@bought_nameid); set .@i,.@i+1)
+		for(set .@j,0; .@j<getarraysize(.Shop); set .@j,.@j+2)
+			if (@bought_nameid[.@i] == .Shop[.@j]) {
+				set @cost, @cost+(.Shop[.@j+1]*@bought_quantity[.@i]);
+				break;
+			}
+	mes "[Event Manager]";
+	if (@cost > #Event_Points) mes "You don't have enough Event Points.";
+	else {
+		for(set .@i,0; .@i<getarraysize(@bought_nameid); set .@i,.@i+1) {
+			getitem @bought_nameid[.@i], @bought_quantity[.@i];
+			dispbottom "Purchased "+@bought_quantity[.@i]+"x "+getitemname(@bought_nameid[.@i])+".";
+		}
+		set #Event_Points, #Event_Points-@cost;
+		mes "Deal completed.";
+		emotion e_cash;
+	}
+	set @cost,0;
+	deletearray @bought_nameid[0], getarraysize(@bought_nameid);
+	deletearray @bought_quantity[0], getarraysize(@bought_quantity);
+	close;
+
+On0W:	// Show "!" emotion while warping players to the event map.
+	while(.Waiting == 1) {
+		emotion e_gasp;
+		sleep 2500;
+	}
+	end;
+On1N:
+	set .1_mobNum[1], .1_mobNum[1]-1;
+	mapannounce .1_map$,"~ "+.1_mobNumS[1]+" special monsters, "+.1_mobNum[1]+" normal monsters ~",16;
+	end;
+On1S:
+	set .1_mobNumS[1], .1_mobNumS[1]-1;
+	Etc(127,.1_points);
+	mapannounce .1_map$,strcharinfo(0)+" has killed a special "+getmonsterinfo(.1_mobID,0)+"!",16;
+	if (.1_mobNumS[1]) mapannounce .1_map$,"~ "+.1_mobNumS[1]+" special monsters, "+.1_mobNum[1]+" normal monsters ~",16;
+	else Event(1,0,0);
+	end;
+On2K:
+	Etc(127,.2_points);
+	mapannounce .2_map$,strcharinfo(0)+" has slain the "+getmonsterinfo(.2_mobID,0)+"!",16;
+	sleep 4000;
+	if (.2_rounds[1] < .2_rounds[0]) {
+		set .2_rounds[1], .2_rounds[1]+1;
+		set .2_mobID, .2_mvp[rand(getarraysize(.2_mvp))];
+		monster .2_map$,0,0,getmonsterinfo(.2_mobID,0),.2_mobID,1,strnpcinfo(0)+"::On2K";
+		mapannounce .2_map$,"Round "+.2_rounds[1]+": "+getmonsterinfo(.2_mobID,0)+" has spawned!",16;
+	}
+	else Event(2,0,0);
+	end;
+On3K:
+	set .3_mobNum[1], .3_mobNum[1]-1;
+	Etc(127,.3_points);
+	set .@str$, ((.3_mobNum[1])?" "+.3_mobNum[1]+" "+getmonsterinfo(.3_mobID,0)+" remain.":"");
+	mapannounce .3_map$,strcharinfo(0)+" got a kill!"+.@str$,16;
+	if (!.3_mobNum[1]) Event(3,0,0);
+	end;
+On4A:
+	if (.4_wait) {
+		announce "The Poring Catcher event will begin in "+.4_wait+" minute"+((.4_wait == 1)?"":"s")+"!",0;
+		set .Waiting,1;
+		donpcevent strnpcinfo(0)+"::On0W";
+		sleep(60000*.4_wait);
+		if (!.Waiting) end;
+		set .Waiting,0;
+	}
+	setarray .@n$[0],"Proing","Pouring","Poiring","Poing","Poriing","Porong","Por1ng","P0ring","PoriNg";
+	setarray .@id[0],1031,1062,1113,1242,1613;
+	for(set .@i,0; .@i<9; set .@i,.@i+1)
+		monster .4_map$,0,0,.@n$[.@i],1002,10,strnpcinfo(0)+"::On4F";
+	for(set .@i,0; .@i<5; set .@i,.@i+1)
+		monster .4_map$,0,0,"Poring",.@id[.@i],((.@i == 4)?1:2),strnpcinfo(0)+"::On4F";
+	monster .4_map$,0,0,"Poring",1002,1,strnpcinfo(0)+"::On4R";
+	announce "The Poring Catcher event has begun!",0;
+	end;
+On4F:
+	set .4_mobNum, .4_mobNum-1;
+	dispbottom "I wasn't the correct Poring!";
+	warp "SavePoint",0,0;
+	end;
+On4R:
+	Etc(127,.4_points);
+	mapannounce .4_map$,strcharinfo(0)+" killed the real Poring!",16;
+	Event(4,0,0);
+	end;
+On5N:
+	set .5_mobNum[2], .5_mobNum[2]-1;
+	end;
+On5S:
+	set .5_mobNum[1], .5_mobNum[1]-1;
+	Etc(127,.5_points);
+	set .@str$, ((.5_mobNum[1])?" "+.5_mobNum[1]+" remain.":"");
+	mapannounce .5_map$,strcharinfo(0)+" has killed a special zombie!"+.@str$,16;
+	if (!.5_mobNum[1]) Event(5,0,0);
+	end;
+On6A:
+	if (.6_wait) {
+		announce "The Disguise event will begin in "+.6_wait+" minute"+((.6_wait == 1)?"":"s")+"!",0;	
+		set .Waiting,1;
+		donpcevent strnpcinfo(0)+"::On0W";
+		sleep(60000*.6_wait);
+		if (!.Waiting) end;
+		set .Waiting,0;
+	}
+	announce "The Disguise event has begun in "+strnpcinfo(4)+"!",0;
+	set .6_rounds[1],1;
+On6B:
+	npctalk "Round "+.6_rounds[1]+"...";
+	set .Waiting,2;
+	sleep rand(2000,2500);
+	if (!.Waiting) end;
+	set .@valid,0;
+	while(!.@valid) {
+		set .6_mobID, rand(1001,1995);
+		if (!compare(.Blacklist$,""+.6_mobID)) set .@valid,1;
+		if (.@valid && .6_mobID[1]) if (getmonsterinfo(.6_mobID[0],0) == getmonsterinfo(.6_mobID[1],0)) set .@valid,0;
+	}
+	setnpcdisplay(strnpcinfo(1),.6_mobID);
+	defpattern 1,"([^:]+):.\\s*"+getmonsterinfo(.6_mobID,0)+".*", "On6C";
+	activatepset 1;
+	set .Waiting,2;
+	sleep(1000*.6_time);
+	if (!.Waiting) end;
+	set .Waiting,0;
+	npctalk "Time's up. The answer was '"+getmonsterinfo(.6_mobID,0)+"'.";
+	donpcevent strnpcinfo(0)+"::On6D";
+	end;
+On6C:
+	Etc(127,.6_points);
+	npctalk strcharinfo(0)+" is correct! The answer was '"+getmonsterinfo(.6_mobID,0)+"'.";
+	set .Waiting,0;
+	awake strnpcinfo(0);
+On6D:
+	set .6_rounds[1], .6_rounds[1]+1;
+	deletepset 1;
+	setnpcdisplay(strnpcinfo(1),109);
+	set .6_mobID[1], .6_mobID;
+	sleep 5000;
+	if (.6_rounds[1] > .6_rounds[0]) {
+		npctalk "That was the last round. Thanks for playing!";
+		set .Waiting,3;
+		sleep 1000;
+		Event(6,0,0);
+	} else donpcevent strnpcinfo(0)+"::On6B";
+	end;
+On7A:
+	announce "The Last Man Standing event will begin in "+.7_wait+" minute"+((.7_wait == 1)?"":"s")+"!",0;	
+	set .Waiting,1;
+	donpcevent strnpcinfo(0)+"::On0W";
+	sleep(60000*.7_wait);
+	if (!.Waiting) end;
+	if (getmapusers(.7_map$) < .7_min) {
+		mapannounce .7_map$,"The Last Man Standing event has been cancelled because not enough players registered.",0;
+		sleep 1000;
+		Event(7,0,0);
+		end;
+	}
+	set .Waiting,2;
+	setmapflag .7_map$, mf_loadevent;
+	mapannounce .7_map$,"The event will start in 10 seconds...",16;
+	sleep 5000;
+	if (.Waiting != 2) end;
+	for(set .@i,5; .@i>0; set .@i,.@i-1) {
+		mapannounce .7_map$,.@i+"...",16;
+		sleep 1000;
+		if (.Waiting != 2) end;
+	}
+	set .Waiting,0;
+	announce "The Last Man Standing event has begun!",0;
+	pvpon .7_map$;
+	donpcevent strnpcinfo(0)+"::On7B";
+	end;
+On7B:
+	while(.Active == 7 && !.Waiting) {
+		set .@i, getmapusers(.7_map$);
+		if (.@i == 1) {
+			set .Waiting,3;
+			mapwarp .7_map$,.7_map$,0,0;
+		} else if (.@i == 0) Event(7,0,0);
+		else sleep 3000;
+	}
+	end;
+OnPCLogoutEvent:
+	set .@i,1;
+OnPCDieEvent:
+	if (.Active == 7 && strcharinfo(3) == .7_map$ && !.Waiting) {
+		mapannounce .7_map$,strcharinfo(0)+" is out!",16;
+		if (!.@i) warp "SavePoint",0,0;
+		awake strnpcinfo(0);
+	}
+	end;
+OnPCLoadMapEvent:
+	if (.Active != 7 || strcharinfo(3) != .7_map$ || getsavepoint(0) == .7_map$) end;
+	if (.Waiting < 3) {	// Kicks out new players that warp to the LMS map.
+		dispbottom "The Last Man Standing event is taking place on this map.";
+		warp "SavePoint",0,0;
+	} else {	// Event trigger for the winner.
+		Etc(127,.7_points);
+		announce strcharinfo(0)+" has won the Last Man Standing event!",0;
+		Event(7,0,0);
+	}
+	end;
+
+function Etc {
+	if (!getarg(0,0)) {
+		if (getgmlevel() < .GMFull) {
+			message strcharinfo(0),"You are not permitted to change this.";
+			return 0;
+		} else return 1;
+	} else if (getarg(0) == 127) {
+		if (getarg(1)) {
+			set #Event_Points, #Event_Points+getarg(1);
+			dispbottom "Gained "+getarg(1)+" Event Point"+((getarg(1) == 1)?"":"s")+"! [Total: "+#Event_Points+"]";
+		}
+		specialeffect2 568;
+		return;
+	} else if (getarg(0) == 255) {
+		if (getarg(1) < 1001) {
+			message strcharinfo(0),"Invalid mob ID '"+getarg(1)+"'.";
+			return 0;
+		} else if (getmonsterinfo(getarg(1),0) == "" || getmonsterinfo(getarg(1),0) == "null") {
+			message strcharinfo(0),"Invalid mob ID '"+getarg(1)+"'.";
+			return 0;
+		} else return 1;
+	} else if (getarg(1,0)) {
+		if (getarg(1) == .Active) {
+			message strcharinfo(0),"You can't change settings while the event is active.";
+			return 0;
+		} else return 1;
+	} else {
+		input .@s$,2,12;
+		if (getmapusers(.@s$) == -1 && .@s$ != "random") message strcharinfo(0),"Invalid map '"+.@s$+"'.";
+		else setd "."+getarg(0)+"_map$", .@s$;
+		return;
+	}
+}
+
+function Event {
+	if (getd("."+getarg(0)+"_map$") == "random") {	// Allowed 'random' town maps.
+		setarray .@towns$[0],"prontera","geffen","payon","alberta","izlude","comodo","gonryun","hugel","rachel";
+		setd "."+getarg(0)+"_map$", .@towns$[rand(getarraysize(.@towns$))];
+	}
+	switch(getarg(0)) {
+		case 1:
+			if (getarg(1)) {
+				monster .1_map$,0,0,getmonsterinfo(.1_mobID,0),.1_mobID,.1_mobNum,strnpcinfo(0)+"::On1N";
+				monster .1_map$,0,0,getmonsterinfo(.1_mobID,0),.1_mobID,.1_mobNumS,strnpcinfo(0)+"::On1S";
+				set .1_mobNum[1], .1_mobNum[0];
+				set .1_mobNumS[1], .1_mobNumS[0];
+				announce "The Monster Summon event has begun in "+.1_map$+"!",0;
+				announce "~ "+.1_mobNumS[1]+" special monsters, "+.1_mobNum[1]+" normal monsters ~",0;
+			} else {
+				killmonster .1_map$,"All";
+				maprespawnguildid .1_map$,0,3;
+				set .1_mobNum[1],0;
+				set .1_mobNumS[1],0;
+			}
+			break;
+		case 2:
+			if (getarg(1)) {
+				set .2_mobID, .2_mvp[rand(getarraysize(.2_mvp))];
+				monster .2_map$,0,0,getmonsterinfo(.2_mobID,0),.2_mobID,1,strnpcinfo(0)+"::On2K";
+				set .2_rounds[1],1;
+				announce "The MVP Summon event has begun in "+.2_map$+"!",0;
+				mapannounce .2_map$,"Round "+.2_rounds[1]+": "+getmonsterinfo(.2_mobID,0)+" has spawned!",16;
+			} else {
+				killmonster .2_map$,"All";
+				maprespawnguildid .2_map$,0,3;
+				set .2_rounds[1],0;
+				set .2_mobID,0;
+			}
+			break;
+		case 3:
+			if (getarg(1)) {
+				monster .3_map$,0,0,getmonsterinfo(.3_mobID,0),.3_mobID,.3_mobNum,strnpcinfo(0)+"::On3K";
+				set .3_mobNum[1], .3_mobNum[0];
+				announce "The Monster Hunt event has begun in "+.3_map$+"!",0;
+				announce .3_mobNum[1]+" "+getmonsterinfo(.3_mobID,0)+" have spawned!",0;
+			} else {
+				killmonster .3_map$,"All";
+				maprespawnguildid .3_map$,0,3;
+				set .3_mobNum[1],0;
+			}
+			break;
+		case 4:
+			if (getarg(1)) {
+				setmapflag .4_map$, mf_noskill;	// Skills are not allowed in Poring Catcher.
+				setmapflag .4_map$, mf_nosave;
+				set .4_mobNum,99;
+				donpcevent strnpcinfo(0)+"::On4A";
+			} else {
+				if (.Waiting) {
+					set .Waiting,0;
+					awake strnpcinfo(0);
+				} else killmonster .4_map$,"All";
+				maprespawnguildid .4_map$,0,3;
+				removemapflag .4_map$, mf_noskill;
+				removemapflag .4_map$, mf_nosave;
+				set .4_mobNum,0;
+			}
+			break;
+		case 5:
+			if (getarg(1)) {
+				setarray .@id[0],1015,1036,1298,1197,1864,1865,1403,1169,1870;
+				setarray .@num[0],400, 325, 100, 175,  75,  75, 150, 175,  25;
+				for(set .@k,0; .@k<9; set .@k,.@k+1)
+					monster .5_map$,0,0,getmonsterinfo(.@id[.@k],0),.@id[.@k],.@num[.@k],strnpcinfo(0)+"::On5N";
+				monster .5_map$,0,0,"Zombie",1015,.5_mobNum,strnpcinfo(0)+"::On5S";
+				if (.5_mvp[0]) for(set .@k,1; .@k<getarraysize(.5_mvp); set .@k,.@k+1)
+					monster .5_map$,0,0,getmonsterinfo(.5_mvp[.@k],0),.5_mvp[.@k],1,strnpcinfo(0)+"::On5S";
+				setarray .5_mobNum[1], .5_mobNum[0]+((.5_mvp[0])?getarraysize(.5_mvp)-1:0), 1500;
+				announce "The Zombie Invasion event has begun in "+.5_map$+"!",0;
+			} else {
+				killmonster .5_map$,"All";
+				maprespawnguildid .5_map$,0,3;
+				setarray .5_mobNum[1],0,0;
+			}
+			break;
+		case 6:
+			if (getarg(1)) {
+				set .6_rounds[1],0;
+				donpcevent strnpcinfo(0)+"::On6A";
+			} else {
+				if (.Waiting < 3) npctalk "A GM has cancelled the event.";
+				if (.Waiting != 1) {
+					setnpcdisplay(strnpcinfo(1),109);
+					deletepset 1;
+				}
+				set .Waiting,0;
+				awake strnpcinfo(0);
+				setarray .6_mobID[0],0,0;
+				set .6_rounds[1],0;
+			}
+			break;
+		case 7:
+			if (getarg(1)) {
+				maprespawnguildid .7_map$,0,3;
+				for(set .@i,0; .@i<7; set .@i,.@i+1)
+					setmapflag .7_map$, .mf[.@i];
+				setmapflag .7_map$,mf_restricted,1;
+				pvpoff .7_map$;
+				gvgoff .7_map$;
+				donpcevent strnpcinfo(0)+"::On7A";
+			} else {
+				if (.Waiting != 1) {
+					removemapflag .7_map$, mf_loadevent;
+					set .Waiting,1;
+				} else set .Waiting,0;
+				awake strnpcinfo(0);
+				set .Waiting,0;
+				maprespawnguildid .7_map$,0,3;
+				for(set .@i,0; .@i<7; set .@i,.@i+1)
+					removemapflag .7_map$, .mf[.@i];
+				//removemapflag .7_map$,mf_restricted,1;
+				pvpoff .7_map$;
+				gvgoff .7_map$;
+			}
+			break;
+	}
+	if (!getarg(1)) {
+		announce "The "+.Events$[getarg(0)]+" event is now over!",0;
+		set .Active[1],0;
+	}
+	set .Active, ((getarg(1))?getarg(0):0);
+	if (getarg(2,0)) {
+		mes "["+.Events$[getarg(0)]+"]";
+		if (getarg(1)) mes "Event initiated.";
+		else mes "Event terminated.";
+		close;
+	}
+	return;
+}
+
+function ShowStatus {
+	if (!.Active || getarg(0) != .Active) return 0;
+	if (getarg(1,0)) mes "Event: ^0055FF"+.Events$[getarg(0)]+"^000000";
+	else mes "Status: ^0055FFActive^000000";
+	set .@map$, getd("."+getarg(0)+"_map$");
+	if (.@map$ != "") mes "Location: ^777777"+.@map$+"^000000";
+	switch(getarg(0)) {
+		case 1:
+			mes "Special "+strmobinfo(1,.1_mobID)+" left: ^777777"+.1_mobNumS[1]+"^000000";
+			mes "Normal "+strmobinfo(1,.1_mobID)+" left: ^777777"+.1_mobNum[1]+"^000000";
+			mes "Points per kill: ^777777"+.1_points+"^000000";
+			break;
+		case 2:
+			mes "Current MVP: ^777777"+getmonsterinfo(.2_mobID,0)+"^000000";
+			mes "Rounds left: ^777777"+(.2_rounds[0]-.2_rounds[1])+"^000000";
+			mes "Points per kill: ^777777"+.2_points+"^000000";
+			break;
+		case 3:
+			mes strmobinfo(1,.3_mobID)+" left: ^777777"+.3_mobNum[1]+"^000000";
+			mes "Points per kill: ^777777"+.3_points+"^000000";
+			break;
+		case 4:
+			mes "Status: ^777777"+((.Waiting)?"Waiting...":"Started")+"^000000";
+			if (!.Waiting) mes "Fake Porings left: ^777777"+.4_mobNum+"^000000";
+			mes "Points for winning: ^777777"+.4_points+"^000000";
+			break;
+		case 5:
+			mes "Special Zombies left: ^777777"+.5_mobNum[1]+"^000000";
+			mes "Normal Zombies left: ^777777"+.5_mobNum[2]+"^000000";
+			mes "Points per kill: ^777777"+.5_points+"^000000";
+			break;
+		case 6:
+			mes "Status: ^777777"+((.Waiting == 1)?"Waiting...":"Started")+"^000000";
+			mes "Rounds left: ^777777"+(.6_rounds[0]-.6_rounds[1])+"^000000";
+			mes "Points per answer: ^777777"+.6_points+"^000000";
+			break;
+		case 7:
+			mes "Status: ^777777"+((.Waiting)?"Waiting...":"Started")+"^000000";
+			mes "Points for winning: ^777777"+.7_points+"^000000";
+			if (.Waiting != 1) mes "Players remaining: ^777777"+getmapusers(.7_map$)+"^000000";
+			break;
+	}
+	return 1;
+}
+
+function SetDefault {
+	if (getarg(0)&1) {		// < Monster Summon >
+		set .1_mobID,1002;	// ID of monster.
+		set .1_mobNum,90;	// Number of 'normal' monsters.
+		set .1_mobNumS,10;	// Number of 'special' monsters.
+		set .1_points,1;	// Points per 'special' monster kill.
+		set .1_map$,"random";	// Event map (random = random town).
+	}
+	if (getarg(0)&2) {		// < MVP Summon >
+		setarray .2_mvp[0],	// List of summonable MVPs.
+		  1038,1039,1046,1059,1086,1087,1112,1115,1147,1150,1157,
+		  1159,1190,1251,1252,1272,1312,1373,1389,1418,1492,1511,
+		  1583,1623,1630,1646,1647,1648,1649,1650,1651,1658,1688,
+		  1708,1719,1734,1751,1768,1779,1785,1832,1871,1874,1885;
+		set .2_rounds,10;	// Number of rounds.
+		set .2_points,2;	// Points per MVP kill.
+		set .2_map$,"random";	// Event map (random = random town).
+	}
+	if (getarg(0)&4) {		// < Monster Hunt >
+		set .3_mobID,1084;	// ID of monster.
+		setarray .3_pre[0],	// List of preset monster options.
+		  1084,1330,1083;
+		set .3_mobNum,rand(2,5);// Number of monsters.
+		set .3_points,2;	// Points per kill.
+		set .3_map$,"random";	// Event map (random = random town).
+	}
+	if (getarg(0)&8) {		// < Poring Catcher >
+		set .4_wait,2;		// Minutes before event starts, after an announcement.
+		set .4_points,5;	// Points for winning.
+		set .4_map$,"jupe_ele";	// Event map (should be small).
+	}
+	if (getarg(0)&16) {		// < Zombie Invasion >
+		set .5_mobNum,30;	// Number of 'special' zombies.
+		set .5_points,1;	// Points per 'special' zombie kill.
+		setarray .5_mvp[0],0,	// Spawn MVPs by default? (0 or 1)
+		  1038,1112,1272,1389,	// List of MVPs to summon.
+		  1492,1734,1768,1708;
+		set .5_map$,"rachel";	// Event map (should be large).
+	}
+	if (getarg(0)&32) {		// < Disguise Event >
+		set .6_wait,2;		// Minutes before event starts, after an announcement.
+		set .6_time,20;		// Seconds to guess the monster.
+		set .6_rounds,10;	// Number of rounds.
+		set .6_points,1;	// Points per correct response.
+	}
+	if (getarg(0)&64) {		// < Last Man Standing >
+		set .7_wait,2;		// Minutes before event starts, after an announcement.
+		set .7_min,5;		// Minimum players to start event.
+		set .7_points,5;	// Points for winning.
+		set .7_map$,"pvp_valk";// Event map.
+	}
+	return;
+}
+
+OnInit:
+	waitingroom "GM Event Manager",0;
+// -------------------- [[ CONFIG START ]] --------------------
+
+	setarray .Events$[1],	// Do NOT comment or delete these!
+		"Monster Summon",	// [1]
+		"MVP Summon",		// [2]
+		"Monster Hunt",		// [4]
+		"Poring Catcher",	// [8]
+		"Zombie Invasion",	// [16]
+		"Disguise",		// [32]
+		"Last Man Standing";	// [64]
+	set .@EventOption, 2|4|8|32|64;	// List of available events.
+	set .GMBasic,40;	// GM level for limited access.
+	set .GMFull, 80;	// GM level with full access.
+	setarray .Shop[0],	// Shop items: <ID>,<cost>.
+		2577,1;
+
+// --------------------- [[ CONFIG END ]] ---------------------
+
+	SetDefault(.@EventOption);
+	set .Menu$,"";
+	for(set .@i,1; .@i<getarraysize(.Events$); set .@i,.@i+1) {
+		if (.@EventOption&(1<<(.@i-1)))
+			set .Menu$, .Menu$+" > "+.Events$[.@i];
+		set .Menu$, .Menu$+":";
+	}
+	set .Blacklist$,
+		"1003,1006,1017,1021,1022,1027,1043,1075,1136,1137,1168,1171,1172,1173,1181,1187,1210,"+ 
+		"1217,1218,1222,1223,1224,1225,1226,1227,1228,1233,1284,1407,1411,1414,1496,1501,1900";
+	setarray .mf[0],0,1,2,3,7,13,34;
+	npcshopitem "event_shop2",512,100;
+	npcshopdelitem "event_shop2",512;
+	for(set .@i,0; .@i<getarraysize(.Shop); set .@i,.@i+2)
+		npcshopadditem "event_shop2", .Shop[.@i], .Shop[.@i+1];
+	end;
+}
+-	shop	event_shop2	-1,512:-1

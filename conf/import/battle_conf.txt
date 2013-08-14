@@ -201,6 +201,9 @@ party_even_share_bonus: 10
 
 /* pet.conf */
 
+// The rate a pet will get friendly by feeding it. (Note 2)
+pet_friendly_rate: 2000
+
 // When the master attacks a monster, whether or not the pet will also attack. (Note 1)
 pet_attack_support: yes
 
@@ -226,3 +229,8 @@ show_hp_sp_drain: yes
 // When set to yes, forces skill points gained from 1st class to be put into 1st class
 // skills, and forces novice skill points to be put into the basic skill. (Note 1)
 player_skillup_limit: no
+
+/* homunc.conf */
+
+// The rate a homunculus will get friendly by feeding it. (Note 2)
+homunculus_friendly_rate: 2000

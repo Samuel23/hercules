@@ -232,19 +232,14 @@ OnInit:
 	//  Time is buff duration is Minuits, in this case 45 mins
 	//  Rate is buff strength, in this case player gains 3 Str
 	setarray .BuffInfo	,188,7,45,3	// +3 Str for 45 Mins Every 7th Day
-				,189,7,45,3	// +3 Agi for 45 Mins Every 7th Day
-				,190,7,45,3	// +3 Vit for 45 Mins Every 7th Day
-				,191,7,45,3	// +3 Int for 45 Mins Every 7th Day
-				,192,7,45,3	// +3 Dex for 45 Mins Every 7th Day
-				,193,7,45,3	// +3 Luk for 45 Mins Every 7th Day
-				,194,4,45,25	// +25 Hit for 45 Mins Every 4th Day
-				,196,4,45,25	// +25 Flee for 45 Mins Every 4th Day
-				,198,10,60,10	// +10% Hp for 60 Mins Every 10th Day
-				,199,10,60,10	// +10% Sp for 60 Mins Every 10th Day
-				,200,13,30,10	// +10% Atk for 30 Mins Every 10th Day
-				,201,13,30,10	// +10% Matk for 30 Mins Every 10th Day
-				,257,9,120,50	// +50% Exp for 120 Mins Every 9th Day
-				,258,9,120,50;	// +50% Item Drops for 120 Mins Every 9th Day
+				,195,4,45,25	// +25 Hit for 45 Mins Every 4th Day
+				,197,4,45,25	// +25 Flee for 45 Mins Every 4th Day
+				,199,10,60,10	// +10% Hp for 60 Mins Every 10th Day
+				,200,10,60,10	// +10% Sp for 60 Mins Every 10th Day
+				,201,13,30,10	// +10% Atk for 30 Mins Every 10th Day
+				,202,13,30,10	// +10% Matk for 30 Mins Every 10th Day
+				,258,9,120,50	// +50% Exp for 120 Mins Every 9th Day
+				,259,9,120,50;	// +50% Item Drops for 120 Mins Every 9th Day
 
 	// Daily Prize items (max 64 days):
 	//   <itemID>,<amount>, // Day 1

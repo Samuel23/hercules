@@ -5,13 +5,13 @@ set .Time,10;		// Announce every x Minute.
 setarray .News$[0],	// Random Message to be Announced
 		"Welcome to Exhilarate Ragnarok Online! Enjoy playing!",
 		"Please Report any Bugs on the Forums. Any Suggestions? Tell us!",
-		"Please Report any Bugs on the Forums. Any Suggestions? Tell us!",
+		"Want to share your favorite screenshots? Post it in the forums.",
 		"Rates: 150x/100x/custom drop rate. You can use @rates to check it out.",
-		"Rates: 150x/100x/custom drop rate. You can use @rates to check it out.",
+		"Refer a friend and get incentives! See Referral System in the forums.",
 		"Max Lvl 150, Max Job Lvl 50, Max Stats 120. With 3rd Jobs.",
-		"Max Lvl 150, Max Job Lvl 50, Max Stats 120. With 3rd Jobs.",
-		"Welcome to Exhilarate Ragnarok Online! Tell us how you feel!",
-		"Welcome to Exhilarate Ragnarok Online! Invite your friends!";
+		"Don't forget to vote every 12 hours and help advertise our server!",
+		"Any feedback about the server? You can make a review of our server in ratemyserver.net",
+		"Welcome to Exhilarate Ragnarok Online! Invite your friends and get incentives!";
 while( 1 ){
 	announce .News$[ rand( getarraysize( .News$ ) ) ],0;
 	sleep ( .Time * 60000 );

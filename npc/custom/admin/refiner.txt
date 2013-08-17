@@ -56,3 +56,8 @@ cryst_in01,91,316,5	duplicate(Mayomayo#mal)	Mayomayo#cryst	555
 // Mora Enchant Duplicate
 // ===========================================================
 cryst_in01,95,314,5	duplicate(Keeper of Secrets#pa082)	Keeper of Secrets#cryst	495
+
+// ===========================================================
+// Refiner Sidekick Duplicate
+// ===========================================================
+cryst_in01,97,391,4	duplicate(Christopher#1)	Christopher#cryst	63

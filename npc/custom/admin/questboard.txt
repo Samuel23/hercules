@@ -240,16 +240,42 @@ L_checkmobs2:
 	close;
 
 OnNPCKillEvent:
-	if(h_run!=1) end;
-	for(set .@i, 1; .@i < getarraysize(getd("."+currentquest$+"_huntingmob")); set .@i,.@i+2){
-		if(killedrid==getd("."+currentquest$+"_huntingmob["+(.@i-1)+"]")){
-			set .@currentmob, getd("."+currentquest$+"_huntingmob["+(.@i-1)+"]");
-			if(getd(currentquest$+"_"+.@currentmob+"_"+.@i+"_killcount")>=getd("."+currentquest$+"_huntingmob["+.@i+"]")) end;
-			setd(currentquest$+"_"+.@currentmob+"_"+.@i+"_killcount", getd(currentquest$+"_"+.@currentmob+"_"+.@i+"_killcount")+1);
-			dispbottom getd("."+currentquest$+"_huntingname$")+": ["+strmobinfo(1,.@currentmob)+"] ("+ getd(currentquest$+"_"+.@currentmob+"_"+.@i+"_killcount")+"/"+getd("."+currentquest$+"_huntingmob["+.@i+"]")+")";
-			end;
+	if (!getcharid(1) || !.Party) {
+		if(h_run!=1) end;
+		for(set .@i, 1; .@i < getarraysize(getd("."+currentquest$+"_huntingmob")); set .@i,.@i+2){
+			if(killedrid==getd("."+currentquest$+"_huntingmob["+(.@i-1)+"]")){
+				set .@currentmob, getd("."+currentquest$+"_huntingmob["+(.@i-1)+"]");
+				if(getd(currentquest$+"_"+.@currentmob+"_"+.@i+"_killcount")>=getd("."+currentquest$+"_huntingmob["+.@i+"]")) end;
+				setd(currentquest$+"_"+.@currentmob+"_"+.@i+"_killcount", getd(currentquest$+"_"+.@currentmob+"_"+.@i+"_killcount")+1);
+				dispbottom getd("."+currentquest$+"_huntingname$")+": ["+strmobinfo(1,.@currentmob)+"] ("+ getd(currentquest$+"_"+.@currentmob+"_"+.@i+"_killcount")+"/"+getd("."+currentquest$+"_huntingmob["+.@i+"]")+")";
+				end;
+			}
+			continue;
 		}
-		continue;
+	}
+	else if (.Party) {
+		set .@mob, killedrid;
+		getmapxy(.@map1$,.@x1,.@y1,0);
+		getpartymember getcharid(1),1;
+		getpartymember getcharid(1),2;
+		for(set .@i,0; .@i<$@partymembercount; set .@i,.@i+1) {
+			if (isloggedin($@partymemberaid[.@i], $@partymembercid[.@i])) {
+				attachrid $@partymemberaid[.@i];
+					getmapxy(.@map2$,.@x2,.@y2,0);
+					if ((.@map1$ == .@map2$ || .Party == 1) && (distance(.@x1,.@y1,.@x2,.@y2) <= 30 || .Party < 3)) {
+						for(set .@j, 1; .@j < getarraysize(getd("."+currentquest$+"_huntingmob")); set .@j,.@j+2){
+							if( strmobinfo(1,.@mob) ==  strmobinfo(1,getd("."+currentquest$+"_huntingmob["+(.@j-1)+"]"))){
+								set .@currentmob, getd("."+currentquest$+"_huntingmob["+(.@j-1)+"]");
+								if(getd(currentquest$+"_"+.@currentmob+"_"+.@j+"_killcount") < getd("."+currentquest$+"_huntingmob["+.@j+"]")) { 
+								setd(currentquest$+"_"+.@currentmob+"_"+.@j+"_killcount", getd(currentquest$+"_"+.@currentmob+"_"+.@j+"_killcount")+1);
+								dispbottom getd("."+currentquest$+"_huntingname$")+": ["+strmobinfo(1,.@currentmob)+"] ("+ getd(currentquest$+"_"+.@currentmob+"_"+.@j+"_killcount")+"/"+getd("."+currentquest$+"_huntingmob["+.@j+"]")+")";
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	end;
 	
@@ -265,6 +291,9 @@ OnInit:
 	//Quest Delay (seconds)
 	//24 hours = 86400 seconds
 	set .quest_delay, 86400;
+	
+	// Party options: 0 (exclude party kills), 1 (include party kills), 2 (same map only), 3 (screen area only)
+	set .Party,2;
 	
 	//To Enable @ Command '@quest' unslash next lines
 	// * Needs extra commands for typos

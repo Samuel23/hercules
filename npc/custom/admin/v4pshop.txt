@@ -55,9 +55,9 @@ function	ShopSettings	{
 			// Currency [ Item ID / Variable Name ]
 			set @Currency$,"31050";
 			// Item ID Lists
-			setarray @ItemLists[0],19507,19520,19519,19518,19510;
+			setarray @ItemLists[0],19507,19520,19519,19518,19510,2285;
 			// Item Price
-			setarray @ItemCost[0],100,100,100,100,50;
+			setarray @ItemCost[0],100,100,100,100,50,5;
 			break;
 		Case 3:
 			// Currency [ Item ID / Variable Name ]
@@ -129,44 +129,74 @@ function	ValueConvert	{
 }
 
 OnBuyItem:
-	ShopSettings( @menu );
-	for(set @i,0; @i < getarraysize( @bought_nameid ); set @i,@i+1)
-		for(set @j,0; @j < getarraysize( @ItemLists ); set @j,@j+1)
-			if( @ItemLists[@j] == @bought_nameid[@i] )
-			set @TotalCost,@TotalCost + ( @ItemCost[@j] * @bought_quantity[@i] );
-	mes "^FF0000       BILLING LIST^000000";
-	mes "^00FF00____________________________^000000";
-	for( set @i,0; @i < getarraysize( @bought_nameid ); set @i,@i+1 )
-			mes "^FF0000"+@bought_quantity[@i]+" x ^0000FF"+getitemname( @bought_nameid[@i] )+"^000000";
-	mes "^00FF00____________________________^000000";
+	setarray .@q[0],@bought_nameid[0],((@bought_quantity[0] > .MaxStack)?.MaxStack:@bought_quantity[0]);
+	setarray @qe[1], getiteminfo(.@q[0],5), getiteminfo(.@q[0],11);
+	if (@qe[2] > 0 && ((@qe[1] & 1) || (@qe[1] & 256) || (@qe[1] & 512) || (@qe[1] & 1024) || (@qe[1] & 2048) || (@qe[1] & 4096) || (@qe[1] & 4) || (@qe[1] & 8192)))
+		set .@preview,1;
+	addtimer 1000, strnpcinfo(0)+"::OnEnd";
+	while(1) {
+		switch(select(" ~ Purchase ^0055FF"+getitemname(.@q[0])+"^000000:"+((.@preview && !@qe[7])?" ~ Preview...":"")+": ~ ^777777Cancel^000000")) {
+		case 1:
+				for(set @i,0; @i < getarraysize( @bought_nameid ); set @i,@i+1)
+					for(set @j,0; @j < getarraysize( @ItemLists ); set @j,@j+1)
+						if( @ItemLists[@j] == @bought_nameid[@i] )
+						set @TotalCost,@TotalCost + ( @ItemCost[@j] * @bought_quantity[@i] );
+				mes "^FF0000       BILLING LIST^000000";
+				mes "^00FF00____________________________^000000";
+				for( set @i,0; @i < getarraysize( @bought_nameid ); set @i,@i+1 )
+						mes "^FF0000"+@bought_quantity[@i]+" x ^0000FF"+getitemname( @bought_nameid[@i] )+"^000000";
+				mes "^00FF00____________________________^000000";
 
-	if( getitemname( atoi( @Currency$ ) ) != "null" )
-		mes "Total Cost : ^0000FF"+ValueConvert( @TotalCost )+" x "+getitemname( atoi( @Currency$ ) )+"^000000";
-	else if( getitemname( atoi( @Currency$ ) ) == "null" ){
-		mes "Total Cost : ^0000FF"+ValueConvert( @TotalCost )+" "+@Currency$+"^000000";
-	}
-	
-	mes "^00FF00____________________________^000000";
-	if( ValidateCost( @Currency$,@TotalCost ) ){
-		if( getitemname( atoi( @Currency$ ) ) != "null" )
-			mes "[ ^FF0000X^000000 ] Insufficient ^0000FF"+getitemname( atoi( @Currency$ ) )+"^000000";
-		else{
-			mes "[ ^FF0000X^000000 ] Insufficient ^0000FF"+@Currency$+"^000000";
-		}
-	}else{
-		if( select( "^0000FFPurchase^000000:Cancel" ) == 1 ){
-			if( getitemname( atoi( @Currency$ ) ) != "null" )
-				delitem atoi( @Currency$ ),@TotalCost;
-			else{
-				set getd( @Currency$ ),getd( @Currency$ ) - @TotalCost;
+				if( getitemname( atoi( @Currency$ ) ) != "null" )
+					mes "Total Cost : ^0000FF"+ValueConvert( @TotalCost )+" x "+getitemname( atoi( @Currency$ ) )+"^000000";
+				else if( getitemname( atoi( @Currency$ ) ) == "null" ){
+					mes "Total Cost : ^0000FF"+ValueConvert( @TotalCost )+" "+@Currency$+"^000000";
+				}
+				
+				mes "^00FF00____________________________^000000";
+				if( ValidateCost( @Currency$,@TotalCost ) ){
+					if( getitemname( atoi( @Currency$ ) ) != "null" )
+						mes "[ ^FF0000X^000000 ] Insufficient ^0000FF"+getitemname( atoi( @Currency$ ) )+"^000000";
+					else{
+						mes "[ ^FF0000X^000000 ] Insufficient ^0000FF"+@Currency$+"^000000";
+					}
+				}else{
+					if( select( "^0000FFPurchase^000000:Cancel" ) == 1 ){
+						if( getitemname( atoi( @Currency$ ) ) != "null" )
+							delitem atoi( @Currency$ ),@TotalCost;
+						else{
+							set getd( @Currency$ ),getd( @Currency$ ) - @TotalCost;
+						}
+						for(set @i,0; @i < getarraysize( @bought_nameid ); set @i,@i+1)
+							getitem @bought_nameid[@i],@bought_quantity[@i];
+						message strcharinfo(0),"Purchased "+getarraysize( @bought_nameid )+" Items.";
+						mes "Thank you for shopping.";
+					}
+				}
+				ClearData();
+				close;
+			case 2:
+			setarray @qe[3], getlook(LOOK_HEAD_BOTTOM), getlook(LOOK_HEAD_TOP), getlook(LOOK_HEAD_MID), getlook(LOOK_ROBE), 1;
+			if ((@qe[1] & 1) || (@qe[1] & 4096)) changelook LOOK_HEAD_BOTTOM, @qe[2];
+			else if ((@qe[1] & 256) || (@qe[1] & 1024)) changelook LOOK_HEAD_TOP, @qe[2];
+			else if ((@qe[1] & 512) || (@qe[1] & 2048)) changelook LOOK_HEAD_MID, @qe[2];
+			else if ((@qe[1] & 4) || (@qe[1] & 8192)) changelook LOOK_ROBE, @qe[2];
+			break;
+			case 3:
+				close;
 			}
-			for(set @i,0; @i < getarraysize( @bought_nameid ); set @i,@i+1)
-				getitem @bought_nameid[@i],@bought_quantity[@i];
-			message strcharinfo(0),"Purchased "+getarraysize( @bought_nameid )+" Items.";
-			mes "Thank you for shopping.";
 		}
-	}
-ClearData();
-close;
 
+OnEnd:
+	if (@qe[7]) {
+		changelook LOOK_HEAD_BOTTOM, @qe[3];
+		changelook LOOK_HEAD_TOP, @qe[4];
+		changelook LOOK_HEAD_MID, @qe[5];
+		changelook LOOK_ROBE, @qe[6];
+	}
+	deletearray @qe[0],8;
+	end;
+
+OnInit:
+	set .MaxStack,100;	// Max number of items purchased at one time.
 }

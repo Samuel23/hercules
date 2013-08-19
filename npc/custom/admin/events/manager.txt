@@ -281,7 +281,14 @@ OpenShop:
 			}
 
 			OnBuyItem:
-				ShopSettings( @menu );
+				setarray .@q[0],@bought_nameid[0],((@bought_quantity[0] > .MaxStack)?.MaxStack:@bought_quantity[0]);
+	setarray @qe[1], getiteminfo(.@q[0],5), getiteminfo(.@q[0],11);
+	if (@qe[2] > 0 && ((@qe[1] & 1) || (@qe[1] & 256) || (@qe[1] & 512) || (@qe[1] & 1024) || (@qe[1] & 2048) || (@qe[1] & 4096) || (@qe[1] & 4) || (@qe[1] & 8192)))
+		set .@preview,1;
+	addtimer 1000, strnpcinfo(0)+"::OnEnd";
+	while(1) {
+		switch(select(" ~ Purchase ^0055FF"+getitemname(.@q[0])+"^000000:"+((.@preview && !@qe[7])?" ~ Preview...":"")+": ~ ^777777Cancel^000000")) {
+		case 1:
 				for(set @i,0; @i < getarraysize( @bought_nameid ); set @i,@i+1)
 					for(set @j,0; @j < getarraysize( @ItemLists ); set @j,@j+1)
 						if( @ItemLists[@j] == @bought_nameid[@i] )
@@ -318,8 +325,29 @@ OpenShop:
 						mes "Thank you for shopping.";
 					}
 				}
-			ClearData();
-			close;
+				ClearData();
+				close;
+			case 2:
+			setarray @qe[3], getlook(LOOK_HEAD_BOTTOM), getlook(LOOK_HEAD_TOP), getlook(LOOK_HEAD_MID), getlook(LOOK_ROBE), 1;
+			if ((@qe[1] & 1) || (@qe[1] & 4096)) changelook LOOK_HEAD_BOTTOM, @qe[2];
+			else if ((@qe[1] & 256) || (@qe[1] & 1024)) changelook LOOK_HEAD_TOP, @qe[2];
+			else if ((@qe[1] & 512) || (@qe[1] & 2048)) changelook LOOK_HEAD_MID, @qe[2];
+			else if ((@qe[1] & 4) || (@qe[1] & 8192)) changelook LOOK_ROBE, @qe[2];
+			break;
+			case 3:
+				close;
+			}
+		}
+
+OnEnd:
+	if (@qe[7]) {
+		changelook LOOK_HEAD_BOTTOM, @qe[3];
+		changelook LOOK_HEAD_TOP, @qe[4];
+		changelook LOOK_HEAD_MID, @qe[5];
+		changelook LOOK_ROBE, @qe[6];
+	}
+	deletearray @qe[0],8;
+	end;
 
 OnInit:
 	set .eventprize,7711;	// Item Id for Event Token

@@ -104,50 +104,57 @@ mall,115,139,4	script	Hat Maker	408,{
 	}
 
 	OnBuyItem:
-		set .@quest, query_sql("SELECT `itemid`, `questitems` FROM `questnpc` WHERE `itemid` LIKE '"+@bought_nameid+"'", .@questid, .@req$);
-		mes "[^0000FF"+@bought_quantity+"x "+getitemname(@bought_nameid)+"^000000]";
-		mes "  ";
-		explode(.@req$, .@req$, ",");
-		set .@i,0;
-		set .@buy,0;
-		while(.@i < getarraysize(.@req$)) {
-			if(strpos(.@req$[.@i], ":") != -1) {
-				explode(.@reqq$, .@req$[.@i], ":");
-				set .@reqid,.@reqq$[0];
-				set .@reqamt,.@reqq$[1];
-				set .@reqamt,.@reqamt*@bought_quantity;
-			} else {
-				set .@reqid,.@req$[0];
-				set .@reqamt,1*@bought_quantity;
-			}
-			if(.@reqid == 1) {
-				if(Zeny >= .@reqamt) {
-					mes " - ^00FF00 "+.@reqamt+"x Zeny^000000";
-				} else {
-					mes " - ^FF0000 "+.@reqamt+"x Zeny^000000";
-					set .@buy,1;
-				}
-			} else {
-				if(countitem(.@reqid) >= .@reqamt) {
-					if(.showitemid) {
-						mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+" ("+.@reqid+")^000000";
-					} else {
-						mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+"^000000";
-					}
-				} else {
-					if(.showitemid) {
-						mes " - ^FF0000 "+.@reqamt+"x "+getitemname(.@reqid)+" ("+.@reqid+")^000000";
-					} else {
-						mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+"^000000";
-					}
-					set .@buy,1;
-				}
-			}
-			set .@i,.@i+1;
+	setarray .@q[0],@bought_nameid[0],((@bought_quantity[0] > .MaxStack)?.MaxStack:@bought_quantity[0]);
+	setarray @qe[1], getiteminfo(.@q[0],5), getiteminfo(.@q[0],11);
+	set .@quest, query_sql("SELECT `itemid`, `questitems` FROM `questnpc` WHERE `itemid` LIKE '"+@bought_nameid+"'", .@questid, .@req$);
+	mes "[^0000FF"+@bought_quantity+"x "+getitemname(@bought_nameid)+"^000000]";
+	mes "  ";
+	explode(.@req$, .@req$, ",");
+	set .@i,0;
+	set @buy,0;
+	while(.@i < getarraysize(.@req$)) {
+		if(strpos(.@req$[.@i], ":") != -1) {
+			explode(.@reqq$, .@req$[.@i], ":");
+			set .@reqid,.@reqq$[0];
+			set .@reqamt,.@reqq$[1];
+			set .@reqamt,.@reqamt*@bought_quantity;
+		} else {
+			set .@reqid,.@req$[0];
+			set .@reqamt,1*@bought_quantity;
 		}
+		if(.@reqid == 1) {
+			if(Zeny >= .@reqamt) {
+				mes " - ^00FF00 "+.@reqamt+"x Zeny^000000";
+			} else {
+				mes " - ^FF0000 "+.@reqamt+"x Zeny^000000";
+				set @buy,1;
+			}
+		} else {
+			if(countitem(.@reqid) >= .@reqamt) {
+				if(.showitemid) {
+					mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+" ("+.@reqid+")^000000";
+				} else {
+					mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+"^000000";
+				}
+			} else {
+				if(.showitemid) {
+					mes " - ^FF0000 "+.@reqamt+"x "+getitemname(.@reqid)+" ("+.@reqid+")^000000";
+				} else {
+					mes " - ^00FF00 "+.@reqamt+"x "+getitemname(.@reqid)+"^000000";
+				}
+				set @buy,1;
+			}
+		}
+		set .@i,.@i+1;
+	}
+	if (@qe[2] > 0 && ((@qe[1] & 1) || (@qe[1] & 256) || (@qe[1] & 512) || (@qe[1] & 1024) || (@qe[1] & 2048) || (@qe[1] & 4096) || (@qe[1] & 4) || (@qe[1] & 8192)))
+		set .@preview,1;
+	addtimer 1000, strnpcinfo(0)+"::OnEnd";
+	while(1) {
+		switch(select(" ~ Purchase ^0055FF"+getitemname(.@q[0])+"^000000:"+((.@preview && !@qe[7])?" ~ Preview...":"")+": ~ ^777777Cancel^000000")) {
+		case 1:
 		set .@i,0;
-		next;
-		if(.@buy == 1) {
+		if(@buy == 1) {
 			mes .npcname$;
 			mes "Come back when you have the required items.";
 		} else {
@@ -184,6 +191,26 @@ mall,115,139,4	script	Hat Maker	408,{
 			}
 		}
 		close;
+		case 2:
+			setarray @qe[3], getlook(LOOK_HEAD_BOTTOM), getlook(LOOK_HEAD_TOP), getlook(LOOK_HEAD_MID), getlook(LOOK_ROBE), 1;
+			if ((@qe[1] & 1) || (@qe[1] & 4096)) changelook LOOK_HEAD_BOTTOM, @qe[2];
+			else if ((@qe[1] & 256) || (@qe[1] & 1024)) changelook LOOK_HEAD_TOP, @qe[2];
+			else if ((@qe[1] & 512) || (@qe[1] & 2048)) changelook LOOK_HEAD_MID, @qe[2];
+			else if ((@qe[1] & 4) || (@qe[1] & 8192)) changelook LOOK_ROBE, @qe[2];
+			break;
+		case 3:
+				close;
+			}
+	}
+OnEnd:
+	if (@qe[7]) {
+		changelook LOOK_HEAD_BOTTOM, @qe[3];
+		changelook LOOK_HEAD_TOP, @qe[4];
+		changelook LOOK_HEAD_MID, @qe[5];
+		changelook LOOK_ROBE, @qe[6];
+	}
+	deletearray @qe[0],8;
+	end;
 
 }
 

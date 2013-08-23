@@ -64,6 +64,12 @@ Crystilia,88,90,4	script	Events Reward Giver	906,{
 		}
 	}
 
+OnPCLoginEvent:
+	set .@penditem$, "You have %d pending items in the Event Rewarder.";
+	query_sql "SELECT `id` FROM `itemizer` WHERE char_name = '" + strcharinfo(0) + "' AND `for` = 'player' AND `collected` = 0 LIMIT 127",@penditemid;
+	message strcharinfo(0),(sprintf(.@penditem$, getarraysize(@penditemid)));
+	end;
+
 // Make Item [GM]
 GM_MakeItem:
 	next;

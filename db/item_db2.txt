@@ -128,7 +128,8 @@
 30010,Starting_Gear_Box,Starting Gear Box,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "startingbox"; },{},{}
 30011,ExhilarateRO's_Freebies,ExhilarateRO's Freebies,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ rentitem 30004,604800; rentitem 30005,259200; rentitem 30006,259200; rentitem 30007,259200; rentitem 30008,259200; rentitem 30009,259200; getitem 12622,1; },{},{}
 30012,ExhilarateRO's_Welcome_Box,ExhilarateRO's Welcome Box,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ rentitem 30004,1209600; rentitem 30005,259200; rentitem 30008,259200; getitem 675,1; getitem 12208,3; getitem 5453,1; getitem 17550,1; },{},{}
-30013,ExhilarateRO's_Recruiter_Box,ExhilarateRO's Recruiter Box,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 7199,10; getitem 675,5; getitem 13550,3; getitem 17550,1; },{},{}
-30014,ExhilarateRO's_Recruiter_Box_II,ExhilarateRO's Recruiter Box II,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",10; getitem 18663,1; getitem 18664,1; },{},{}
-30015,ExhilarateRO's_Referred_Box,ExhilarateRO's Referred Box,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 7199,20; getitem 675,5; getitem 13550,5; getitem 17550,1; getitem 18630,1; },{},{}
+30013,ExhilarateRO's_Recruiter_Box,ExhilarateRO's Recruiter Box,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 7199,10; getitem 675,5; getitem 13550,3; getitem 616,3; getitem 30000,1; getitem 30001,1; getitem 30002,1; getitem 17550,1; },{},{}
+30014,ExhilarateRO's_Recruiter_Box_II,ExhilarateRO's Recruiter Box II,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",10; getitem 18663,1; getitem 18664,1; getitem 6231,1; getitem 6235,1; },{},{}
+30015,ExhilarateRO's_Referred_Box,ExhilarateRO's Referred Box,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 7199,20; getitem 675,5; getitem 13550,5; getitem 616,3; getitem 30000,1; getitem 30001,1; getitem 30002,1; getitem 17550,1; getitem 18630,1; },{},{}
+30016,ExhilarateRO's_Referred_Box_II,ExhilarateRO's Referred Box II,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 616,5; getitem 6231,1; getitem 6235,1; },{},{}
 31050,Vote_Coin,Vote Coin,3,0,,0,,,,,0xFFFFFFFF,63,2,,,,,,{},{},{}

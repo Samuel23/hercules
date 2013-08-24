@@ -1633,7 +1633,7 @@ void clif_changemap(struct map_session_data *sd, short m, int x, int y) {
 
 	WFIFOHEAD(fd,packet_len(0x91));
 	WFIFOW(fd,0) = 0x91;
-	mapindex_getmapname_ext(map[m].cName ? map[m].cName : map[m].name, (char*)WFIFOP(fd,2));
+	mapindex_getmapname_ext(map[m].custom_name ? map[map[m].instance_src_map].name : map[m].name, (char*)WFIFOP(fd,2));
 	WFIFOW(fd,18) = x;
 	WFIFOW(fd,20) = y;
 	WFIFOSET(fd,packet_len(0x91));
@@ -4423,10 +4423,11 @@ int clif_calc_walkdelay(struct block_list *bl,int delay, int type, int damage, i
 ///     10 = critical hit
 ///     11 = lucky dodge
 ///     12 = (touch skill?)
-int clif_damage(struct block_list* src, struct block_list* dst, unsigned int tick, int sdelay, int ddelay, int damage, int div, int type, int damage2)
+int clif_damage(struct block_list* src, struct block_list* dst, unsigned int tick, int sdelay, int ddelay, int64 in_damage, int div, int type, int64 in_damage2)
 {
 	unsigned char buf[33];
 	struct status_change *sc;
+	int damage,damage2;
 #if PACKETVER < 20071113
 	const int cmd = 0x8a;
 #else
@@ -4435,7 +4436,10 @@ int clif_damage(struct block_list* src, struct block_list* dst, unsigned int tic
 
 	nullpo_ret(src);
 	nullpo_ret(dst);
-
+	
+	damage = (int)cap_value(in_damage,INT_MIN,INT_MAX);
+	damage2 = (int)cap_value(in_damage2,INT_MIN,INT_MAX);
+	
 	type = clif_calc_delay(type,div,damage+damage2,ddelay);
 	sc = iStatus->get_sc(dst);
 	if(sc && sc->count) {
@@ -4568,7 +4572,7 @@ void clif_changemapcell(int fd, int16 m, int x, int y, int type, enum send_targe
 	WBUFW(buf,2) = x;
 	WBUFW(buf,4) = y;
 	WBUFW(buf,6) = type;
-	mapindex_getmapname_ext(map[m].cName ? map[m].cName : map[m].name,(char*)WBUFP(buf,8));
+	mapindex_getmapname_ext(map[m].custom_name ? map[map[m].instance_src_map].name : map[m].name,(char*)WBUFP(buf,8));
 
 	if( fd ) {
 		WFIFOHEAD(fd,packet_len(0x192));
@@ -5106,14 +5110,16 @@ void clif_skill_cooldown(struct map_session_data *sd, uint16 skill_id, unsigned 
 /// Skill attack effect and damage.
 /// 0114 <skill id>.W <src id>.L <dst id>.L <tick>.L <src delay>.L <dst delay>.L <damage>.W <level>.W <div>.W <type>.B (ZC_NOTIFY_SKILL)
 /// 01de <skill id>.W <src id>.L <dst id>.L <tick>.L <src delay>.L <dst delay>.L <damage>.L <level>.W <div>.W <type>.B (ZC_NOTIFY_SKILL2)
-int clif_skill_damage(struct block_list *src,struct block_list *dst,unsigned int tick,int sdelay,int ddelay,int damage,int div,uint16 skill_id,uint16 skill_lv,int type)
+int clif_skill_damage(struct block_list *src,struct block_list *dst,unsigned int tick,int sdelay,int ddelay,int64 in_damage,int div,uint16 skill_id,uint16 skill_lv,int type)
 {
 	unsigned char buf[64];
 	struct status_change *sc;
+	int damage;
 
 	nullpo_ret(src);
 	nullpo_ret(dst);
 
+	damage = (int)cap_value(in_damage,INT_MIN,INT_MAX);
 	type = clif_calc_delay(type,div,damage,ddelay);
 	sc = iStatus->get_sc(dst);
 	if(sc && sc->count) {
@@ -6524,7 +6530,7 @@ void clif_party_member_info(struct party_data *p, struct map_session_data *sd)
 	WBUFB(buf,14) = (p->party.member[i].online)?0:1;
 	memcpy(WBUFP(buf,15), p->party.name, NAME_LENGTH);
 	memcpy(WBUFP(buf,39), sd->status.name, NAME_LENGTH);
-	mapindex_getmapname_ext(map[sd->bl.m].cName ? map[sd->bl.m].cName : map[sd->bl.m].name, (char*)WBUFP(buf,63));
+	mapindex_getmapname_ext(map[sd->bl.m].custom_name ? map[map[sd->bl.m].instance_src_map].name : map[sd->bl.m].name, (char*)WBUFP(buf,63));
 	WBUFB(buf,79) = (p->party.item&1)?1:0;
 	WBUFB(buf,80) = (p->party.item&2)?1:0;
 	clif->send(buf,packet_len(0x1e9),&sd->bl,PARTY);

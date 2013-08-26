@@ -17,6 +17,7 @@
 
 -	script	FloatingRates	-1,{
 //add any other HOURS
+OnStart:
 OnHour00:
 OnHour06:
 OnHour12:
@@ -43,7 +44,7 @@ OnHour18:
 	stopnpctimer;
 	end;
 
-
+OnEnd:
 OnHour01:
 OnHour07:
 OnHour13:

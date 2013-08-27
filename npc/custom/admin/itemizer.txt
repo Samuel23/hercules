@@ -164,7 +164,6 @@ GM_GiveItem:
 		}
 	}
 	next;
-	set .@ep_char_id,getcharid(0,.@ep_char_name$);
 	mes .npc$;
 	mes "Okay, who do you want to give ^0000FF"+ .@ep_item_count +"x^000000 ^008000"+ getitemname(.@ep_item_id) +"^000000?";
 	mes "Enter player name"+ (.check_online ? " (must be online)." : " .");

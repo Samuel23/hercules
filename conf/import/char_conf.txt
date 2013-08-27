@@ -11,6 +11,11 @@ server_name: ExhilarateRO
 login_ip: 127.0.0.1
 char_ip: 127.0.0.1
 
+// Amount of time in seconds by which the character deletion is delayed.
+// Default: 86400 (24 hours)
+// NOTE: Requires client 2010-08-03aragexeRE or newer.
+char_del_delay: 0
+
 //==================================================================
 // Pincode system -- INCOMPLETE / BROKEN
 //==================================================================

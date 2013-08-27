@@ -1,7 +1,7 @@
 
 COMMON_H = ../common/HPMi.h ../common/cbasetypes.h
 
-PLUGINS = sample db2sql
+PLUGINS = sample db2sql vendsql
 
 @SET_MAKE@
 
@@ -9,13 +9,15 @@ CC = @CC@
 export CC
 
 #####################################################################
-.PHONY : all $(PLUGINS) sample db2sql clean help
+.PHONY : all $(PLUGINS) sample db2sql vendsql clean help
 
 all: $(PLUGINS)
 
 sample: sample@DLLEXT@
 
 db2sql: db2sql@DLLEXT@
+
+vendsql: vendsql@DLLEXT@
 
 clean:
 	@echo "	CLEAN	plugins"

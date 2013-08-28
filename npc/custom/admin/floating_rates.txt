@@ -41,14 +41,11 @@ OnHour18:
 	announce "Floating rates Activated: "+(.@brate/100)+"x / "+(.@jrate/100)+"x / "+(.@drate)+"x",bc_all,0xFF6060;
 	sleep 10000;
 	announce "Floating rates will last for an hour",bc_all,0xFF6060;
-	stopnpctimer;
+	initnpctimer;
 	end;
 
 OnEnd:
-OnHour01:
-OnHour07:
-OnHour13:
-OnHour19:
+OnTimer3600000: // After 1 hour
 //-------------------
 	/*Original Rates*/
 	set .@brate,15000;
@@ -73,6 +70,7 @@ OnHour19:
 	announce "Floating Rates Ended.",bc_all,0xFF6060;
 	sleep 4000;
 	announce "Current ExhilarateRO rates are: "+(.@brate/100)+"x / "+(.@jrate/100)+"x / "+(.@drate)+"x",bc_all,0xFF6060;
+	stopnpctimer;
 	end;
 	
 /*OnInit:

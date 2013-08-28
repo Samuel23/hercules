@@ -11,7 +11,8 @@ setarray .News$[0],	// Random Message to be Announced
 		"Max Lvl 150, Max Job Lvl 50, Max Stats 120. With 3rd Jobs.",
 		"Don't forget to vote every 12 hours and help advertise our server!",
 		"Any feedback about the server? You can make a review of our server in ratemyserver.net",
-		"Welcome to Exhilarate Ragnarok Online! Invite your friends and get incentives!";
+		"Welcome to Exhilarate Ragnarok Online! Invite your friends and get incentives!",
+		"Please like and share our facebook page! Join also our facebook group.";
 while( 1 ){
 	announce .News$[ rand( getarraysize( .News$ ) ) ],0;
 	sleep ( .Time * 60000 );

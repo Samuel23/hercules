@@ -40,14 +40,16 @@ Crystilia,88,90,4	script	Events Reward Giver	906,{
 	if (getgmlevel() >= .min_gm_lvl) {
 		mes "Hello "+ strcharinfo(0) +".";
 		mes "What would you like today?";
-		switch(select("Make Item","Give Item","Give Group Item","Player Menu","Nothing")) {
+		switch(select("Make Item","Give Item","Delete Item","Give Group Item","Player Menu","Nothing")) {
 			case 1:	// Make Item
 				goto GM_MakeItem;
 			case 2:	// Give Item
 				goto GM_GiveItem;
-			case 3:	// Give Group Item
+			case 3:	// Delete Item
+				goto GM_DeleteItem;
+			case 4:	// Give Group Item
 				goto GM_GiveGroup;
-			case 4:	// Player Menu
+			case 5:	// Player Menu
 				goto Player_Collect;
 			default:
 				close; break;
@@ -65,9 +67,13 @@ Crystilia,88,90,4	script	Events Reward Giver	906,{
 	}
 
 OnPCLoginEvent:
-	set .@penditem$, "You have %d pending items in the Event Rewarder.";
+	set .@penditem$, "You have %d pending item(s) in the Event Rewarder.";
 	query_sql "SELECT `id` FROM `itemizer` WHERE char_name = '" + strcharinfo(0) + "' AND `for` = 'player' AND `collected` = 0 LIMIT 127",@penditemid;
-	message strcharinfo(0),(sprintf(.@penditem$, getarraysize(@penditemid)));
+	if ( @penditemid >=1 ) {
+		mes sprintf(.@penditem$, getarraysize(@penditemid));
+		close;
+	}
+	else { end; }
 	end;
 
 // Make Item [GM]
@@ -246,6 +252,83 @@ Player_Collect:
 		}
 	}
 	close;
+	end;
+
+// Delete Item
+GM_DeleteItem:
+	next;
+	if (getarraysize(.@db_id))
+	{
+		deletearray .@db_id,127;
+		deletearray .@item_id,127;
+		deletearray .@item_name$,127;
+		deletearray .@item_amount,127;
+		deletearray .@char_name$,127;
+		deletearray .@account_bound,127;
+		deletearray .@reason$,127;
+		deletearray .@by_gm$,127;
+	}
+	set .@result,query_sql("SELECT `id`,`item_id`,`item_name`,`item_amount`,`char_name`,`bound`,`reason`,`by_gm` FROM `itemizer` WHERE (`for` = 'player' AND `collected` = 0) LIMIT 127",
+						  .@db_id,
+						  .@item_id,
+						  .@item_name$,
+						  .@item_amount,
+						  .@char_name$,
+						  .@account_bound,
+						  .@reason$,
+						  .@by_gm$);
+	if (!.@result)
+	{
+		mes .npc$;
+		mes "^CC0000No items that not  yet collected can be deleted.^000000";
+		close;
+	}
+	else
+	{
+		goto Delete_Final;
+	}
+	close;
+	end;
+	
+Delete_Final:
+	set .@options$,"";
+	for (set @i,0; @i < .@result; set @i,@i+1)
+	{
+		set .@options$,.@options$+"["+.@db_id[@i]+"]"+ .@item_amount[@i] +"x "+.@item_name$[@i]+" for "+.@char_name$[@i]+":";
+	}
+	mes .npc$;
+	mes "Here is a list of item(s) that are not yet collected.";
+	mes "Pick the item you want to delete now.";
+	set .@choice,select(.@options$) - 1;
+	next;
+	mes .npc$;
+	mes "ID - "+ .@item_id[.@choice];
+	mes "Name - "+ .@item_name$[.@choice];
+	mes "Amount - "+ .@item_amount[.@choice] +"x";
+	mes "For - "+ .@char_name$[.@choice];
+	mes "Account Bound - "+ (.@account_bound[.@choice]?"Yes":"No");
+	mes "By - "+ .@by_gm$[.@choice];
+	mes "Reason - "+ .@reason$[.@choice];
+	switch (select("Delete:Delete Later")) {
+
+		case 1:
+		mes .npc$;
+		query_sql "DELETE FROM `itemizer` WHERE `id`= '"+.@db_id[.@choice]+"' AND `item_id`='"+.@item_id[.@choice]+"' AND `item_name`='"+.@item_name$[.@choice]+"' AND `char_name`='"+.@char_name$[.@choice]+"'";
+		mes "You have successfuly deleted the item";
+		next;
+		set .@result,(.@result - 1);
+		deletearray .@db_id[.@choice],1;
+		deletearray .@item_id[.@choice],1;
+		deletearray .@item_name$[.@choice],1;
+		deletearray .@item_amount[.@choice],1;
+		deletearray .@reason$[.@choice],1;
+		deletearray .@by_gm$[.@choice],1;
+		goto Delete_Final;
+	
+		case 2:
+		next;
+		goto Delete_Final;
+	}
 	end;
 
 // Collect Event Prize (Part 2) [Player]

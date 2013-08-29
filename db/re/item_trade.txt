@@ -1963,3 +1963,4 @@
 14524,15,99		// Fish Slice
 13550,15,99		// Fish Slice Box of 10
 30003,15,99		// Fish Slice Box of 50
+31050,31,99		// Vote Coin

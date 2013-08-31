@@ -807,6 +807,8 @@ int64 battle_calc_masteryfix(struct block_list *src, struct block_list *target, 
 		damage += div * sd->spiritball * 3;
 	if( skill_id != CR_SHIELDBOOMERANG ) // Only Shield boomerang doesn't takes the Star Crumbs bonus.
 		damage += div * (left ? sd->left_weapon.star : sd->right_weapon.star);
+	if( skill_id != MC_CARTREVOLUTION && (skill=pc->checkskill(sd,BS_HILTBINDING)) > 0 )
+		damage += 4;
 
 	if(sd->status.party_id && (skill=pc->checkskill(sd,TK_POWER)) > 0){
 		if( (i = party_foreachsamemap(party->sub_count, sd, 0)) > 1 )
@@ -4738,7 +4740,7 @@ struct Damage battle_calc_weapon_attack(struct block_list *src,struct block_list
 			if (skill_id && (i = pc->skillatk_bonus(sd, skill_id)))
 				ATK_ADDRATE(i);
 	#ifdef RENEWAL
-			if( wflag&BF_LONG )
+			if( wd.flag&BF_LONG )
 				ATK_ADDRATE(sd->bonus.long_attack_atk_rate);
 	#endif	
 			if( (i=pc->checkskill(sd,AB_EUCHARISTICA)) > 0 &&

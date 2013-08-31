@@ -66,16 +66,6 @@ Crystilia,88,90,4	script	Events Reward Giver	906,{
 		}
 	}
 
-OnPCLoginEvent:
-	set .@penditem$, "You have %d pending item(s) in the Event Rewarder.";
-	query_sql "SELECT `id` FROM `itemizer` WHERE char_name = '" + strcharinfo(0) + "' AND `for` = 'player' AND `collected` = 0 LIMIT 127",@penditemid;
-	if ( @penditemid >=1 ) {
-		mes sprintf(.@penditem$, getarraysize(@penditemid));
-		close;
-	}
-	else { end; }
-	end;
-
 // Make Item [GM]
 GM_MakeItem:
 	next;
@@ -669,4 +659,16 @@ if (.@curSecond <= 9) {
 // Return MySQL Friendly Timestamp
 return .@timestamp$;
 
+}
+
+-	script	Pending Item	-1,{
+OnPCLoginEvent:
+	set .@penditem$, "You have %d pending item(s) in the Event Rewarder.";
+	query_sql "SELECT `id` FROM `itemizer` WHERE char_name = '" + strcharinfo(0) + "' AND `for` = 'player' AND `collected` = 0 LIMIT 127",@penditemid;
+	if ( @penditemid >=1 ) {
+		mes sprintf(.@penditem$, getarraysize(@penditemid));
+		close;
+	}
+	else { end; }
+	end;
 }

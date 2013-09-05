@@ -1,0 +1,85 @@
+quiz_01,42,285,4,	script	Gift For All	717,{
+
+	if (.special == 0) {
+		for(set .@i,0;.@i<getarraysize(.ordinary);set .@i,.@i+2) {
+		getitem .ordinary[.@i],.ordinary[.@i+1];
+		}
+		announce strcharinfo(0) + " has received his Free Gifts!",bc_all;
+		warp "prontera",155,170;
+		end;
+	}
+	else if (.special == 1) {
+		if (#firstmonth == 0 ) {
+			for(set .@i,0;.@i<getarraysize(.specials);set .@i,.@i+2) {
+			getitem .specials[.@i],.specials[.@i+1];
+			}
+			set #CASHPOINTS, #CASHPOINTS + .bonuscash;
+			dispbottom "You have obtained "+.bonuscash+" Cash points.";
+			dispbottom "Total Cashpoints: "+#CASHPOINTS+"";
+			set #firstmonth,1;
+			announce strcharinfo(0) + " has received his Free Gifts!",bc_all;
+			warp "prontera",155,170;
+			end;
+		}
+		else {
+			mes "Sorry, but you already have received your monthsary gift.";
+			close;
+		}
+	}
+	else end;
+
+OnWhisperGlobal:
+	input .@setting$;
+
+	if(getgmlevel() >= 70) {
+		if (.@setting$ == "ordinary"){
+			set .special,0;
+			dispbottom "You have set the Gift NPC to ORDINARY.";
+			end;
+		}
+		else if (.@setting$ == "special"){
+			set .special,1;
+			dispbottom "You have set the Gift NPC to SPECIAL.";
+			end;
+		}
+		else 
+		dispbottom "Only ordinary/special is accepted!.";
+		close;
+	}
+	else end;
+	end;
+
+OnInit:
+set .special,0;
+setarray .ordinary[0],12103,1,673,1,12214,1;
+setarray .specials[0],12103,5,677,5,12214,5;
+set .bonuscash,50;
+waitingroom "Gift For All",0;
+disablenpc "Gift For All";
+//hideonnpc "Gift For All";
+end;
+}
+
+-	script	fon	-1,{
+OnWhisperGlobal:
+if(getgmlevel() >= 80) {
+	enablenpc "Gift For All";
+	//hideoffnpc "Gift For All";
+	//waitingroom "Gift For All",0;
+	mes "You have enabled Gift For All NPC!";
+	close;
+	}
+else end;
+}
+
+-	script	foff	-1,{
+OnWhisperGlobal:
+if(getgmlevel() >= 80) {
+	disablenpc "Gift For All";
+	//hideonnpc "Gift For All";
+	//delwaitingroom "Gift For All";
+	mes "You have disabled Gift For All NPC!";
+	close;
+	}
+else end;
+}

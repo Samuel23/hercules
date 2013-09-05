@@ -873,7 +873,9 @@ void clif_set_unit_idle2(struct block_list* bl, struct map_session_data *tsd, en
 	sd = BL_CAST(BL_PC, bl);
 	
 	p.PacketType = idle_unit2Type;
+#if PACKETVER >= 20071106
 	p.objecttype = clif_bl_type(bl);
+#endif
 	p.GID = bl->id;
 	p.speed = iStatus->get_speed(bl);
 	p.bodyState = (sc) ? sc->opt1 : 0;
@@ -919,8 +921,10 @@ void clif_set_unit_idle(struct block_list* bl, struct map_session_data *tsd, enu
 	int g_id = iStatus->get_guild_id(bl);
 	
 #if PACKETVER < 20091103
-	if( !pcdb_checkid(vd->class_) )
-		return clif->set_unit_idle2(bl,tsd,target);
+	if( !pcdb_checkid(vd->class_) ) {
+		clif->set_unit_idle2(bl,tsd,target);
+		return;
+	}
 #endif
 	
 	sd = BL_CAST(BL_PC, bl);
@@ -1005,7 +1009,9 @@ void clif_spawn_unit2(struct block_list* bl, enum send_target target) {
 	sd = BL_CAST(BL_PC, bl);
 	
 	p.PacketType = spawn_unit2Type;
+#if PACKETVER >= 20071106
 	p.objecttype = clif_bl_type(bl);
+#endif
 	p.GID = bl->id;
 	p.speed = iStatus->get_speed(bl);
 	p.bodyState = (sc) ? sc->opt1 : 0;
@@ -1030,7 +1036,6 @@ void clif_spawn_unit2(struct block_list* bl, enum send_target target) {
 	p.sex = vd->sex;
 	WBUFPOS(&p.PosDir[0],0,bl->x,bl->y,unit_getdir(bl));
 	p.xSize = p.ySize = (sd) ? 5 : 0;
-	p.clevel = clif_setlevel(bl);
 
 	clif->send(&p,sizeof(p),bl,target);
 }
@@ -1043,8 +1048,10 @@ void clif_spawn_unit(struct block_list* bl, enum send_target target) {
 	int g_id = iStatus->get_guild_id(bl);
 
 #if PACKETVER < 20091103
-	if( !pcdb_checkid(vd->class_) )
-		return clif->spawn_unit2(bl,target);
+	if( !pcdb_checkid(vd->class_) ) {
+		clif->spawn_unit2(bl,target);
+		return;
+	}
 #endif
 	
 	sd = BL_CAST(BL_PC, bl);
@@ -1133,7 +1140,7 @@ void clif_set_unit_walking(struct block_list* bl, struct map_session_data *tsd, 
 #if PACKETVER >= 20091103
 	p.PacketLength = sizeof(p);
 #endif
-#if PACKETVER > 7
+#if PACKETVER >= 20071106
 	p.objecttype = clif_bl_type(bl);
 #endif
 	p.GID = bl->id;

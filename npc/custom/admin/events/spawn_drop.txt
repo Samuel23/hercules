@@ -1,0 +1,44 @@
+//===== Hercules Script ======================================
+//= Spawn, Kill and Drop
+//===== By: ================================================== 
+//= Admin Elijah
+//===== Current Version: =====================================
+//= 1.0
+//===== Compatible With: =====================================
+//= Hercules
+//===== Description: =========================================
+//= GM will summon monsters then players will get specific items
+//= set by the gm after killing the monsters
+//===== Additional Comments: =================================
+//= 1.0 Inital Release
+//============================================================
+
+-	script	Spawn Drop	-1,{
+
+OnInit:
+	set .Map$,"payon";
+	set .monster,2150;	// Watermelon Monster
+	set .monsteramount,rand(100,500);	// Amount of monster to be spawned
+	end;
+
+OnAdminStart:
+	setmapflag .Map$,mf_noskill;
+	killmonster .Map$,"All";
+	monster .Map$,0,0,"Surprise",.monster,.monsteramount,strnpcinfo(0)+"::OnSpawnKilled";
+	announce "Total of "+.monsteramount+" watermelons have been spawned in "+.Map$+"!",0;
+	sleep 2500;
+	announce "Kill all the Watermelons! : Every watermelons you kill will give you prizes!",0;
+	end;
+
+OnSpawnKilled:
+	/* Item Prize */
+	if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
+		getexp rand(1000,10000),rand(100,1000);
+		set .@AddZeny,rand(1000,50000);
+		set Zeny, Zeny + .@AddZeny;
+		dispbottom "You have gained "+.@AddZeny+"z.";
+	}
+	if (.monsteramount) announce "There are now "+mobcount(.Map$,strnpcinfo(0)+"::OnSpawnKilled")+" Watermelon(s) left in "+.Map$+".",bc_all;
+	if (mobcount(.Map$,strnpcinfo(0)+"::OnSpawnKilled") <= 1)  removemapflag .Map$,mf_noskill;
+	end;
+}

@@ -52,7 +52,7 @@ OnWhisperGlobal:
 OnInit:
 set .special,0;
 setarray .ordinary[0],12103,1,673,1,12214,1;
-setarray .specials[0],12103,5,677,5,12214,5;
+setarray .specials[0],12103,5,675,5,12214,5,12412,3,14522,150,14523,150;
 set .bonuscash,50;
 waitingroom "Gift For All",0;
 disablenpc "Gift For All";

@@ -6,7 +6,7 @@ OnWhisperGlobal:
 	mes "What do you want to do?";
 	switch (select("Start Events:Change Settings:Open Shop:Cancel")) {
 		case 1:
-			switch (select("Start Poring Catcher:Start Disguise:Start Monster Invasion:Start Dice:Start Poring Race:Start Jumper:Spawn Treasure Chests:Spawn Mushrooms:Start Floating Rates:Nothing")) {
+			switch (select("Start Poring Catcher:Start Disguise:Start Monster Invasion:Start Dice:Start Poring Race:Start Jumper:Spawn Treasure Chests:Spawn Mushrooms:Start Floating Rates:Start Spawn Drop:Nothing")) {
 				case 1:
 					donpcevent "poring#announcer::OnStart";
 					close;
@@ -33,6 +33,9 @@ OnWhisperGlobal:
 					close;
 				case 9:
 					donpcevent "FloatingRates::OnStart";
+					close;
+				case 10:
+					donpcevent "Spawn Drop::OnAdminStart";
 					close;
 				default:
 					close;

@@ -63,9 +63,9 @@ function	ShopSettings	{
 			// Currency [ Item ID / Variable Name ]
 			set @Currency$,"31050";
 			// Item ID Lists
-			setarray @ItemLists[0],19542,19534,19529,19553,19550;
+			setarray @ItemLists[0],19542,19534,19529,19553,19550,5421,18522,5767,5770,5264,5788,5786,18507,18563,18571,18570,18603,18637;
 			// Item Price
-			setarray @ItemCost[0],300,200,50,50,50;
+			setarray @ItemCost[0],300,200,50,50,50,100,100,80,80,80,150,80,200,200,50,500,500,150;
 			break;
 		default:
 			ErrorNotice( "Invalid Menu Selection for Menu "+@menu+"." );

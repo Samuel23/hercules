@@ -65,6 +65,7 @@ function Pick {
 		set .@i, select(@menu$)-getarg(1,0);
 		warp getarg(0)+((.@i<10)?"0":"")+.@i,@c[.@i*2],@c[.@i*2+1];
 	}
+	if ((!compare(strcharinfo(3),"gld_dun")) && (!compare(strcharinfo(3),"arug_dun")) && (!compare(strcharinfo(3),"schg_dun")) )
 	getmapxy(lastwarp$,lastwarpx,lastwarpy,0);
 	close;
 }
@@ -200,7 +201,7 @@ menu	"Abyss Lakes",D1, "Amatsu Dungeon",D2, "Anthell",D3,
 	"Coal Mines",D10, "Culvert",D11, "Cursed Abbey",D12, "Dewata Dungeon",D41,
 	"Einbroch Dungeon",D13, "Endless Tower",D14, "Gefenia",D15,
 	"Geffen Dungeon",D16, "Glast Heim",D17, "Gonryun Dungeon",D18,
-	/*"Guild Dungeons",GD,*/ "Hidden Dungeon",D19, "Ice Dungeon",D20,
+	"Guild Dungeons",GD, "Hidden Dungeon",D19, "Ice Dungeon",D20,
 	"Juperos",D21, "Kiel Dungeon",D22, "Louyang Dungeon",D23,
 	"Magma Dungeon",D24, "Malangdo Dungeon",D42, "Moscovia Dungeon",D25,
 	"Nidhogg's Dungeon",D26, "Odin Temple",D27, "Orc Dungeon",D28, "Payon Dungeon",D29,
@@ -296,9 +297,25 @@ D41: setarray @c[2],285,160,299,29;
 	Disp("Dewata Dungeon",1,2); Pick("dew_dun");
 D42: setarray @c[2],33,230;
 	Disp("Malangdo Dungeon",1,1); Pick("mal_dun");
-/*GD: setarray @c[2],119,93,39,161,50,44,116,45,199,195,200,124;
-	Disp("","Baldur:Luina:Valkyrie:Britoniah:Arunafeltz:Schwaltzvalt");
-	Pick("","gld_dun01","gld_dun02","gld_dun03","gld_dun04","arug_dun01","schg_dun01");*/
+GD: setarray @c[2],119,93,39,161,50,44,116,45,199,195,200,124;
+	mes "To able to access guild dungeon, there is a 500,000z fee.";
+	mes "Do you want to continue?";
+	mes "(If you press YES, the zeny will already be deducted/deleted from you!)";
+	switch (select("Yes:No")) {
+		case 1:
+			if (Zeny < .GDFee) {
+				next;
+				mes "Sorry, but you don't have money!";
+				close;
+				}
+			else {
+				set Zeny, Zeny - .GDFee;
+				Disp("","Baldur:Luina:Valkyrie:Britoniah:Arunafeltz:Schwaltzvalt");
+				Pick("","gld_dun01","gld_dun02","gld_dun03","gld_dun04","arug_dun01","schg_dun01");
+			}
+		default:
+			close;
+	}
 
 // --------------------------------------------------
 	Castles:
@@ -476,6 +493,11 @@ DetectDonate:
 		}
 	}
 	return;
+	end;
+
+OnInit:
+set .GDFee,500000;
+end;
 }
 
 // --------------------------------------------------

@@ -67,6 +67,7 @@
 
 2795,Green_Apple_Ring,Green Apple Ring,5,0,,0,,0,,0,0x000FDF80,56,2,136,,99,0,0,{ if(JobLevel<30) { bonus bAllStats,6-(JobLevel/5); } },{},{}
 
+4205,Mimic_Card,Mimic Card,6,20,,10,,,,,,,,136,,,,,{ bonus2 bAddMonsterDropItem,603,2000; },{},{}
 4377,Green_Iguana_Card,Grove Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12063,RC_Formless,2000; },{},{}
 
 // Refine Tickets

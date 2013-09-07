@@ -105,6 +105,18 @@
 17504,Donation_Box_V,Donation Box V,18,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 674,8; getitem 12103,25; getitem 14232,32; getitem 12912,5; getitem 31013,45; getitem 31014,45; getitem 31012,1; },{},{}
 17505,Donation_Box_VI,Donation Box VI,18,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 674,12; getitem 12103,33; getitem 14232,40; getitem 12912,6; getitem 31013,56; getitem 31014,56; getitem 31012,3; },{},{}
 
+17520,Cash_Scroll_5,Cash Scroll 5,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",5; },{},{}
+17521,Cash_Scroll_10,Cash Scroll 10,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",10; },{},{}
+17522,Cash_Scroll_20,Cash Scroll 20,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",20; },{},{}
+17523,Cash_Scroll_30,Cash Scroll 30,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",30; },{},{}
+17524,Cash_Scroll_40,Cash Scroll 40,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",40; },{},{}
+17525,Cash_Scroll_50,Cash Scroll 50,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",50; },{},{}
+17526,Cash_Scroll_60,Cash Scroll 60,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",60; },{},{}
+17527,Cash_Scroll_70,Cash Scroll 70,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",70; },{},{}
+17528,Cash_Scroll_80,Cash Scroll 80,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",80; },{},{}
+17529,Cash_Scroll_90,Cash Scroll 90,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",90; },{},{}
+17530,Cash_Scroll_100,Cash Scroll 100,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",100; },{},{}
+
 // VIP Scrolls
 17550,VIP_SILVER_Scroll_1,VIP SILVER Scroll 1,2,,,10,,,, ,0xFFFFFFFF,63,2,,,,,,{ callfunc "VIP_SILVER",getcharid(3),7,17550; },{},{}
 17551,VIP_SILVER_Scroll_2,VIP SILVER Scroll 2,2,,,10,,,, ,0xFFFFFFFF,63,2,,,,,,{ callfunc "VIP_SILVER",getcharid(3),14,17551; },{},{}

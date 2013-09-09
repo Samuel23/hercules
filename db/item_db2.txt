@@ -67,8 +67,28 @@
 
 2795,Green_Apple_Ring,Green Apple Ring,5,0,,0,,0,,0,0x000FDF80,56,2,136,,99,0,0,{ if(JobLevel<30) { bonus bAllStats,6-(JobLevel/5); } },{},{}
 
+4149,Gargoyle_Card,Gargoyle Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12028,RC_Insect,2000; },{},{}
+4177,Dryad_Card,Dryad Card,6,20,,10,,,,,,,,769,,,,,{ bonus3 bAddMonsterDropItem,993,RC_Plant,2000; bonus2 bSubEle,Ele_Earth,10; },{},{}
+4187,Raydric_Archer_Card,Raydric Archer Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12030,RC_Demon,2000; },{},{}
+4188,Leib_Olmai_Card,Leib Olmai Card,6,20,,10,,,,,,,,769,,,,,{ bonus2 bSubEle,Ele_Fire,10; bonus3 bAddMonsterDropItem,990,RC_Brute,2000; },{},{}
+4195,Leaf_Cat_Card,Leaf Cat Card,6,20,,10,,,,,,,,769,,,,,{ bonus2 bSubEle,Ele_Water,10; bonus3 bAddMonsterDropItem,991,RC_Fish,2000; },{},{}
 4205,Mimic_Card,Mimic Card,6,20,,10,,,,,,,,136,,,,,{ bonus2 bAddMonsterDropItem,603,2000; },{},{}
+4206,Mystcase_Card,Myst Case Card,6,20,,10,,,,,,,,769,,,,,{ bonus2 bAddMonsterDropItem,644,2000; },{},{}
+4219,Sageworm_Card,Sage Worm Card,6,20,,10,,,,,,,,136,,,,,{ bonus2 bAddMonsterDropItem,715,2000; bonus2 bAddMonsterDropItem,716,2000; bonus2 bAddMonsterDropItem,717,2000; },{},{}
+4224,Stem_Worm_Card,Stem Worm Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12032,RC_Brute,2000; },{},{}
+4228,Sleeper_Card,Sleeper Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12031,RC_Fish,2000; },{},{}
+4232,Wild_Ginseng_Card,Hermit Plant Card,6,20,,10,,,,,,,,136,,,,,{ bonus2 bAddItemHealRate,Red_Herb,50; bonus2 bAddItemHealRate,Yellow_Herb,50; bonus2 bAddItemHealRate,White_Herb,50; bonus3 bAddMonsterDropItem,507,RC_Plant,2000; bonus3 bAddMonsterDropItem,508,RC_Plant,2000; bonus3 bAddMonsterDropItem,509,RC_Plant,2000; },{},{}
+4256,Orc_Archer_Card,Orc Archer Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12034,RC_DemiHuman,2000; },{},{}
+4262,Evil_Cloud_Hermit_Card,Cloud Hermit Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12029,RC_Plant,2000; },{},{}
+4265,Li_Me_Mang_Ryang_Card,Jing Guai Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12033,RC_Angel,2000; },{},{}
+4271,Giant_Honet_Card,Giant Hornet Card,6,20,,10,,,,,,,,769,,,,,{ bonus2 bSubEle,Ele_Wind,10; bonus3 bAddMonsterDropItem,992,RC_Insect,2000; },{},{}
+4344,Anopheles_Card,Anopheles Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12058,RC_Insect,2000; },{},{}
+4347,Armaia_Card,Armeyer Dinze Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12053,RC_Fish,2000; },{},{}
+4355,Gremlin_Card,Gremlin Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12043,RC_Brute,2000; },{},{}
 4377,Green_Iguana_Card,Grove Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12063,RC_Formless,2000; },{},{}
+4385,Dragon_Egg_Card,Dragon Egg Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12048,RC_Dragon,2000; },{},{}
+4389,Plasma_Card,Plasma Card,6,20,,10,,,,,,,,136,,,,,{ bonus2 bAddMonsterDropItem,12118,2000; bonus2 bAddMonsterDropItem,12119,2000; bonus2 bAddMonsterDropItem,12120,2000; bonus2 bAddMonsterDropItem,12121,2000; },{},{}
+4391,Retribution_Card,Baroness of Retribution Card,6,20,,10,,,,,,,,136,,,,,{ bonus3 bAddMonsterDropItem,12068,RC_Angel,2000; },{},{}
 
 // Refine Tickets
 6228,Guarantee_Weapon_9Up,+9 Weapon Refine Ticket,3,0,,0,,,,,,,,,,,,,{},{},{}

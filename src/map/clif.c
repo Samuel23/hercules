@@ -4470,7 +4470,7 @@ int clif_damage(struct block_list* src, struct block_list* dst, unsigned int tic
 	WBUFL(buf,14)=sdelay;
 	WBUFL(buf,18)=ddelay;
 #if PACKETVER < 20071113
-	if (battle_config.hide_woe_damage && map_flag_gvg(src->m)) {
+	if (battle_config.hide_woe_damage && map_flag_gvg2(src->m)) {
 		WBUFW(buf,22)=damage?div:0;
 		WBUFW(buf,27)=damage2?div:0;
 	} else {
@@ -4480,7 +4480,7 @@ int clif_damage(struct block_list* src, struct block_list* dst, unsigned int tic
 	WBUFW(buf,24)=div;
 	WBUFB(buf,26)=type;
 #else
-	if (battle_config.hide_woe_damage && map_flag_gvg(src->m)) {
+	if (battle_config.hide_woe_damage && map_flag_gvg2(src->m)) {
 		WBUFL(buf,22)=damage?div:0;
 		WBUFL(buf,29)=damage2?div:0;
 	} else {
@@ -5149,7 +5149,7 @@ int clif_skill_damage(struct block_list *src,struct block_list *dst,unsigned int
 	WBUFL(buf,12)=tick;
 	WBUFL(buf,16)=sdelay;
 	WBUFL(buf,20)=ddelay;
-	if (battle_config.hide_woe_damage && map_flag_gvg(src->m)) {
+	if (battle_config.hide_woe_damage && map_flag_gvg2(src->m)) {
 		WBUFW(buf,24)=damage?div:0;
 	} else {
 		WBUFW(buf,24)=damage;
@@ -5180,7 +5180,7 @@ int clif_skill_damage(struct block_list *src,struct block_list *dst,unsigned int
 	WBUFL(buf,12)=tick;
 	WBUFL(buf,16)=sdelay;
 	WBUFL(buf,20)=ddelay;
-	if (battle_config.hide_woe_damage && map_flag_gvg(src->m)) {
+	if (battle_config.hide_woe_damage && map_flag_gvg2(src->m)) {
 		WBUFL(buf,24)=damage?div:0;
 	} else {
 		WBUFL(buf,24)=damage;
@@ -6968,7 +6968,7 @@ void clif_sendegg(struct map_session_data *sd)
 	nullpo_retv(sd);
 
 	fd=sd->fd;
-	if (battle_config.pet_no_gvg && map_flag_gvg(sd->bl.m)) { //Disable pet hatching in GvG grounds during Guild Wars [Skotlex]
+	if (battle_config.pet_no_gvg && map_flag_gvg2(sd->bl.m)) { //Disable pet hatching in GvG grounds during Guild Wars [Skotlex]
 		clif->message(fd, msg_txt(666));
 		return;
 	}
@@ -9336,8 +9336,7 @@ void clif_hercules_chsys_mjoin(struct map_session_data *sd) {
 
 /// Notification from the client, that it has finished map loading and is about to display player's character (CZ_NOTIFY_ACTORINIT).
 /// 007d
-void clif_parse_LoadEndAck(int fd,struct map_session_data *sd)
-{
+void clif_parse_LoadEndAck(int fd,struct map_session_data *sd) {
 	if(sd->bl.prev != NULL)
 		return;
 
@@ -9414,7 +9413,7 @@ void clif_parse_LoadEndAck(int fd,struct map_session_data *sd)
 	}
 
 	if( sd->bg_id ) clif->bg_hp(sd); // BattleGround System
-
+	
 	if(map[sd->bl.m].flag.pvp && !(sd->sc.option&OPTION_INVISIBLE)) {
 		if(!battle_config.pk_mode) { // remove pvp stuff for pk_mode [Valaris]
 			if (!map[sd->bl.m].flag.pvp_nocalcrank)
@@ -9434,15 +9433,16 @@ void clif_parse_LoadEndAck(int fd,struct map_session_data *sd)
 	if (map[sd->bl.m].flag.gvg_dungeon)
 		clif->map_property(sd, MAPPROPERTY_FREEPVPZONE); //TODO: Figure out the real packet to send here.
 
-	if( map_flag_gvg(sd->bl.m) )
+	if( map_flag_gvg2(sd->bl.m) )
 		clif->map_property(sd, MAPPROPERTY_AGITZONE);
+
 	// info about nearby objects
 	// must use foreachinarea (CIRCULAR_AREA interferes with foreachinrange)
 	iMap->foreachinarea(clif->getareachar, sd->bl.m, sd->bl.x-AREA_SIZE, sd->bl.y-AREA_SIZE, sd->bl.x+AREA_SIZE, sd->bl.y+AREA_SIZE, BL_ALL, sd);
 
 	// pet
 	if( sd->pd ) {
-		if( battle_config.pet_no_gvg && map_flag_gvg(sd->bl.m) ) { //Return the pet to egg. [Skotlex]
+		if( battle_config.pet_no_gvg && map_flag_gvg2(sd->bl.m) ) { //Return the pet to egg. [Skotlex]
 			clif->message(sd->fd, msg_txt(666));
 			pet_menu(sd, 3); //Option 3 is return to egg.
 		} else {
@@ -9548,6 +9548,9 @@ void clif_parse_LoadEndAck(int fd,struct map_session_data *sd)
 
 		if(sd->npc_id)
 			npc_event_dequeue(sd);
+		
+		if( sd->guild && ( battle_config.guild_notice_changemap == 2 || ( battle_config.guild_notice_changemap == 1 && sd->state.changemap ) ) )
+			clif->guild_notice(sd,sd->guild);
 	}
 
 	if( sd->state.changemap ) {// restore information that gets lost on map-change
@@ -9556,7 +9559,7 @@ void clif_parse_LoadEndAck(int fd,struct map_session_data *sd)
 		clif->equpcheckbox(sd);
 #endif
 		if( (battle_config.bg_flee_penalty != 100 || battle_config.gvg_flee_penalty != 100) &&
-			(map_flag_gvg(sd->state.pmap) || map_flag_gvg(sd->bl.m) || map[sd->state.pmap].flag.battleground || map[sd->bl.m].flag.battleground) )
+			(map_flag_gvg2(sd->state.pmap) || map_flag_gvg2(sd->bl.m) || map[sd->state.pmap].flag.battleground || map[sd->bl.m].flag.battleground) )
 			status_calc_bl(&sd->bl, SCB_FLEE); //Refresh flee penalty
 
 		if( iMap->night_flag && map[sd->bl.m].flag.nightenabled ) { //Display night.
@@ -9896,6 +9899,38 @@ void clif_parse_GlobalMessage(int fd, struct map_session_data* sd)
 		if (DIFF_TICK(sd->cantalk_tick, iTimer->gettick()) > 0)
 			return;
 		sd->cantalk_tick = iTimer->gettick() + battle_config.min_chat_delay;
+	}
+
+	if( (sd->class_&MAPID_UPPERMASK) == MAPID_SUPER_NOVICE ) {
+		unsigned int next = pc->nextbaseexp(sd);
+		if( next == 0 ) next = pc->thisbaseexp(sd);
+		if( next ) { // 0%, 10%, 20%, ...
+			int percent = (int)( ( (float)sd->status.base_exp/(float)next )*1000. );
+			if( (battle_config.snovice_call_type || percent) && ( percent%100 ) == 0 ) {// 10.0%, 20.0%, ..., 90.0%
+				switch (sd->state.snovice_call_flag) {
+					case 0:
+						if( strstr(message, msg_txt(1479)) ) // "Dear angel, can you hear my voice?"
+							sd->state.snovice_call_flag = 1;
+						break;
+					case 1: {
+						char buf[256];
+						snprintf(buf, 256, msg_txt(1480), sd->status.name);
+						if( strstr(message, buf) ) // "I am %s Super Novice~"
+							sd->state.snovice_call_flag = 2;
+					}
+						break;
+					case 2:
+						if( strstr(message, msg_txt(1481)) ) // "Help me out~ Please~ T_T"
+							sd->state.snovice_call_flag = 3;
+						break;
+					case 3:
+						sc_start(&sd->bl, iStatus->skill2sc(MO_EXPLOSIONSPIRITS), 100, 17, skill->get_time(MO_EXPLOSIONSPIRITS, 5)); //Lv17-> +50 critical (noted by Poki) [Skotlex]
+						clif->skill_nodamage(&sd->bl, &sd->bl, MO_EXPLOSIONSPIRITS, 5, 1);  // prayer always shows successful Lv5 cast and disregards noskill restrictions
+						sd->state.snovice_call_flag = 0;
+						break;
+				}
+			}
+		}
 	}
 	
 	if( sd->gcbind ) {
@@ -13674,6 +13709,10 @@ void clif_parse_NoviceDoriDori(int fd, struct map_session_data *sd)
 ///       "Help me out~ Please~ T_T"
 void clif_parse_NoviceExplosionSpirits(int fd, struct map_session_data *sd)
 {
+	/* [Ind/Hercules] */
+	/* game client is currently broken on this (not sure the packetver range) */
+	/* it sends the request when the criteria doesn't match (and of course we let it fail) */
+	/* so restoring the old parse_globalmes method. */
 	if( ( sd->class_&MAPID_UPPERMASK ) == MAPID_SUPER_NOVICE ) {
 		unsigned int next = pc->nextbaseexp(sd);
 		if( next == 0 ) next = pc->thisbaseexp(sd);
@@ -17128,36 +17167,45 @@ void clif_cashshop_db(void) {
 			if( (cat = config_setting_get_member(cats, entry_name)) != NULL ) {
 				int item_count = config_setting_length(cat);
 				
-				for(k = 0; k < item_count; k++) {
-					config_setting_t *entry = config_setting_get_elem(cat,k);
-					const char *name = config_setting_name(entry);
-					int price = config_setting_get_int(entry);
-					struct item_data * data = NULL;
-					
-					if( price < 1 ) {
-						ShowWarning("cashshop_db: unsupported price '%d' for entry named '%s' in category '%s'\n", price, name, entry_name);
-						continue;
-					}
-										
-					if( name[0] == 'I' && name[1] == 'D' && strlen(name) <= 7 ) {
-						if( !( data = itemdb->exists(atoi(name+2))) ) {
-							ShowWarning("cashshop_db: unknown item id '%s' in category '%s'\n", name+2, entry_name);
-							continue;
-						}
-					} else {
-						if( !( data = itemdb->search_name(name) ) ) {
-							ShowWarning("cashshop_db: unknown item name '%s' in category '%s'\n", name, entry_name);
-							continue;
-						}
-					}
-					
-					
+				if( item_count == 0 ) {
+					ShowWarning("cashshop_db: category '%s' is empty! adding dull apple!\n", entry_name);
 					RECREATE(clif->cs.data[i], struct hCSData *, ++clif->cs.item_count[i]);
 					CREATE(clif->cs.data[i][ clif->cs.item_count[i] - 1 ], struct hCSData , 1);
 					
-					clif->cs.data[i][ clif->cs.item_count[i] - 1 ]->id = data->nameid;
-					clif->cs.data[i][ clif->cs.item_count[i] - 1 ]->price = price;
-					item_count_t++;
+					clif->cs.data[i][ clif->cs.item_count[i] - 1 ]->id = UNKNOWN_ITEM_ID;
+					clif->cs.data[i][ clif->cs.item_count[i] - 1 ]->price = 999;
+				} else {
+					for(k = 0; k < item_count; k++) {
+						config_setting_t *entry = config_setting_get_elem(cat,k);
+						const char *name = config_setting_name(entry);
+						int price = config_setting_get_int(entry);
+						struct item_data * data = NULL;
+						
+						if( price < 1 ) {
+							ShowWarning("cashshop_db: unsupported price '%d' for entry named '%s' in category '%s'\n", price, name, entry_name);
+							continue;
+						}
+											
+						if( name[0] == 'I' && name[1] == 'D' && strlen(name) <= 7 ) {
+							if( !( data = itemdb->exists(atoi(name+2))) ) {
+								ShowWarning("cashshop_db: unknown item id '%s' in category '%s'\n", name+2, entry_name);
+								continue;
+							}
+						} else {
+							if( !( data = itemdb->search_name(name) ) ) {
+								ShowWarning("cashshop_db: unknown item name '%s' in category '%s'\n", name, entry_name);
+								continue;
+							}
+						}
+						
+						
+						RECREATE(clif->cs.data[i], struct hCSData *, ++clif->cs.item_count[i]);
+						CREATE(clif->cs.data[i][ clif->cs.item_count[i] - 1 ], struct hCSData , 1);
+						
+						clif->cs.data[i][ clif->cs.item_count[i] - 1 ]->id = data->nameid;
+						clif->cs.data[i][ clif->cs.item_count[i] - 1 ]->price = price;
+						item_count_t++;
+					}
 				}
 			} else {
 				ShowError("cashshop_db: category '%s' (%d) not found!!\n",entry_name,i);

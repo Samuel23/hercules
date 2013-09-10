@@ -1021,6 +1021,8 @@ void initChangeTables(void) {
 	StatusChangeFlagTable[SC_REBOUND] |= SCB_SPEED|SCB_REGEN;
 
 	StatusChangeFlagTable[SC_ALL_RIDING] = SCB_SPEED;
+	StatusChangeFlagTable[SC_WEDDING] = SCB_SPEED;
+
 
 	/* StatusDisplayType Table [Ind/Hercules] */
 	StatusDisplayType[SC_ALL_RIDING]		= true;
@@ -1205,7 +1207,7 @@ int status_damage(struct block_list *src,struct block_list *target,int64 in_hp, 
 			if ((sce=sc->data[SC_ENDURE]) && !sce->val4 && !sc->data[SC_LKCONCENTRATION]) {
 				//Endure count is only reduced by non-players on non-gvg maps.
 				//val4 signals infinite endure. [Skotlex]
-				if (src && src->type != BL_PC && !map_flag_gvg(target->m) && !map[target->m].flag.battleground && --(sce->val2) < 0)
+				if (src && src->type != BL_PC && !map_flag_gvg2(target->m) && !map[target->m].flag.battleground && --(sce->val2) < 0)
 					status_change_end(target, SC_ENDURE, INVALID_TIMER);
 			}
 			if ((sce=sc->data[SC_GRAVITATION]) && sce->val3 == BCT_SELF) {
@@ -1299,7 +1301,7 @@ int status_damage(struct block_list *src,struct block_list *target,int64 in_hp, 
 		}
 	}
 
-	if( sc && sc->data[SC_KAIZEL] && !map_flag_gvg(target->m) )
+	if( sc && sc->data[SC_KAIZEL] && !map_flag_gvg2(target->m) )
 	{ //flag&8 = disable Kaizel
 		int time = skill->get_time2(SL_KAIZEL,sc->data[SC_KAIZEL]->val1);
 		//Look for Osiris Card's bonus effect on the character and revive 100% or revive normally
@@ -4784,7 +4786,7 @@ static signed short status_calc_flee(struct block_list *bl, struct status_change
 {
 	if( bl->type == BL_PC )
 	{
-		if( map_flag_gvg(bl->m) )
+		if( map_flag_gvg2(bl->m) )
 			flee -= flee * battle_config.gvg_flee_penalty/100;
 		else if( map[bl->m].flag.battleground )
 			flee -= flee * battle_config.bg_flee_penalty/100;
@@ -5591,7 +5593,7 @@ static short status_calc_aspd_rate(struct block_list *bl, struct status_change *
 
 static unsigned short status_calc_dmotion(struct block_list *bl, struct status_change *sc, int dmotion)
 {
-	if( !sc || !sc->count || map_flag_gvg(bl->m) || map[bl->m].flag.battleground )
+	if( !sc || !sc->count || map_flag_gvg2(bl->m) || map[bl->m].flag.battleground )
 		return cap_value(dmotion,0,USHRT_MAX);
 	/**
 	* It has been confirmed on official servers that MvP mobs have no dmotion even without endure
@@ -6495,7 +6497,22 @@ int status_get_sc_def(struct block_list *bl, enum sc_type type, int rate, int ti
 }
 /* [Ind/Hercules] fast-checkin sc-display array */
 void status_display_add(struct map_session_data *sd, enum sc_type type, int dval1, int dval2, int dval3) {
-	struct sc_display_entry *entry = ers_alloc(pc_sc_display_ers, struct sc_display_entry);
+	struct sc_display_entry *entry;
+	int i;
+	
+	for( i = 0; i < sd->sc_display_count; i++ ) {
+		if( sd->sc_display[i]->type == type )
+			break;
+	}
+	
+	if( i != sd->sc_display_count ) {
+		sd->sc_display[i]->val1 = dval1;
+		sd->sc_display[i]->val2 = dval2;
+		sd->sc_display[i]->val3 = dval3;
+		return;
+	}
+	
+	entry = ers_alloc(pc_sc_display_ers, struct sc_display_entry);
 
 	entry->type = type;
 	entry->val1 = dval1;

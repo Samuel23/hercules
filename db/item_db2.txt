@@ -137,6 +137,18 @@
 17529,Cash_Scroll_90,Cash Scroll 90,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",90; },{},{}
 17530,Cash_Scroll_100,Cash Scroll 100,2,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ callfunc "addcash",100; },{},{}
 
+//Food Boxes
+17531,Food_Box_I,Food Box I,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17532,Food_Box_II,Food Box II,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17533,Food_Box_III,Food Box III,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17534,Food_Box_IV,Food Box IV,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17535,Food_Box_V,Food Box V,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17536,Food_Box_VI,Food Box VI,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17537,Food_Box_VII,Food Box VII,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17538,Food_Box_VIII,Food Box VIII,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17539,Food_Box_IX,Food Box IX,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+17540,Food_Box_X,Food Box X,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
+
 // VIP Scrolls
 17550,VIP_SILVER_Scroll_1,VIP SILVER Scroll 1,2,,,10,,,, ,0xFFFFFFFF,63,2,,,,,,{ callfunc "VIP_SILVER",getcharid(3),7,17550; },{},{}
 17551,VIP_SILVER_Scroll_2,VIP SILVER Scroll 2,2,,,10,,,, ,0xFFFFFFFF,63,2,,,,,,{ callfunc "VIP_SILVER",getcharid(3),14,17551; },{},{}
@@ -150,6 +162,9 @@
 17559,VIP_Platinum_Scroll_2,VIP Platinum Scroll 2,2,,,10,,,, ,0xFFFFFFFF,63,2,,,,,,{ callfunc "VIP_PLATINUM",getcharid(3),14,17559; },{},{}
 17560,VIP_Platinum_Scroll_3,VIP Platinum Scroll 3,2,,,10,,,, ,0xFFFFFFFF,63,2,,,,,,{ callfunc "VIP_PLATINUM",getcharid(3),21,17560; },{},{}
 17561,VIP_Platinum_Scroll_4,VIP Platinum Scroll 4,2,,,10,,,, ,0xFFFFFFFF,63,2,,,,,,{ callfunc "VIP_PLATINUM",getcharid(3),30,17561; },{},{}
+
+// Custom Boxes
+17570,Lucky_Costume_Box,Lucky Costume Box,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}
 
 // Custom Items
 30000,Acid_Bomb_Box_100,Acid Bomb Box II,18,20,,10,,,,,0xFFFFFFFF,63,2,,,,,,{ getitem 7135,100; getitem 7136,100; },{},{}

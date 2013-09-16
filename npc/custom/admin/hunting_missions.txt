@@ -18,7 +18,7 @@
 //= 1.3a Added mission reset options.
 //============================================================
 
-prontera,152,187,6	script	Hunting Missions	951,{
+Crystilia,43,73,5	script	Hunting Missions	951,{
 function Chk; function Cm;
 	mes "[Hunting Missions]";
 	mes "Hello, "+strcharinfo(0)+"!";

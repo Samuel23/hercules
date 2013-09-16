@@ -1,3 +1,7 @@
+/*battle.conf */
+// Does HP recover if hit by an attribute that's same as your own? (Note 1)
+attribute_recover: yes
+
 /* client.conf */
 // Whether to enable the official packet obfuscation support (good vs WPE)
 // 0: disabled

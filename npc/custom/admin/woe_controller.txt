@@ -64,7 +64,7 @@ OnInit:
 // -----------------------------------------------------------
 
 	// Combine values as needed (e.g. 1|8 = 1+8 = 9).
-	set .Options, 1|8;
+	set .Options, 1;
 
 	// Rewards per castle.
 	// -- when given directly: <itemID>,<amount>{,<itemID>,<amount>,...}

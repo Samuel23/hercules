@@ -91,10 +91,20 @@ return;
 }
 
 -	script	nextlevel	-1,{
-
+function Go;
 OnInit:
 	bindatcmd "nextlevel",strnpcinfo(3)+"::OnAtcommand",0;
 	bindatcmd "commands2",strnpcinfo(3)+"::OnNewCommands",0;
+	bindatcmd "pvp",strnpcinfo(3)+"::OnPvP",0;
+	setarray .DonorUpper[0],5467,5805,5518,5374,5495,5379,5013,5801,5137,5226,5375,5257,5451,5535,5312,5372,5492,5567,5564,5481,5340,5341,5342,5343,5344,5345,5269;
+	setarray .DonorMiddle[0],18503,5800,5421,5389,5135,5326,5471,5325,5592,5664;
+	setarray .DonorLower[0],5462,5596,5597,5532,5536,5463,5361,5377;
+	setarray .DonorArmor[0],2383,2384,2369,2349,2351,2345,2347;
+	setarray .DonorWeapon[0],1228,13017,13414,13412,13413,1579,16003;
+	setarray .DonorShield[0],2127,2132,2136,2126,2128,2115;
+	setarray .DonorGarment[0],2534,2554,2547,2533,2537,2542,2524;
+	setarray .DonorShoes[0],2410,2428,2433,2421;
+	setarray .DonorAccessories[0],2629,27005,27006,2767,2769,2630,2768,2771,2766,2770,2737;
 	end;
 
 OnAtcommand:
@@ -120,7 +130,118 @@ OnNPCKillEvent:
 	}
 	end;
 
-OnNewCommands:
-	dispbottom "checktreasure   checkmushroom   loginreward   quest   nextlevel";
+OnPvP:
+	if(compare (.@atcmd_parameters$[0],"1")) {
+	callsub DetectDonate;
+	announce "[ "+strcharinfo(0)+" ] is warped into Non Donor PVP Arena 1.",0;
+	Go("pvpmap",0,0);
+	}
+	else if(compare (.@atcmd_parameters$[0],"2")) {
+	announce "[ "+strcharinfo(0)+" ] is warped into Donor PVP Arena 1.",0;
+	Go("pvpmap",0,0);
+	}
+	else if(compare (.@atcmd_parameters$[0],"3")) {
+		if (getcharid(2) == 0) {
+		mes "[Warper]";
+		mes "Sorry but you don't have a guild!";
+		close;
+		end;
+		}
+	announce "[ "+strcharinfo(0)+" ] is warped into GVG Arena 1.",0;
+	Go("guild_vs1",0,0);
+	}
+	else {
+	message strcharinfo(0),"[ExhilarateRO PvP/GvG Stats]";
+	dispbottom "Room#1 (@pvp 1): Player On Map -["+getmapusers("pvpmap.gat")+"]- Pots Enabled, Donation Disabled";
+	dispbottom "Room#2 (@pvp 2): Player On Map -["+getmapusers("pvpmap3.gat")+"]- Pots/Donation Enabled";
+	dispbottom "Room#3 (@pvp 3): Player On Map -["+getmapusers("guild_vs1.gat")+"]- GVG Pots/Donation Enabled";
+	}
 	end;
+
+OnNewCommands:
+	dispbottom "checktreasure   checkmushroom   loginreward   quest   nextlevel   mission";
+	dispbottom "pvp";
+	end;
+
+DetectDonate:
+	for (set .@i,0; .@i < (getarraysize(.DonorUpper)); set .@i,.@i+1) {
+		if (countitem(.DonorUpper[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorUpper[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorLower)); set .@i,.@i+1) {
+		if	(countitem(.DonorLower[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorLower[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorMiddle)); set .@i,.@i+1) {
+		if	(countitem(.DonorMiddle[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorMiddle[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorArmor)); set .@i,.@i+1) {
+		if	(countitem(.DonorArmor[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorArmor[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorWeapon)); set .@i,.@i+1) {
+		if	(countitem(.DonorWeapon[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorWeapon[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorShield)); set .@i,.@i+1) {
+		if	(countitem(.DonorShield[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorShield[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorGarment)); set .@i,.@i+1) {
+		if	(countitem(.DonorGarment[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorGarment[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorShoes)); set .@i,.@i+1) {
+		if	(countitem(.DonorShoes[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorShoes[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	for (set .@i,0; .@i < (getarraysize(.DonorAccessories)); set .@i,.@i+1) {
+		if	(countitem(.DonorAccessories[.@i]) >= 1) {
+			mes "[Warper]";
+			mes "Sorry but donation items (^FF0000"+getitemname (.DonorAccessories[.@i]) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+	return;
+	end;
+
+function Go {
+	warp getarg(0),getarg(1,0),getarg(2,0);
+	getmapxy(lastwarp$,lastwarpx,lastwarpy,0);
+	close;
+}
 }

@@ -27,10 +27,10 @@ function	script	MVPRankChar	{
 	query_sql "UPDATE `char_ranking` SET `mvp_kills`='"+.@mvpkills+"' WHERE `char_id`='"+getarg(0)+"'";
 	}
 	announce "You have now ["+.@mvpkills+"] MVP Kills!",bc_self;
-		if (.@mvpkills > .@top1) {
+		/*if (.@mvpkills > .@top1) {
 			announce ""+strcharinfo(0)+" is now the top 1 MVP KILLER with ["+.@mvpkills+"] MVP Kills!",bc_all;
 			end;
-		}
+		}*/
 	return;
 }
 

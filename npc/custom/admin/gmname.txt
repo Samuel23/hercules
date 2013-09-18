@@ -1,7 +1,6 @@
 -	script	gmnamecheck	-1,{
 
 OnPcLoginEvent:
-if (getgmlevel() < 20) end;
 if (gmlvlnamecheck == 1) end;
 if (getgmlevel() == 99) set @gmlvlname$,"[Admin]";
 if (getgmlevel() == 98) set @gmlvlname$,"[Co-Admin]";

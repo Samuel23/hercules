@@ -506,7 +506,6 @@ setarray .DonorShield[0],2127,2132,2136,2126,2128,2115;
 setarray .DonorGarment[0],2534,2554,2547,2533,2537,2542,2524;
 setarray .DonorShoes[0],2410,2428,2433,2421;
 setarray .DonorAccessories[0],2629,27005,27006,2767,2769,2630,2768,2771,2766,2770,2737;
-}
 end;
 }
 

@@ -245,3 +245,198 @@ function Go {
 	close;
 }
 }
+
+-	script	bg	-1,{
+OnInit:
+	bindatcmd "bg",strnpcinfo(3)+"::OnAtcommand",0;
+	end;
+
+OnAtcommand:
+	if (checkweight(1201,1) == 0) {
+		mes "- Wait a minute !! -";
+		mes "- Currently you're carrying -";
+		mes "- too many items with you. -";
+		mes "- Please try again -";
+		mes "- after you loose some weight. -";
+		close;
+	}
+	if ((Class == job_Novice) || (BaseClass == Job_Supernovice)) {
+		mes "[Battleground Officer]";
+		mes "I'm very pleased that you want to join us and fight the Croix Army, but I'm sorry: I can't send a rookie like you to die on the cruel battlefield.";
+		close;
+	}
+	if (BaseLevel < 80) {
+		mes "[Battleground Officer]";
+		mes "I'm very pleased that you want to join us and fight the Croix Army, but I'm sorry: I can't send a rookie like you to die on the cruel battlefield.";
+		close;
+	}
+	if(compare (.@atcmd_parameters$[0],"1")) {
+		callsub FlaviusCheck,1;
+	}
+	if(compare (.@atcmd_parameters$[0],"2")) {
+		callsub FlaviusCheck,2;
+	}
+	if(compare (.@atcmd_parameters$[0],"3")) {
+		callsub KVMCheck;
+	}
+	if(compare (.@atcmd_parameters$[0],"4")) {
+		callsub TierraCheck,1;
+	}
+	if(compare (.@atcmd_parameters$[0],"5")) {
+		callsub TierraCheck,2;
+	}
+	else {
+	message strcharinfo(0),"[ExhilarateRO Battelground Stats]";
+	dispbottom "Flavius#1 (@bg 1): Player On Waitingroom -["+ (getareausers ("bat_room",82,220,89,227) +  getareausers ("bat_room",82,204,89,211)) +"]-";
+	dispbottom "Flavius#2 (@bg 2): Player On Waitingroom -["+ (getareausers ("bat_room",138,220,145,227) + getareausers ("bat_room",138,204,145,211)) +"]-";
+	dispbottom "KVM (@bg 3): Player On Waitingroom -["+ (getareausers ("bat_room",173,227,166,220) + getareausers ("bat_room",173,211,166,204)) +"]-";
+	dispbottom "Tierra#1 (@bg 4): Player On Waitingroom -["+ (getareausers ("bat_room",54,220,61,227) + getareausers ("bat_room",54,204,61,211)) +"]-";
+	dispbottom "Tierra#2 (@bg 5): Player On Waitingroom -["+ (getareausers ("bat_room",110,220,117,227) + getareausers ("bat_room",110,204,117,211)) +"]-";
+	}
+	end;
+
+FlaviusCheck:
+	set .@chk_urtime,checkquest(2070,PLAYTIME);
+	if ((.@chk_urtime == 0)|| (.@chk_urtime == 1)) {
+		mes "[Battleground Officer]";
+		mes "You seem to have just returned from the battlefield.";
+		mes "It's too early for you to go back. Go rest, and leave the enemies to us!";
+		close;
+	}
+	else {
+		if (.@chk_urtime == 2)
+		erasequest 2070;
+		if (getarg(0) == 1) set .@mapcount2,getmapusers("bat_b01");
+		if (getarg(0) == 2) set .@mapcount2,getmapusers("bat_b02");
+		if (.@mapcount2 > 0) {
+			mes "[Battleground Officer]";
+			mes "I've received a report informing me that an elite corps has been dispatched to the battlefield fighting the Croixs already.";
+			mes "Why don't you go wait for a while? I suggest you sharpen your weapons and prepare your supplies until then.";
+			close;
+		}
+		else {
+			if ((getarg(0) == 1) && ($@FlaviusBG1 > 0)) {
+				mes "[Battleground Officer]";
+				mes "An elite corps is already standing by to be dispatched to the battlefield.";
+				mes "Why don't you go wait for a while? I suggest you sharpen your weapons and prepare your supplies until then.";
+				close;
+			}
+			if ((getarg(0) == 2) && ($@FlaviusBG2 > 0)) {
+				mes "[Battleground Officer]";
+				mes "An elite corps is already standing by to be dispatched to the battlefield.";
+				mes "Why don't you go wait for a while? I suggest you sharpen your weapons and prepare your supplies until then.";
+				close;
+			}
+			else {
+				switch (rand(1,2)) {
+					case 1:
+						if (getarg(0) == 1) {
+							announce strcharinfo(0) + " joined Flavius 1 Guillaume. [" +( getareausers ("bat_room",82,220,89,227) +1) +"/3]",bc_all;
+							warp "bat_room",85,223;	// Flavius 1 Guillaume
+							close;
+						}
+						if (getarg(0) == 2) {
+							announce strcharinfo(0) + " joined Flavius 2 Guillaume. [" +( getareausers ("bat_room",138,220,145,227) +1) +"/3]",bc_all;
+							warp "bat_room",141,224;	// Flavius 2 Guillaume
+							close;
+						}
+					case 2:
+						if (getarg(0) == 1) {
+							announce strcharinfo(0) + " joined Flavius 1 Croix. ["+( getareausers ("bat_room",82,204,89,211) +1) +"/3]",bc_all;
+							warp "bat_room",85,207;	// Flavius 1 Croix
+							close;
+						}
+						if (getarg(0) == 2) {
+							announce strcharinfo(0) + " joined Flavius 2 Croix. ["+( getareausers ("bat_room",138,204,145,211) +1) +"/3]",bc_all;
+							warp "bat_room",141,207;	// Flavius 2 Croix
+							close;
+						}
+					}
+			}
+		}
+	}
+	end;
+
+KVMCheck:
+	set .@permit,checkquest(6025,PLAYTIME);
+	if ((.@permit == 0) || (.@permit == 1)) {
+		mes "[Battleground Officer]";
+		mes "It seems you have recently participated in a KVM battle. You must wait 5 minutes before signing up again.";
+		close;
+	}
+	else if (.@permit == 2) { 
+	erasequest 6025;
+	}
+	switch (rand(1,2)) {
+		case 1:
+			announce strcharinfo(0) + " joined KVM Guillaume. [" +( getareausers ("bat_room",173,227,166,220) +1) +"/3]",bc_all;
+			warp "bat_room",169,223;	// KVM Guillaume
+			close;
+		case 2:
+			announce strcharinfo(0) + " joined KVM Croix. ["+( getareausers ("bat_room",173,211,166,204) +1) +"/3]",bc_all;
+			warp "bat_room",169,207;	// KVM Croix
+			close;
+		}
+	end;
+
+TierraCheck:
+	set .@chk_urtime,checkquest(2069,PLAYTIME);
+	if (.@chk_urtime == 1) {
+		mes "[Battleground Officer]";
+		mes "You seem to have just returned from the battlefield.";
+		mes "It's too early for you to go back. Go rest, and leave the enemies to us!";
+		close;
+	}
+	else {
+		if (.@chk_urtime == 2)
+			erasequest 2069;
+		if (getarg(0) == 1) set .@mapcount,getmapusers("bat_a01");
+		if (getarg(0) == 2) set .@mapcount,getmapusers("bat_a02");
+		if (.@mapcount > 0) {
+			mes "[Battleground Officer]";
+			mes "I've received a report informing me that an elite corps has been dispatched to the battlefield fighting the Croixs already.";
+			mes "Why don't you go wait for a while? I suggest you sharpen your weapons and prepare your supplies until then.";
+			close;
+		}
+		else {
+			if ((getarg(0) == 2) && ($@TierraBG1)) {
+				mes "[Battleground Officer]";
+				mes "An elite corps is already standing by to be dispatched to the battlefield.";
+				mes "Why don't you go wait for a while? I suggest you sharpen your weapons and prepare your supplies until then.";
+				close;
+			}
+			if ((getarg(0) == 2) && ($@TierraBG2)) {
+				mes "[Battleground Officer]";
+				mes "An elite corps is already standing by to be dispatched to the battlefield.";
+				mes "Why don't you go wait for a while? I suggest you sharpen your weapons and prepare your supplies until then.";
+				close;
+			}
+			else {
+				switch (rand(1,2)) {
+					case 1:
+						if (getarg(0) == 1) {
+							announce strcharinfo(0) + " joined Tierra 1 Guillaume. [" +( getareausers ("bat_room",54,220,61,227) +1) +"/3]",bc_all;
+							warp "bat_room",57,223;	// Tierra 1 Guillaume
+							close;
+						}
+						if (getarg(0) == 2) {
+							announce strcharinfo(0) + " joined Tierra 2 Guillaume. [" +( getareausers ("bat_room",110,220,117,227) +1) +"/3]",bc_all;
+							warp "bat_room",114,223;	// Tierra 2 Guillaume
+							close;
+						}
+					case 2:
+						if (getarg(0) == 1) {
+							announce strcharinfo(0) + " joined Tierra 1 Croix. ["+( getareausers ("bat_room",54,204,61,211) +1) +"/3]",bc_all;
+							warp "bat_room",57,207;	// Tierra 1 Croix
+							close;
+						}
+						if (getarg(0) == 2) {
+							announce strcharinfo(0) + " joined Tierra 2 Croix. ["+( getareausers ("bat_room",110,204,117,211) +1) +"/3]",bc_all;
+							warp "bat_room",114,207;	// Tierra 2 Croix
+							close;
+						}
+				}
+			}
+		}
+	}
+}

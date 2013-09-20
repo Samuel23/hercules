@@ -400,21 +400,17 @@ int pc_banding(struct map_session_data *sd, uint16 skill_lv) {
 // Increases a player's fame points and displays a notice to him
 void pc_addfame(struct map_session_data *sd,int count)
 {
+	int ranktype = -1;
 	nullpo_retv(sd);
 	sd->status.fame += count;
 	if(sd->status.fame > MAX_FAME)
 		sd->status.fame = MAX_FAME;
 	switch(sd->class_&MAPID_UPPERMASK){
-		case MAPID_BLACKSMITH: // Blacksmith
-			clif->fame_blacksmith(sd,count);
-			break;
-		case MAPID_ALCHEMIST: // Alchemist
-			clif->fame_alchemist(sd,count);
-			break;
-		case MAPID_TAEKWON: // Taekwon
-			clif->fame_taekwon(sd,count);
-			break;
+		case MAPID_BLACKSMITH: ranktype = RANKTYPE_BLACKSMITH; break;
+		case MAPID_ALCHEMIST:  ranktype = RANKTYPE_ALCHEMIST; break;
+		case MAPID_TAEKWON: ranktype = RANKTYPE_TAEKWON; break;
 	}
+	clif->update_rankingpoint(sd, ranktype, count);
 	chrif->updatefamelist(sd);
 }
 
@@ -652,7 +648,7 @@ int pc_equippoint(struct map_session_data *sd,int n)
 	if(!sd->inventory_data[n])
 		return 0;
 
-	if (!itemdb_isequip2(sd->inventory_data[n]))
+	if (!itemdb->isequip2(sd->inventory_data[n]))
 		return 0; //Not equippable by players.
 
 	ep = sd->inventory_data[n]->equip;
@@ -1082,7 +1078,7 @@ bool pc_authok(struct map_session_data *sd, int login_id2, time_t expiration_tim
 		
 	//Set here because we need the inventory data for weapon sprite parsing.
 	iStatus->set_viewdata(&sd->bl, sd->status.class_);
-	unit_dataset(&sd->bl);
+	unit->dataset(&sd->bl);
 
 	sd->guild_x = -1;
 	sd->guild_y = -1;
@@ -1334,7 +1330,7 @@ int pc_reg_received(struct map_session_data *sd)
 	}
 
 	if( npc->motd ) /* [Ind/Hercules] */
-		script->run(npc->motd->u.scr.script, 0, sd->bl.id, fake_nd->bl.id);
+		script->run(npc->motd->u.scr.script, 0, sd->bl.id, npc->fake_nd->bl.id);
 
 	return 1;
 }
@@ -3699,7 +3695,7 @@ int pc_checkadditem(struct map_session_data *sd,int nameid,int amount)
 
 	data = itemdb->search(nameid);
 
-	if(!itemdb_isstackable2(data))
+	if(!itemdb->isstackable2(data))
 		return ADDITEM_NEW;
 
 	if( data->stack.inventory && amount > data->stack.amount )
@@ -3945,7 +3941,7 @@ int pc_additem(struct map_session_data *sd,struct item *item_data,int amount,e_l
 
 	i = MAX_INVENTORY;
 
-	if( itemdb_isstackable2(data) && item_data->expire_time == 0 )
+	if( itemdb->isstackable2(data) && item_data->expire_time == 0 )
 	{ // Stackable | Non Rental
 		for( i = 0; i < MAX_INVENTORY; i++ )
 		{
@@ -3976,8 +3972,8 @@ int pc_additem(struct map_session_data *sd,struct item *item_data,int amount,e_l
 		clif->additem(sd,i,amount,0);
 	}
 #ifdef NSI_UNIQUE_ID
-	if( !itemdb_isstackable2(data) && !item_data->unique_id )
-		sd->status.inventory[i].unique_id = itemdb_unique_id(0,0);
+	if( !itemdb->isstackable2(data) && !item_data->unique_id )
+		sd->status.inventory[i].unique_id = itemdb->unique_id(0,0);
 #endif
 	logs->pick_pc(sd, log_type, amount, &sd->status.inventory[i],sd->inventory_data[i]);
 
@@ -4476,7 +4472,7 @@ int pc_useitem(struct map_session_data *sd,int n) {
 	
 	script->current_item_id = nameid;
 	
-	script->run(item_script,0,sd->bl.id,fake_nd->bl.id);
+	script->run(item_script,0,sd->bl.id,npc->fake_nd->bl.id);
 	
 	script->current_item_id = 0;
 	script->potion_flag = 0;
@@ -4517,7 +4513,7 @@ int pc_cart_additem(struct map_session_data *sd,struct item *item_data,int amoun
 		return 1;
 
 	i = MAX_CART;
-	if( itemdb_isstackable2(data) && !item_data->expire_time )
+	if( itemdb->isstackable2(data) && !item_data->expire_time )
 	{
 		ARR_FIND( 0, MAX_CART, i,
 			sd->status.cart[i].nameid == item_data->nameid &&
@@ -4731,7 +4727,7 @@ int pc_steal_item(struct map_session_data *sd,struct block_list *bl, uint16 skil
 	memset(&tmp_item,0,sizeof(tmp_item));
 	tmp_item.nameid = itemid;
 	tmp_item.amount = 1;
-	tmp_item.identify = itemdb_isidentified2(data);
+	tmp_item.identify = itemdb->isidentified2(data);
 	flag = pc->additem(sd,&tmp_item,1,LOG_TYPE_PICKDROP_PLAYER);
 
 	//TODO: Should we disable stealing when the item you stole couldn't be added to your inventory? Perhaps players will figure out a way to exploit this behaviour otherwise?
@@ -4874,7 +4870,7 @@ int pc_setpos(struct map_session_data* sd, unsigned short mapindex, int x, int y
 			struct hQueue *queue;
 			if( (queue = script->queue(sd->queues[i])) && queue->onMapChange[0] != '\0' ) {
 				pc->setregstr(sd, script->add_str("QMapChangeTo"), map[m].name);
-				npc_event(sd, queue->onMapChange, 0);
+				npc->event(sd, queue->onMapChange, 0);
 			}
 		}
 		
@@ -4908,7 +4904,7 @@ int pc_setpos(struct map_session_data* sd, unsigned short mapindex, int x, int y
 			skill->clear_unitgroup(&sd->bl);
 		party->send_dot_remove(sd); //minimap dot fix [Kevin]
 		guild->send_dot_remove(sd);
-		bg_send_dot_remove(sd);
+		bg->send_dot_remove(sd);
 		if (sd->regen.state.gc)
 			sd->regen.state.gc = 0;
 		// make sure vending is allowed here
@@ -4930,10 +4926,10 @@ int pc_setpos(struct map_session_data* sd, unsigned short mapindex, int x, int y
 			return 2;
 
 		if (sd->npc_id)
-			npc_event_dequeue(sd);
-		npc_script_event(sd, NPCE_LOGOUT);
+			npc->event_dequeue(sd);
+		npc->script_event(sd, NPCE_LOGOUT);
 		//remove from map, THEN change x/y coordinates
-		unit_remove_map_pc(sd,clrtype);
+		unit->remove_map_pc(sd,clrtype);
 		sd->mapindex = mapindex;
 		sd->bl.x=x;
 		sd->bl.y=y;
@@ -4942,7 +4938,7 @@ int pc_setpos(struct map_session_data* sd, unsigned short mapindex, int x, int y
 		chrif->changemapserver(sd, ip, (short)port);
 
 		//Free session data from this map server [Kevin]
-		unit_free_pc(sd);
+		unit->free_pc(sd);
 
 		return 0;
 	}
@@ -4965,7 +4961,7 @@ int pc_setpos(struct map_session_data* sd, unsigned short mapindex, int x, int y
 	}
 
 	if(sd->bl.prev != NULL){
-		unit_remove_map_pc(sd,clrtype);
+		unit->remove_map_pc(sd,clrtype);
 		clif->changemap(sd,m,x,y); // [MouseJstr]
 	} else if(sd->state.active)
 		//Tag player for rewarping after map-loading is done. [Skotlex]
@@ -5730,9 +5726,9 @@ int pc_follow_timer(int tid, unsigned int tick, int id, intptr_t data)
 	if (sd->bl.prev != NULL && tbl->prev != NULL &&
 		sd->ud.skilltimer == INVALID_TIMER && sd->ud.attacktimer == INVALID_TIMER && sd->ud.walktimer == INVALID_TIMER)
 	{
-		if((sd->bl.m == tbl->m) && unit_can_reach_bl(&sd->bl,tbl, AREA_SIZE, 0, NULL, NULL)) {
+		if((sd->bl.m == tbl->m) && unit->can_reach_bl(&sd->bl,tbl, AREA_SIZE, 0, NULL, NULL)) {
 			if (!check_distance_bl(&sd->bl, tbl, 5))
-				unit_walktobl(&sd->bl, tbl, 5, 0);
+				unit->walktobl(&sd->bl, tbl, 5, 0);
 		} else
 			pc->setpos(sd, map_id2index(tbl->m), tbl->x, tbl->y, CLR_TELEPORT);
 	}
@@ -5753,7 +5749,7 @@ int pc_stop_following (struct map_session_data *sd)
 	sd->followtarget = -1;
 	sd->ud.target_to = 0;
 
-	unit_stop_walking(&sd->bl, 1);
+	unit->stop_walking(&sd->bl, 1);
 	
 	return 0;
 }
@@ -5813,7 +5809,7 @@ int pc_checkbaselevelup(struct map_session_data *sd) {
 		sc_start(&sd->bl,iStatus->skill2sc(AL_BLESSING),100,10,600000);
 	}
 	clif->misceffect(&sd->bl,0);
-	npc_script_event(sd, NPCE_BASELVUP); //LORDALFA - LVLUPEVENT
+	npc->script_event(sd, NPCE_BASELVUP); //LORDALFA - LVLUPEVENT
 
 	if(sd->status.party_id)
 		party->send_levelup(sd);
@@ -5862,7 +5858,7 @@ int pc_checkjoblevelup(struct map_session_data *sd)
 	if (pc->checkskill(sd, SG_DEVIL) && !pc->nextjobexp(sd))
 		clif->status_change(&sd->bl,SI_DEVIL1, 1, 0, 0, 0, 1); //Permanent blind effect from SG_DEVIL.
 
-	npc_script_event(sd, NPCE_JOBLVUP);
+	npc->script_event(sd, NPCE_JOBLVUP);
 	return 1;
 }
 
@@ -6656,7 +6652,7 @@ void pc_respawn(struct map_session_data* sd, clr_type clrtype)
 {
 	if( !pc_isdead(sd) )
 		return; // not applicable
-	if( sd->bg_id && bg_member_respawn(sd) )
+	if( sd->bg_id && bg->member_respawn(sd) )
 		return; // member revived by battleground
 
 	pc->setstand(sd);
@@ -6700,7 +6696,7 @@ void pc_damage(struct map_session_data *sd,struct block_list *src,unsigned int h
 	}
 
 	if( sd->status.pet_id > 0 && sd->pd && battle_config.pet_damage_support )
-		pet_target_check(sd,src,1);
+		pet->target_check(sd,src,1);
 
 	if( sd->status.ele_id > 0 )
 		elemental->set_target(sd,src);
@@ -6726,13 +6722,13 @@ int pc_dead(struct map_session_data *sd,struct block_list *src) {
 	if(sd->status.pet_id > 0 && sd->pd) {
 		struct pet_data *pd = sd->pd;
 		if( !map[sd->bl.m].flag.noexppenalty ) {
-			pet_set_intimate(pd, pd->pet.intimate - pd->petDB->die);
+			pet->set_intimate(pd, pd->pet.intimate - pd->petDB->die);
 			if( pd->pet.intimate < 0 )
 				pd->pet.intimate = 0;
 			clif->send_petdata(sd,sd->pd,1,pd->pet.intimate);
 		}
 		if( sd->pd->target_id ) // Unlock all targets...
-			pet_unlocktarget(sd->pd);
+			pet->unlocktarget(sd->pd);
 	}
 
 	if (sd->status.hom_id > 0){
@@ -6755,24 +6751,24 @@ int pc_dead(struct map_session_data *sd,struct block_list *src) {
 	}
 
 	if (sd->npc_id && sd->st && sd->st->state != RUN)
-		npc_event_dequeue(sd);
+		npc->event_dequeue(sd);
 	
 	pc_setglobalreg(sd,"PC_DIE_COUNTER",sd->die_counter+1);
 	pc->setparam(sd, SP_KILLERRID, src?src->id:0);
 
 	if( sd->bg_id ) {/* TODO: purge when bgqueue is deemed ok */
-		struct battleground_data *bg;
-		if( (bg = bg_team_search(sd->bg_id)) != NULL && bg->die_event[0] )
-			npc_event(sd, bg->die_event, 0);
+		struct battleground_data *bgd;
+		if( (bgd = bg->team_search(sd->bg_id)) != NULL && bgd->die_event[0] )
+			npc->event(sd, bgd->die_event, 0);
 	}
 	
 	for( i = 0; i < sd->queues_count; i++ ) {
 		struct hQueue *queue;
 		if( (queue = script->queue(sd->queues[i])) && queue->onDeath[0] != '\0' )
-			npc_event(sd, queue->onDeath, 0);
+			npc->event(sd, queue->onDeath, 0);
 	}
 	
-	npc_script_event(sd,NPCE_DIE);
+	npc->script_event(sd,NPCE_DIE);
 		
 	// Clear anything NPC-related when you die and was interacting with one.
 	if (sd->npc_id || sd->npc_shopid) {
@@ -6817,7 +6813,7 @@ int pc_dead(struct map_session_data *sd,struct block_list *src) {
 			{
 				struct mob_data *md=(struct mob_data *)src;
 				if(md->target_id==sd->bl.id)
-					mob_unlocktarget(md,tick);
+					mob->unlocktarget(md,tick);
 				if(battle_config.mobs_level_up && md->status.hp &&
 					(unsigned int)md->level < pc->maxbaselv(sd) &&
 					!md->guardian_data && !md->special_state.ai// Guardians/summons should not level. [Skotlex]
@@ -6850,7 +6846,7 @@ int pc_dead(struct map_session_data *sd,struct block_list *src) {
 	if (src && src->type == BL_PC) {
 		struct map_session_data *ssd = (struct map_session_data *)src;
 		pc->setparam(ssd, SP_KILLEDRID, sd->bl.id);
-		npc_script_event(ssd, NPCE_KILLPC);
+		npc->script_event(ssd, NPCE_KILLPC);
 
 		if (battle_config.pk_mode&2) {
 			ssd->status.manner -= 5;
@@ -7036,8 +7032,8 @@ int pc_dead(struct map_session_data *sd,struct block_list *src) {
 		iTimer->add_timer(tick+1, pc_respawn_timer, sd->bl.id, 0);
 		return 1|8;
 	} else if( sd->bg_id ) {
-		struct battleground_data *bg = bg_team_search(sd->bg_id);
-		if( bg && bg->mapindex > 0 ) { // Respawn by BG
+		struct battleground_data *bgd = bg->team_search(sd->bg_id);
+		if( bgd && bgd->mapindex > 0 ) { // Respawn by BG
 			iTimer->add_timer(tick+1000, pc_respawn_timer, sd->bl.id, 0);
 			return 1|8;
 		}
@@ -8331,7 +8327,7 @@ static int pc_eventtimer(int tid, unsigned int tick, int id, intptr_t data)
 	{
 		sd->eventtimer[i] = INVALID_TIMER;
 		sd->eventcount--;
-		npc_event(sd,p,0);
+		npc->event(sd,p,0);
 	}
 	else
 		ShowError("pc_eventtimer: no such event timer\n");
@@ -8774,7 +8770,7 @@ int pc_equipitem(struct map_session_data *sd,int n,int req_pos)
 	//OnEquip script [Skotlex]
 	if (id) {
 		if (id->equip_script)
-			script->run(id->equip_script,0,sd->bl.id,fake_nd->bl.id);
+			script->run(id->equip_script,0,sd->bl.id,npc->fake_nd->bl.id);
 		if(itemdb_isspecial(sd->status.inventory[n].card[0]))
 			; //No cards
 		else {
@@ -8784,7 +8780,7 @@ int pc_equipitem(struct map_session_data *sd,int n,int req_pos)
 					continue;
 				if ( ( data = itemdb->exists(sd->status.inventory[n].card[i]) ) != NULL ) {
 					if( data->equip_script )
-						script->run(data->equip_script,0,sd->bl.id,fake_nd->bl.id);
+						script->run(data->equip_script,0,sd->bl.id,npc->fake_nd->bl.id);
 				}
 			}
 		}
@@ -8941,7 +8937,7 @@ int pc_unequipitem(struct map_session_data *sd,int n,int flag) {
 	//OnUnEquip script [Skotlex]
 	if (sd->inventory_data[n]) {
 		if (sd->inventory_data[n]->unequip_script)
-			script->run(sd->inventory_data[n]->unequip_script,0,sd->bl.id,fake_nd->bl.id);
+			script->run(sd->inventory_data[n]->unequip_script,0,sd->bl.id,npc->fake_nd->bl.id);
 		if(itemdb_isspecial(sd->status.inventory[n].card[0]))
 			; //No cards
 		else {
@@ -8952,7 +8948,7 @@ int pc_unequipitem(struct map_session_data *sd,int n,int flag) {
 
 				if ( ( data = itemdb->exists(sd->status.inventory[n].card[i]) ) != NULL ) {
 					if( data->unequip_script )
-						script->run(data->unequip_script,0,sd->bl.id,fake_nd->bl.id);
+						script->run(data->unequip_script,0,sd->bl.id,npc->fake_nd->bl.id);
 				}
 
 			}

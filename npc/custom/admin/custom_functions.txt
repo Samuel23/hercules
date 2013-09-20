@@ -160,7 +160,7 @@ OnPvP:
 
 OnNewCommands:
 	dispbottom "checktreasure   checkmushroom   loginreward   quest   nextlevel   mission";
-	dispbottom "pvp";
+	dispbottom "pvp   bg";
 	end;
 
 DetectDonate:

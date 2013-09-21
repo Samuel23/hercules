@@ -96,7 +96,7 @@ mall,115,139,4	script	Hat Maker	408,{
 		emotion 23,1;
 		close();
 		} else {
-		close2;
+		close;
 		npcshopattach "questshop";
 		callshop "questshop",1;
 		}

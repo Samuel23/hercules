@@ -64,7 +64,7 @@ set .Kick, 2; //Who to kick? (0:Feedee|1:Feeder|2:Both)
 set .Rollback, 10; //How many times should the kill count rollback when feeding is called? (10:Recommended)
 
 //Announcer Setting
-set .Broadcast, 0; //Where do you want to broadcast? (0:bc_all|1:bc_map)
+set .Broadcast,0; //Where do you want to broadcast? (0:bc_all|1:bc_map)
 set .Streak, 1; //Show number of killing streak in broadcast? e.g. Ghost is Beyond Godlike(8)
 set .Multiple, 1; //Show number of multiple kill in broadcast? e.g. Makizushi just got an Ownage(5)
 set .Nemesis, 1; //Show number of nemesis in broadcast? e.g. Epoque is owning Jguy(9)
@@ -170,8 +170,8 @@ if(@nm < .Feed){
 	}
 	for(set .@i, 0; .@i < getarraysize(.ItemID); set .@i, .@i + 1){ if(.ItemID){ getitem .ItemID[.@i], .Amount[.@i]; }}
 }
-if(.RandomKillTerm){ announce strcharinfo(0)+" "+.KillWord$[rand(0, getarraysize(.KillWord$) - 1)]+" "+rid2name(killedrid)+"'s head", ((.Broadcast)?bc_all:bc_map), .KColor$; } 
-else { announce strcharinfo(0)+" pawned "+rid2name(killedrid)+"'s head in "+strcharinfo(3)+"!", ((.Broadcast)?bc_all:bc_map), .KColor$; }
+if(.RandomKillTerm){ announce strcharinfo(0)+" "+.KillWord$[rand(0, getarraysize(.KillWord$) - 1)]+" "+rid2name(killedrid)+"'s head", ((.Broadcast)?bc_map:bc_all), .KColor$; } 
+else { announce strcharinfo(0)+" pawned "+rid2name(killedrid)+"'s head in "+strcharinfo(3)+"!", ((.Broadcast)?bc_map:bc_all), .KColor$; }
 if(@ks < 10){ set @ks, @ks + 1; }
 if(@mk < 6){ set @mk, @mk + 1; } 
 if(!NemesisKilled){ set NemesisKilled, killedrid; }
@@ -253,29 +253,29 @@ return;
 
 OnAnnounce:
 if((@ks == 1) && (#FirstBlood == 1)){
-	if(#Announcer == 0){ announce strcharinfo(0)+" drew first blood", ((.Broadcast)?bc_all:bc_map), .KSColor$; }
-	if(#Announcer >= 1){ announce strcharinfo(0)+" got bloodlust", ((.Broadcast)?bc_all:bc_map), .KSColor$; }
+	if(#Announcer == 0){ announce strcharinfo(0)+" drew first blood", ((.Broadcast)?bc_map:bc_all), .KSColor$; }
+	if(#Announcer >= 1){ announce strcharinfo(0)+" got bloodlust", ((.Broadcast)?bc_map:bc_all), .KSColor$; }
 	set #FirstBlood, 0;
 	soundeffectall ""+#Announcer+"_KS"+1+".wav", 0, strcharinfo(3);
 }
 if(@ks > 2){
-	if(#Announcer == 0){ announce strcharinfo(0)+" "+.KSDotA$[@ks - 3]+" "+((.Streak)?"("+@ks+")":"")+"", ((.Broadcast)?bc_all:bc_map), .KSColor$; }
-	if(#Announcer >= 1){ announce strcharinfo(0)+" "+.KSHoN$[@ks - 3]+" "+((.Streak)?"("+@ks+")":"")+"", ((.Broadcast)?bc_all:bc_map), .KSColor$; }
+	if(#Announcer == 0){ announce strcharinfo(0)+" "+.KSDotA$[@ks - 3]+" "+((.Streak)?"("+@ks+")":"")+"", ((.Broadcast)?bc_map:bc_all), .KSColor$; }
+	if(#Announcer >= 1){ announce strcharinfo(0)+" "+.KSHoN$[@ks - 3]+" "+((.Streak)?"("+@ks+")":"")+"", ((.Broadcast)?bc_map:bc_all), .KSColor$; }
 	soundeffectall ""+#Announcer+"_KS"+@ks+".wav", 0, strcharinfo(3);
 }
 if(@mk > 1){
-	if(#Announcer == 0){ announce strcharinfo(0)+" "+.MKDotA$[@mk - 2]+" "+((.Multiple)?"("+@mk+")":"")+"", ((.Broadcast)?bc_all:bc_map), .MKColor$; }
-	if(#Announcer >= 1){ announce strcharinfo(0)+" "+.MKHoN$[@mk - 2]+" "+((.Multiple)?"("+@mk+")":"")+"", ((.Broadcast)?bc_all:bc_map), .MKColor$; }
+	if(#Announcer == 0){ announce strcharinfo(0)+" "+.MKDotA$[@mk - 2]+" "+((.Multiple)?"("+@mk+")":"")+"", ((.Broadcast)?bc_map:bc_all), .MKColor$; }
+	if(#Announcer >= 1){ announce strcharinfo(0)+" "+.MKHoN$[@mk - 2]+" "+((.Multiple)?"("+@mk+")":"")+"", ((.Broadcast)?bc_map:bc_all), .MKColor$; }
 	sleep2 1500;
 	soundeffectall ""+#Announcer+"_MK"+@mk+".wav", 0, strcharinfo(3);
 }
 if((@nm > 3) && (@nm < .Feed)){
-	announce strcharinfo(0)+" is owning "+rid2name(NemesisKilled)+" "+((.Nemesis)?"("+@nm+")":"")+"", ((.Broadcast)?bc_all:bc_map), .NMColor$;
+	announce strcharinfo(0)+" is owning "+rid2name(NemesisKilled)+" "+((.Nemesis)?"("+@nm+")":"")+"", ((.Broadcast)?bc_map:bc_all), .NMColor$;
 	sleep2 2000;
 	if(#Announcer > 0){ soundeffectall #Announcer+"_Nemesis.wav", 0, strcharinfo(3); } else { soundeffectall "1_Nemesis.wav", 0;}
 }
 if(@nm >= .Feed){
-	announce rid2name(NemesisKilled)+" is feeding "+strcharinfo(0)+" "+((.Feeder)?"("+@nm+")":"")+"", ((.Broadcast)?bc_all:bc_map), .FDColor$;
+	announce rid2name(NemesisKilled)+" is feeding "+strcharinfo(0)+" "+((.Feeder)?"("+@nm+")":"")+"", ((.Broadcast)?bc_map:bc_all), .FDColor$;
 	sleep2 1500;
 	soundeffectall "Feeder.wav", 0, strcharinfo(3);
 } return;
@@ -283,13 +283,13 @@ if(@nm >= .Feed){
 OnDeath:
 attachrid(killedrid);
 if(@ks > 2){
-	if(#Announcer == 0){ announce rid2name(killerrid)+" just ended "+strcharinfo(0)+"'s "+.ESDotA$[@ks - 3]+" "+((.Streak)?"("+@ks+")":"")+"", ((.Broadcast)?bc_all:bc_map), .ESColor$; }
-	if(#Announcer >=1){ announce rid2name(killerrid)+" just ended "+strcharinfo(0)+"'s "+.ESHoN$[@ks - 3]+" "+((.Streak)?"("+@ks+")":"")+"", ((.Broadcast)?bc_all:bc_map), .ESColor$; }
+	if(#Announcer == 0){ announce rid2name(killerrid)+" just ended "+strcharinfo(0)+"'s "+.ESDotA$[@ks - 3]+" "+((.Streak)?"("+@ks+")":"")+"", ((.Broadcast)?bc_map:bc_all), .ESColor$; }
+	if(#Announcer >=1){ announce rid2name(killerrid)+" just ended "+strcharinfo(0)+"'s "+.ESHoN$[@ks - 3]+" "+((.Streak)?"("+@ks+")":"")+"", ((.Broadcast)?bc_map:bc_all), .ESColor$; }
 }
 if(@nm > 3){
 if (rid2name(killerrid) == rid2name(killedrid)) {
 	soundeffectall #Announcer+"_Payback.wav", 0, strcharinfo(3);
-	announce rid2name(killerrid)+" just have a payback againts "+strcharinfo(0)+" "+((.Nemesis)?"("+@nm+")":"")+"", ((.Broadcast)?bc_all:bc_map), .PBColor$;
+	announce rid2name(killerrid)+" just have a payback againts "+strcharinfo(0)+" "+((.Nemesis)?"("+@nm+")":"")+"", ((.Broadcast)?bc_map:bc_all), .PBColor$;
 }
 } callsub OnClearData;
 return;

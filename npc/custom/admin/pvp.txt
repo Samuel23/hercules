@@ -64,7 +64,7 @@ set .Kick, 2; //Who to kick? (0:Feedee|1:Feeder|2:Both)
 set .Rollback, 10; //How many times should the kill count rollback when feeding is called? (10:Recommended)
 
 //Announcer Setting
-set .Broadcast, 1; //Where do you want to broadcast? (0:bc_all|1:bc_map)
+set .Broadcast, 0; //Where do you want to broadcast? (0:bc_all|1:bc_map)
 set .Streak, 1; //Show number of killing streak in broadcast? e.g. Ghost is Beyond Godlike(8)
 set .Multiple, 1; //Show number of multiple kill in broadcast? e.g. Makizushi just got an Ownage(5)
 set .Nemesis, 1; //Show number of nemesis in broadcast? e.g. Epoque is owning Jguy(9)

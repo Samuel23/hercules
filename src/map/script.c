@@ -2761,11 +2761,10 @@ void pop_stack(struct script_state* st, int start, int end)
 /*==========================================
  * Release script dependent variable, dependent variable of function
  *------------------------------------------*/
-void script_free_vars(struct DBMap* storage)
-{
-	if( storage )
-	{// destroy the storage construct containing the variables
-		db_destroy(storage);
+void script_free_vars(struct DBMap* var_storage) {
+	if( var_storage ) {
+		// destroy the storage construct containing the variables
+		db_destroy(var_storage);
 	}
 }
 
@@ -8151,10 +8150,9 @@ BUILDIN(savepoint)
 /*==========================================
  * GetTimeTick(0: System Tick, 1: Time Second Tick)
  *------------------------------------------*/
-BUILDIN(gettimetick)	/* Asgard Version */
-{
+BUILDIN(gettimetick) { /* Asgard Version */
 	int type;
-	time_t timer;
+	time_t clock;
 	struct tm *t;
 	
 	type=script_getnum(st,2);
@@ -8167,8 +8165,8 @@ BUILDIN(gettimetick)	/* Asgard Version */
 			break;
 		case 1:
 			//type 1:(Second Ticks: 0-86399, 00:00:00-23:59:59)
-			time(&timer);
-			t=localtime(&timer);
+			time(&clock);
+			t=localtime(&clock);
 			script_pushint(st,((t->tm_hour)*3600+(t->tm_min)*60+t->tm_sec));
 			break;
 		case 0:
@@ -8186,16 +8184,15 @@ BUILDIN(gettimetick)	/* Asgard Version */
  * 4: WeekDay     5: MonthDay     6: Month
  * 7: Year
  *------------------------------------------*/
-BUILDIN(gettime)	/* Asgard Version */
-{
+BUILDIN(gettime) { /* Asgard Version */
 	int type;
-	time_t timer;
+	time_t clock;
 	struct tm *t;
 	
 	type=script_getnum(st,2);
 	
-	time(&timer);
-	t=localtime(&timer);
+	time(&clock);
+	t=localtime(&clock);
 	
 	switch(type){
 		case 1://Sec(0~59)
@@ -9716,19 +9713,18 @@ BUILDIN(getstatus)
 		return true;
 	}
 	
-	switch( type )
-	{
+	switch( type ) {
 		case 1:	 script_pushint(st, sd->sc.data[id]->val1);	break;
 		case 2:  script_pushint(st, sd->sc.data[id]->val2);	break;
 		case 3:  script_pushint(st, sd->sc.data[id]->val3);	break;
 		case 4:  script_pushint(st, sd->sc.data[id]->val4);	break;
 		case 5:
 		{
-			struct TimerData* timer = (struct TimerData*)iTimer->get_timer(sd->sc.data[id]->timer);
+			struct TimerData* td = (struct TimerData*)iTimer->get_timer(sd->sc.data[id]->timer);
 			
-			if( timer )
-			{// return the amount of time remaining
-				script_pushint(st, timer->tick - iTimer->gettick());
+			if( td ) {
+				// return the amount of time remaining
+				script_pushint(st, td->tick - iTimer->gettick());
 			}
 		}
 			break;
@@ -15496,17 +15492,15 @@ BUILDIN(mercenary_sc_start)
 	return true;
 }
 
-BUILDIN(mercenary_get_calls)
-{
+BUILDIN(mercenary_get_calls) {
 	struct map_session_data *sd = script_rid2sd(st);
-	int guild;
+	int guild_id;
 	
 	if( sd == NULL )
 		return true;
 	
-	guild = script_getnum(st,2);
-	switch( guild )
-	{
+	guild_id = script_getnum(st,2);
+	switch( guild_id ) {
 		case ARCH_MERC_GUILD:
 			script_pushint(st,sd->status.arch_calls);
 			break;
@@ -15524,19 +15518,17 @@ BUILDIN(mercenary_get_calls)
 	return true;
 }
 
-BUILDIN(mercenary_set_calls)
-{
+BUILDIN(mercenary_set_calls) {
 	struct map_session_data *sd = script_rid2sd(st);
-	int guild, value, *calls;
+	int guild_id, value, *calls;
 	
 	if( sd == NULL )
 		return true;
 	
-	guild = script_getnum(st,2);
+	guild_id = script_getnum(st,2);
 	value = script_getnum(st,3);
 	
-	switch( guild )
-	{
+	switch( guild_id ) {
 		case ARCH_MERC_GUILD:
 			calls = &sd->status.arch_calls;
 			break;
@@ -15556,17 +15548,15 @@ BUILDIN(mercenary_set_calls)
 	return true;
 }
 
-BUILDIN(mercenary_get_faith)
-{
+BUILDIN(mercenary_get_faith) {
 	struct map_session_data *sd = script_rid2sd(st);
-	int guild;
+	int guild_id;
 	
 	if( sd == NULL )
 		return true;
 	
-	guild = script_getnum(st,2);
-	switch( guild )
-	{
+	guild_id = script_getnum(st,2);
+	switch( guild_id ) {
 		case ARCH_MERC_GUILD:
 			script_pushint(st,sd->status.arch_faith);
 			break;
@@ -15584,19 +15574,17 @@ BUILDIN(mercenary_get_faith)
 	return true;
 }
 
-BUILDIN(mercenary_set_faith)
-{
+BUILDIN(mercenary_set_faith) {
 	struct map_session_data *sd = script_rid2sd(st);
-	int guild, value, *calls;
+	int guild_id, value, *calls;
 	
 	if( sd == NULL )
 		return true;
 	
-	guild = script_getnum(st,2);
+	guild_id = script_getnum(st,2);
 	value = script_getnum(st,3);
 	
-	switch( guild )
-	{
+	switch( guild_id ) {
 		case ARCH_MERC_GUILD:
 			calls = &sd->status.arch_faith;
 			break;
@@ -15612,7 +15600,7 @@ BUILDIN(mercenary_set_faith)
 	
 	*calls += value;
 	*calls = cap_value(*calls, 0, INT_MAX);
-	if( mercenary->get_guild(sd->md) == guild )
+	if( mercenary->get_guild(sd->md) == guild_id )
 		clif->mercenary_updatestatus(sd,SP_MERCFAITH);
 	
 	return true;

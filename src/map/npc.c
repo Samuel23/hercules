@@ -398,13 +398,13 @@ int npc_event_doall(const char* name)
 int npc_event_do_clock(int tid, unsigned int tick, int id, intptr_t data)
 {
 	static struct tm ev_tm_b; // tracks previous execution time
-	time_t timer;
+	time_t clock;
 	struct tm* t;
 	char buf[64];
 	int c = 0;
 
-	timer = time(NULL);
-	t = localtime(&timer);
+	clock = time(NULL);
+	t = localtime(&clock);
 
 	if (t->tm_min != ev_tm_b.tm_min ) {
 		char* day;
@@ -3835,13 +3835,13 @@ int npc_reload(void) {
 }
 
 //Unload all npc in the given file
-bool npc_unloadfile( const char* path ) {
+bool npc_unloadfile( const char* filepath ) {
 	DBIterator * iter = db_iterator(npc->name_db);
 	struct npc_data* nd = NULL;
 	bool found = false;
 
 	for( nd = dbi_first(iter); dbi_exists(iter); nd = dbi_next(iter) ) {
-		if( nd->path && strcasecmp(nd->path,path) == 0 ) {
+		if( nd->path && strcasecmp(nd->path,filepath) == 0 ) {
 			found = true;
 			npc->unload_duplicates(nd);/* unload any npcs which could duplicate this but be in a different file */
 			npc->unload(nd, true);

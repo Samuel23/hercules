@@ -37,7 +37,7 @@
 //
 Crystilia,88,90,4	script	Events Reward Giver	906,{
 	mes .npc$;
-	if (getgmlevel() >= .min_gm_lvl) {
+	if (getgmlevel() >= .min_gm_lvl) || (getgroupid() == 4) {
 		mes "Hello "+ strcharinfo(0) +".";
 		mes "What would you like today?";
 		switch(select("Make Item","Give Item","Delete Item","Give Group Item","Player Menu","Nothing")) {
@@ -111,7 +111,7 @@ GM_MakeItem:
 GM_GiveItem:
 	next;
 	mes .npc$;
-	if (getgmlevel() < .min_eventgm_lvl)
+	if (getgmlevel() < .min_eventgm_lvl) || (getgroupid() < 4)
 	{
 		mes "^CC0000Access Denied!";
 		mes "You must be atleast level "+ .min_eventgm_lvl +" GM.^000000";
@@ -444,7 +444,7 @@ if (.group_item == 0 ) {
 else {
 	next;
 	mes .npc$;
-	if (getgmlevel() < .min_eventgm_lvl)
+	if (getgmlevel() < .min_eventgm_lvl) || (getgroupid() < 4)
 	{
 		mes "^CC0000Access Denied!";
 		mes "You must be atleast level "+ .min_eventgm_lvl +" GM.^000000";

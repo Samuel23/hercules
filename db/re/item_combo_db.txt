@@ -70,7 +70,7 @@
 2171:15053,{ bonus bAgi,2; }
 2171:15056,{ bonus bAgi,2; }
 2173:15055,{ bonus bFlee,10; bonus bFlee2,10; }
-2278:18527,{ bonus2 bAddMonsterDropItem,12192,20; }
+2278:18527,{ bonus2 bAddMonsterDropItem,12192,2000; }
 2281:18527,{ bonus bFlee,10; }
 2286:18539,{ bonus bUseSPrate,-3; }
 2312:2656,{ bonus bDef,5; bonus bMaxHP,150; }
@@ -160,7 +160,7 @@
 4028:4296,{ bonus bStr,3; }
 4029:4183,{ bonus bFlee,18; }
 4031:4161,{ bonus bDef,3; bonus bVit,3; }
-4036:4186:4233:4281:4343,{ bonus bStr,4; bonus bMaxHPrate,7; bonus bMaxSPrate,7; bonus2 bSkillAtk,"MC_MAMMONITE",20; bonus bSPDrainValue,1; if(BaseJob==Job_Alchemist) { bonus3 bAutoSpell,"BS_ADRENALINE",1,10; bonus2 bAddMonsterDropItem,7139,3; bonus2 bAddMonsterDropItem,905,10; } }
+4036:4186:4233:4281:4343,{ bonus bStr,4; bonus bMaxHPrate,7; bonus bMaxSPrate,7; bonus2 bSkillAtk,"MC_MAMMONITE",20; bonus bSPDrainValue,1; if(BaseJob==Job_Alchemist) { bonus3 bAutoSpell,"BS_ADRENALINE",1,10; bonus2 bAddMonsterDropItem,7139,2000; bonus2 bAddMonsterDropItem,905,3000; } }
 4039:4210:4230:4257:4348,{ bonus bStr,6; bonus bAgi,4; bonus2 bSkillAtk,"RG_BACKSTAP",10; if(getskilllv("RG_STRIPARMOR")==5) bonus3 bAutoSpell,"RG_STRIPARMOR",5,50; if(BaseJob==Job_Rogue) { bonus bUseSPrate,-20; bonus3 bAutoSpell,"RG_INTIMIDATE",1,-20; } }
 4074:4162,{ bonus2 bAddEffWhenHit,Eff_Blind,600; }
 4090:4212:4328,{ bonus bAllStats,1; }
@@ -173,12 +173,12 @@
 4178:4234:4252:4297:4381,{ bonus bDex,5; bonus2 bSkillAtk,"CG_ARROWVULCAN",5; bonus2 bSkillAtk,"DC_THROWARROW",10; bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10; if(BaseJob==Job_Bard||BaseJob==Job_Dancer) bonus3 bAutoSpellWhenHit,"CG_TAROTCARD",2,50; }
 4185:4217:4280:4293:4312,{ bonus bVit,10; bonus bVariableCastrate,-10; bonus bUseSPRate,-10; if(BaseClass==Job_Acolyte) { bonus2 bExpAddRace,RC_Undead,5; bonus2 bExpAddRace,RC_Demon,5; bonus2 bSubRace,RC_Undead,30; bonus2 bSubRace,RC_Demon,30; } }
 4185:4293:4312:4332,{ bonus bStr,3; bonus bMaxSP,80; bonus bBaseAtk,25; bonus3 bAutoSpell,"AL_CRUCIS",5,10; bonus2 bSkillAtk,"MO_EXTREMITYFIST",10; if(BaseJob==Job_Monk) { bonus bUseSPrate,-10; bonus bNoCastCancel,0; } }
-4186:4206:4233:4281:4321,{ bonus bLuk,10; bonus2 bSPDrainValue,2,0; bonus2 bSkillAtk,42,20; if(BaseClass==Job_Merchant) { bonus2 bAddMonsterDropItem,617,5; bonus bMagicDamageReturn,20; } }
+4186:4206:4233:4281:4321,{ bonus bLuk,10; bonus2 bSPDrainValue,2,0; bonus2 bSkillAtk,42,20; if(BaseClass==Job_Merchant) { bonus2 bAddMonsterDropItem,617,2000; bonus bMagicDamageReturn,20; } }
 4191:4208:4258:4309:4325:4327,{ bonus bMaxHP,500; bonus bDef,5; bonus bMdef,5; bonus2 bSkillAtk,14,10; bonus2 bSkillAtk,19,10; bonus2 bSkillAtk,20,10; if(BaseClass==Job_Mage) { bonus bMatkRate,3; bonus bVariableCastrate,-15; } }
 4193:4294,{ bonus bMaxHP,300; bonus bMaxSP,60; }
-4208:4258:4325:4327:4382,{ bonus bInt,3; bonus2 bSkillAtk,"WZ_HEAVENDRIVE",10; bonus2 bSkillAtk,"MG_THUNDERSTORM",10; if(BaseJob==Job_Sage) { bonus bMagicDamageReturn,20; bonus2 bAddMonsterDropItem,716,100; bonus2 bAddMonsterDropItem,715,100; bonus bVariableCastrate,-20; } }
+4208:4258:4325:4327:4382,{ bonus bInt,3; bonus2 bSkillAtk,"WZ_HEAVENDRIVE",10; bonus2 bSkillAtk,"MG_THUNDERSTORM",10; if(BaseJob==Job_Sage) { bonus bMagicDamageReturn,20; bonus2 bAddMonsterDropItem,716,2000; bonus2 bAddMonsterDropItem,715,2000; bonus bVariableCastrate,-20; } }
 4218:4269,{ bonus bHPrecovRate,30; bonus bSPrecovRate,30; bonus bVit,4; bonus bInt,4; }
-4220:4246:4311:4319:4331,{ bonus bStr,10; bonus bMaxHPrate,20; bonus bHPrecovRate,50; bonus3 bAutoSpell,"BS_WEAPONPERFECT",1,3; bonus2 bAddMonsterDropItem,501,500; if(BaseClass==Job_Swordman) { bonus2 bAddItemHealRate,Red_Potion,50; bonus2 bAddItemHealRate,Yellow_Potion,50; bonus2 bAddItemHealRate,Orange_Potion,50; bonus2 bAddItemHealRate,White_Potion,50; } }
+4220:4246:4311:4319:4331,{ bonus bStr,10; bonus bMaxHPrate,20; bonus bHPrecovRate,50; bonus3 bAutoSpell,"BS_WEAPONPERFECT",1,3; bonus2 bAddMonsterDropItem,501,2000; if(BaseClass==Job_Swordman) { bonus2 bAddItemHealRate,Red_Potion,50; bonus2 bAddItemHealRate,Yellow_Potion,50; bonus2 bAddItemHealRate,Orange_Potion,50; bonus2 bAddItemHealRate,White_Potion,50; } }
 4229:4244:4299:4313,{ bonus bDef,3; bonus bMdef,3; }
 4237:4238,{ bonus3 bAutoSpell,"MG_LIGHTNINGBOLT",5,20; }
 4268:4277,{ bonus bBaseAtk,20; bonus bLuk,3; }
@@ -194,6 +194,9 @@
 5358:5653,{ bonus bAgi,1; bonus bFlee,3; }
 5401:5653,{ bonus bInt,1; bonus bMatkRate,2; }
 //5470:5653,{ bonus bDex,1; bonus bLongAtkRate,3; }
-13027:15044,{ bonus3 bAddMonsterDropItem,929,RC_Brute,100+(getrefine()*10); bonus3 bAddMonsterDropItem,929,RC_DemiHuman,100+(getrefine()*10); bonus3 bAddMonsterDropItem,970,RC_Brute,20+(getrefine()*2); bonus3 bAddMonsterDropItem,970,RC_DemiHuman,20+(getrefine()*2); }
+13027:15044,{ bonus3 bAddMonsterDropItem,929,RC_Brute,2000+(getrefine()*10); bonus3 bAddMonsterDropItem,929,RC_DemiHuman,2000+(getrefine()*10); bonus3 bAddMonsterDropItem,970,RC_Brute,2000+(getrefine()*2); bonus3 bAddMonsterDropItem,970,RC_DemiHuman,2000+(getrefine()*2); }
 13034:13035,{ bonus bMaxSP,20; bonus bMaxHPRate,5; bonus bHit,10; bonus2 bAddSize,Size_Large,30; autobonus "{ bonus bAspdRate,100; }",1,7000,0,"{ specialeffect2 EF_POTION_BERSERK; }"; }
 18507:18539,{ bonus bUseSPrate,-3; }
+
+// Custom V. Set
+17562:17563:17564:17565,{ bonus bAllStats,1; }

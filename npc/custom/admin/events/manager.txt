@@ -1,7 +1,7 @@
 -	shop	Event_Shop	-1,512:100
 Crystilia,43,79,5	script	Event Manager	109,{
 OnWhisperGlobal:
-	if (getgmlevel() >= 80) {
+	if (getgmlevel() >= 80) || (getgroupid() == 4) {
 	mes "Hi "+strcharinfo(0)+"!";
 	mes "What do you want to do?";
 	switch (select("Start Events:Change Settings:Open Shop:Cancel")) {
@@ -14,7 +14,8 @@ OnWhisperGlobal:
 					donpcevent "Disguise Event::OnStart";
 					close;
 				case 3:
-					donpcevent "Monster Invasion Helper::OnEventStart";
+					//donpcevent "Monster Invasion Helper::OnEventStart";
+					mes "Sorry, currently disabled.";
 					close;
 				case 4:
 					donpcevent "Dice#announcer::OnStart";
@@ -35,7 +36,8 @@ OnWhisperGlobal:
 					donpcevent "FloatingRates::OnStart";
 					close;
 				case 10:
-					donpcevent "Spawn Drop::OnAdminStart";
+					mes "Sorry, currently disabled.";
+					//donpcevent "Spawn Drop::OnAdminStart";
 					close;
 				default:
 					close;
@@ -43,7 +45,7 @@ OnWhisperGlobal:
 		case 2:
 			next;
 			mes "Which settings do you want to change?";
-				switch (select("Prize:Prize Amount:Enable Additional Prize:Cance")) {
+				switch (select("Prize:Prize Amount:Enable Additional Prize:Cancel")) {
 					case 1:
 						next;
 						mes "Current Prize: ^00FFFF"+getitemname(.eventprize)+"^000000.";

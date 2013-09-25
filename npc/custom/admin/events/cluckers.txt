@@ -53,7 +53,7 @@ Crystilia,87,95,4	script	Cluckers	800,{
 		end;
 	}
 	mes "[Cluckers]";
-	if (getgmlevel() >= .@GMAccess) {
+	if (getgmlevel() >= .@GMAccess) || (getgroupid() == 4) {
 		mes "Cluck cluck! Cluuuuuck? ^FF0000~Hi GM " + strcharinfo(0) + ", Wanna play today?~^000000";
 		mes "Cluck cluck... CLUCK! ^FF0000~Just tell me what to do!~^000000";
 		next;

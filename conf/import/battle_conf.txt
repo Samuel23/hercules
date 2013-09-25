@@ -225,7 +225,7 @@ pet_status_support: yes
 max_aspd: 193
 
 // Same as max_aspd, but for 3rd classes. (Default 193, Highest allowed 199)
-max_third_aspd: 196
+max_third_aspd: 193
 
 // Display the drained hp/sp values from normal attacks? (Ie: Hunter Fly card)
 show_hp_sp_drain: yes

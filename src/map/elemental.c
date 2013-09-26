@@ -145,8 +145,8 @@ int elemental_get_lifetime(struct elemental_data *ed) {
 	if( ed == NULL || ed->summon_timer == INVALID_TIMER )
 		return 0;
 
-	td = iTimer->get_timer(ed->summon_timer);
-	return (td != NULL) ? DIFF_TICK(td->tick, iTimer->gettick()) : 0;
+	td = timer->get(ed->summon_timer);
+	return (td != NULL) ? DIFF_TICK(td->tick, timer->gettick()) : 0;
 }
 
 int elemental_save(struct elemental_data *ed) {
@@ -190,7 +190,7 @@ static int elemental_summon_end(int tid, unsigned int tick, int id, intptr_t dat
 void elemental_summon_stop(struct elemental_data *ed) {
 	nullpo_retv(ed);
 	if( ed->summon_timer != INVALID_TIMER )
-		iTimer->delete_timer(ed->summon_timer, elemental_summon_end);
+		timer->delete(ed->summon_timer, elemental_summon_end);
 	ed->summon_timer = INVALID_TIMER;
 }
 
@@ -215,7 +215,7 @@ int elemental_delete(struct elemental_data *ed, int reply) {
 
 void elemental_summon_init(struct elemental_data *ed) {
 	if( ed->summon_timer == INVALID_TIMER )
-		ed->summon_timer = iTimer->add_timer(iTimer->gettick() + ed->elemental.life_time, elemental_summon_end, ed->master->bl.id, 0);
+		ed->summon_timer = timer->add(timer->gettick() + ed->elemental.life_time, elemental_summon_end, ed->master->bl.id, 0);
 
 	ed->regen.state.block = 0;
 }
@@ -257,7 +257,7 @@ int elemental_data_received(struct s_elemental *ele, bool flag) {
 
 		iMap->addiddb(&ed->bl);
 		status_calc_elemental(ed,1);
-		ed->last_spdrain_time = ed->last_thinktime = iTimer->gettick();
+		ed->last_spdrain_time = ed->last_thinktime = timer->gettick();
 		ed->summon_timer = INVALID_TIMER;
 		elemental_summon_init(ed);
 	} else {
@@ -430,9 +430,9 @@ int elemental_action(struct elemental_data *ed, struct block_list *bl, unsigned 
 			ed->ud.skill_lv = skill_lv;
 
 			if( skill->get_inf(skill_id) & INF_GROUND_SKILL )
-				ed->ud.skilltimer = iTimer->add_timer( tick+iStatus->get_speed(&ed->bl)*walk_dist, skill->castend_pos, ed->bl.id, 0 );
+				ed->ud.skilltimer = timer->add( tick+iStatus->get_speed(&ed->bl)*walk_dist, skill->castend_pos, ed->bl.id, 0 );
 			else
-				ed->ud.skilltimer = iTimer->add_timer( tick+iStatus->get_speed(&ed->bl)*walk_dist, skill->castend_id, ed->bl.id, 0 );
+				ed->ud.skilltimer = timer->add( tick+iStatus->get_speed(&ed->bl)*walk_dist, skill->castend_id, ed->bl.id, 0 );
 		}
 		return 1;
 
@@ -490,11 +490,11 @@ int elemental_change_mode_ack(struct elemental_data *ed, int mode) {
 
 	if( ed->ud.skilltimer != INVALID_TIMER )
 		return 0;
-	else if( DIFF_TICK(iTimer->gettick(), ed->ud.canact_tick) < 0 )
+	else if( DIFF_TICK(timer->gettick(), ed->ud.canact_tick) < 0 )
 		return 0;
 
 	ed->target_id = bl->id;	// Set new target
-	ed->last_thinktime = iTimer->gettick();
+	ed->last_thinktime = timer->gettick();
 
 	if( skill->get_inf(skill_id) & INF_GROUND_SKILL )
 		unit->skilluse_pos(&ed->bl, bl->x, bl->y, skill_id, skill_lv);
@@ -762,7 +762,7 @@ int read_elementaldb(void) {
 	char *str[26];
 	int i, j = 0, k = 0, ele;
 	struct s_elemental_db *db;
-	struct status_data *status;
+	struct status_data *estatus;
 
 	sprintf(line, "%s/%s", iMap->db_path, "elemental_db.txt");
 	memset(elemental->elemental_db,0,sizeof(elemental->elemental_db));
@@ -798,44 +798,44 @@ int read_elementaldb(void) {
 		safestrncpy(db->name, str[2], NAME_LENGTH);
 		db->lv = atoi(str[3]);
 
-		status = &db->status;
+		estatus = &db->status;
 		db->vd.class_ = db->class_;
 
-		status->max_hp = atoi(str[4]);
-		status->max_sp = atoi(str[5]);
-		status->rhw.range = atoi(str[6]);
-		status->rhw.atk = atoi(str[7]);
-		status->rhw.atk2 = atoi(str[8]);
-		status->def = atoi(str[9]);
-		status->mdef = atoi(str[10]);
-		status->str = atoi(str[11]);
-		status->agi = atoi(str[12]);
-		status->vit = atoi(str[13]);
-		status->int_ = atoi(str[14]);
-		status->dex = atoi(str[15]);
-		status->luk = atoi(str[16]);
+		estatus->max_hp = atoi(str[4]);
+		estatus->max_sp = atoi(str[5]);
+		estatus->rhw.range = atoi(str[6]);
+		estatus->rhw.atk = atoi(str[7]);
+		estatus->rhw.atk2 = atoi(str[8]);
+		estatus->def = atoi(str[9]);
+		estatus->mdef = atoi(str[10]);
+		estatus->str = atoi(str[11]);
+		estatus->agi = atoi(str[12]);
+		estatus->vit = atoi(str[13]);
+		estatus->int_ = atoi(str[14]);
+		estatus->dex = atoi(str[15]);
+		estatus->luk = atoi(str[16]);
 		db->range2 = atoi(str[17]);
 		db->range3 = atoi(str[18]);
-		status->size = atoi(str[19]);
-		status->race = atoi(str[20]);
+		estatus->size = atoi(str[19]);
+		estatus->race = atoi(str[20]);
 
 		ele = atoi(str[21]);
-		status->def_ele = ele%10;
-		status->ele_lv = ele/20;
-		if( status->def_ele >= ELE_MAX ) {
-			ShowWarning("Elemental %d has invalid element type %d (max element is %d)\n", db->class_, status->def_ele, ELE_MAX - 1);
-			status->def_ele = ELE_NEUTRAL;
+		estatus->def_ele = ele%10;
+		estatus->ele_lv = ele/20;
+		if( estatus->def_ele >= ELE_MAX ) {
+			ShowWarning("Elemental %d has invalid element type %d (max element is %d)\n", db->class_, estatus->def_ele, ELE_MAX - 1);
+			estatus->def_ele = ELE_NEUTRAL;
 		}
-		if( status->ele_lv < 1 || status->ele_lv > 4 ) {
-			ShowWarning("Elemental %d has invalid element level %d (max is 4)\n", db->class_, status->ele_lv);
-			status->ele_lv = 1;
+		if( estatus->ele_lv < 1 || estatus->ele_lv > 4 ) {
+			ShowWarning("Elemental %d has invalid element level %d (max is 4)\n", db->class_, estatus->ele_lv);
+			estatus->ele_lv = 1;
 		}
 
-		status->aspd_rate = 1000;
-		status->speed = atoi(str[22]);
-		status->adelay = atoi(str[23]);
-		status->amotion = atoi(str[24]);
-		status->dmotion = atoi(str[25]);
+		estatus->aspd_rate = 1000;
+		estatus->speed = atoi(str[22]);
+		estatus->adelay = atoi(str[23]);
+		estatus->amotion = atoi(str[24]);
+		estatus->dmotion = atoi(str[25]);
 
 		j++;
 	}
@@ -931,8 +931,8 @@ int do_init_elemental(void) {
 	read_elementaldb();
 	elemental->read_skilldb();
 
-	iTimer->add_timer_func_list(elemental_ai_timer,"elemental_ai_timer");
-	iTimer->add_timer_interval(iTimer->gettick()+MIN_ELETHINKTIME,elemental_ai_timer,0,0,MIN_ELETHINKTIME);
+	timer->add_func_list(elemental_ai_timer,"elemental_ai_timer");
+	timer->add_interval(timer->gettick()+MIN_ELETHINKTIME,elemental_ai_timer,0,0,MIN_ELETHINKTIME);
 
 	return 0;
 }

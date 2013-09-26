@@ -198,7 +198,7 @@ if(.PvPMap$[0] != "All"){
 	}
 }
 else {
-if (getmapflag(""+strcharinfo(3)+"",pvp)) || (getmapflag(""+strcharinfo(3)+"",gvg)) {
+if (getmapflag(""+strcharinfo(3)+"",mf_pvp) == 1) || (getmapflag(""+strcharinfo(3)+"",mf_gvg) == 1) {
 set Death, Death + 1;
 }
 }

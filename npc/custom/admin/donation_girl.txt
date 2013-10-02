@@ -116,7 +116,7 @@ OnInit:
 	set $donation_name$,"Donation Claim";
 	// Below here are SQL only setting
 	// Database name to use:
-	set $database_name$,"ragnarok";
+	set $database_name$,"exhilaratero";
 	// Table name to use for the main table
 	set $table_balance$,"donation";
 	// Table name to use for donated items

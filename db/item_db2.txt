@@ -113,7 +113,9 @@
 18641,Ribbon_Magic_Hat,Ribbon Magic Hat,5,20,,200,,2,,1,0xFFFFFFFE,63,2,256,,0,1,794,{ bonus bInt,3; bonus bMatkRate,5; bonus bMaxSP,50; },{},{}
 18657,Pegasus_Wing_Ears,Pegasus Ear Wing,5,20,,500,,1,,0,0xFFFFFFFF,63,2,512,,80,0,568,{ bonus bAspdRate,1; if (BaseLevel >= 100 & BaseLevel < 150) { bonus bAspdRate,2; } else if (BaseLevel >= 150) { bonus bAspdRate,3; } },{},{}
 18505,Umbala_Spirit,Umbala Spirit,5,0,,0,,1,,1,0xFFFFFFFF,63,2,1,,0,0,675,{ bonus bVit,1; bonus bMaxHPrate,1; bonus2 bAddMonsterDropItem,517,500; },{},{}
+18522,Evil_Marcher_Hat,Evil Marching Hat,5,20,,500,,10,,1,0xFFFFFFFF,63,2,256,,0,1,687,{ bonus bStr,2; bonus bMdef,1; bonus bAtkRate,2; if (getrefine()>=7) { bonus bCriticalRate,10; } if (getrefine()>=9) { bonus bAtkRate,5; bonus bLongAtkRate,5; } },{},{}
 18566,Nut_Donut_In_Mouth,Nut Donut In Mouth,5,20,,0,,1,,0,0xFFFFFFFF,63,2,1,,0,0,736,{ bonus bBaseAtk,5; bonus bMatk,5; },{},{}
+18571,Lucky_Hat,Lucky Hat,5,20,,1000,,0,,0,0xFFFFFFFF,63,2,256,,0,0,740,{ bonus2 bExpAddRace,RC_NONBOSS,3; bonus2 bExpAddRace,RC_BOSS,3; },{},{}
 
 18666,CD_In_Mouth,CD In Mouth,5,20,,200,,0,,0,0xFFFFFFFE,63,2,1,,20,0,815,{ bonus4 bAutoSpell,"MG_FIREBOLT",5,6,3; bonus4 bAutoSpell,"MG_LIGHTNINGBOLT",5,6,3; bonus4 bAutoSpell,"MG_COLDBOLT",5,6,3; bonus4 bAutoSpell,"MG_SOULSTRIKE",5,6,3; bonus4 bAutoSpell,"WZ_EARTHSPIKE",5,6,3; },{},{}
 

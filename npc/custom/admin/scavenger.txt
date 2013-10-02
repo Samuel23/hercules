@@ -1,0 +1,173 @@
+//===== eAthena Script ======================================= 
+//= Scavenger Hunt NPC
+//===== By: ================================================== 
+//= Iceandrews and MagnusG87
+//= Contact: caiaphas(at)hotmail.com
+//= eAthena ID: Iceandrews
+//===== Description: ========================================= 
+//=
+//= This NPC initiates a server wide Scavenger Hunt.
+//= The NPC generates a list of 10 items that are to be
+//= collected.  This list is valid for everyone on the entire
+//= server.  All players compete against each other to gather 
+//= the items in the hunt.  Once a player collects all the
+//= items, they can turn them in for a large experience 
+//= reward, both job and base.  At this time, a new list of
+//= items is generated for the entire server.  If at any time
+//= the list of items is too hard, or impossible to gather,
+//= a GM character can reset the game and generate a new list
+//= of items.  Only GM characters or a server restart will
+//= generate a new list of items.
+//=
+//= ******************* WARNINGS *****************************
+//= 1 - It is possible that some hunts may be impossible.
+//=	This script should generate a list of items that are 
+//=	dropped by a mosnter or sold by and NPC.  However,
+//=	it may select a mosnter that is NOT in the game.
+//=	I believe this is a rare case.
+//= 2 - This script makes use of a global variable.
+//=
+//===== Version History: =====================================
+//= 1.0 - Initial Release
+//= 1.1 - Made adjustments to the way in which it generated
+//=	  the item list.  Previously, it was ANY random item
+//=	  from the item_db.txt.  Now it should ONLY items
+//=	  that are either dropped by a monster  or sold by
+//=	  any NPC.  I also added code to choose between 
+//=	  and experience reward or a specified number of base
+//=	  and job levels.
+//============================================================
+
+
+prontera,143,101,6	script	ScavengerHunt	856,{
+
+//Main Menu Choices.
+	mes "[Scavenger Hunt]";
+	mes "Welcome to the Scavenger Hunt!";
+	next;
+	switch (select("View Current Scavenger Hunt Items:Hand in Current Scavenger Hunt Items:Leave:Initiate New Scavenger Hunt")) {
+		case 1:// Diplays the list of items and their item ID number that is valid for the current hunt.
+			ViewItems:
+			mes "[Scavenger Hunt]";
+			mes "This is the current list of items.";
+			mes "";
+			for(set .@i,0; .@i < 10; set .@i,.@i+1)
+			{
+				mes .@i+1 + ". " + getitemname(.scavengerList[.@i]) + " - Item ID:" + .scavengerList[.@i];
+			}
+			close;
+			end;
+		case 2:// Check to make sure you have all the required items in your inventory.  If you do, you get the rewards. If not, the NPC interactions ends.
+			CheckForItems:
+			for(set .@i,0; .@i < 10; set .@i,.@i+1) {
+				if(countitem(.scavengerList[.@i]) == 0)
+				{
+					// Player does not have the required items.
+					mes "[Scavenger Hunt]";
+					mes "Sorry, but it looks like you are missing some items. Come back when you've collected everything.";
+					next;
+					mes "[Scavenger Hunt]";
+					mes "Good luck finding everything!";
+					close;
+				}
+			}
+			mes "[Scavenger Hunt]";
+			mes "Congratulations! You've collected all the items in this Scavenger Hunt. Would you like to turn them in for the reward?";
+			next;
+			switch(select("Yes:No")) {
+				case 1:
+					for(set .@i,0; .@i < 10; set .@i,.@i+1) {
+						delitem .scavengerList[.@i],1;
+					}
+					// EXp Reward of 300000 base and job experience.
+					getexp 300000,300000;
+					callsub setScavengerList;
+					announce "Attention! A new scavenger hunt has begun!  Come and get the new item list!",bc_all;
+					mes "[Scavenger Hunt]";
+					mes "You've gained base and job experience.";
+					next;
+					mes "[Scavenger Hunt]";
+					mes "Good luck finding everything!";
+					close;
+				case 2:
+					mes "[Scavenger Hunt]";
+					mes "Aww, but you're missing out on a great reward!";
+					next;
+					mes "[Scavenger Hunt]";
+					mes "Good luck finding everything!";
+					close;
+			}
+		case 3:
+			mes "[Scavenger Hunt]";
+			mes "Good luck finding everything!";
+			close;
+		case 4: // Check to make sure player is a GM. If they player is a GM, generate a new item list. If they are not, provide a message and leave the NPC.
+			if (getgmlevel() >= 20 ) {
+				callsub setScavengerList;
+				mes "[Scavenger Hunt]";
+				mes "A new list of item has been generated. Thanks!";
+				next;
+				menu	"View Current Scavenger Hunt Items",viewItems,
+					"Leave",QuitHunt;
+			}
+			else
+			{
+				mes "[Scavenger Hunt]";
+				mes "Sorry, you don't have the rights to start a new Scavenger Hunt.";
+				next;
+				mes "[Scavenger Hunt]";
+				mes "Good luck finding everything!";
+				close;
+			}
+	}
+
+QuitHunt:
+mes "[Scavenger Hunt]";
+mes "Good luck finding everything!";
+close;
+end;
+
+setScavengerList:
+	
+	//initializes list of scavenger items
+	for( set .@i,0; .@i < 10 ; set .@i,.@i+1 )
+	{
+		set .@valid, 0;
+		
+		//continue generating random numbers until a valid item is found
+		while(.@valid == 0)
+		{
+			// This is the range of item IDs that can be produced
+			// for any given scavenger hunt.  This can be changed.
+
+			set .@j, rand(501, 30000);
+			
+			// This takes the random number above and does 2 things.
+			// First it check to see if the item exists at all.
+			// If getiteminfo() returns -1, then an item with that 
+			// number is not in the item database.  If that item does
+			// exist, then it returns the maximum drop rate for that
+			// item from the entier mosnter set.  For example, if the
+			// item is a 'Apple', and both Porings (5%) and Luncatis (1%)
+			// drop this item, the function will return 5.  This verifies
+			// that the item ID gernerated is dropped by a monster.
+			// If the returned number is 10000, this means it is
+			// sold by an NPC.  So this generates a list of random
+			// items that are either dropped by a mosnter or sold
+			// by and NPC.
+
+			if((getiteminfo(.@j,3) > 0) && (getiteminfo(.@j,2) == 3))
+			{
+				set .scavengerList[.@i], .@j;
+				set .@valid , 1;
+			}
+		}	
+	}
+
+	return;
+	end;
+
+OnInit:
+callsub setScavengerList;
+end;
+}

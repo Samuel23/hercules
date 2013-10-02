@@ -6,7 +6,7 @@ OnWhisperGlobal:
 	mes "What do you want to do?";
 	switch (select("Start Events:Change Settings:Open Shop:Cancel")) {
 		case 1:
-			switch (select("Start Poring Catcher:Start Disguise:Start Monster Invasion:Start Dice:Start Poring Race:Start Jumper:Spawn Treasure Chests:Spawn Mushrooms:Start Floating Rates:Start Spawn Drop:Nothing")) {
+			switch (select("Start Poring Catcher:Start Disguise:Start Monster Invasion:Start Dice:Start Poring Race:Start Jumper:Spawn Treasure Chests:Spawn Mushrooms:Start Floating Rates:Start Spawn Drop:Start Maze:Nothing")) {
 				case 1:
 					donpcevent "poring#announcer::OnStart";
 					close;
@@ -38,6 +38,9 @@ OnWhisperGlobal:
 				case 10:
 					mes "Sorry, currently disabled.";
 					//donpcevent "Spawn Drop::OnAdminStart";
+					close;
+				case 11:
+					donpcevent "Maze#announcer::OnStart";
 					close;
 				default:
 					close;
@@ -367,6 +370,7 @@ OnInit:
 	set .jumper,5;	// Original Prize Amount for Jumper
 	set .mushroom,1;	// Original Prize Amount for Mushroom
 	set .tbox,1;	// Original Prize Amount for Treasure Chest
+	set .maze,10;	// Original Prize Amount for Maze Event
 
 	set .AddPrize,1;	//enable Additional Prize
 }

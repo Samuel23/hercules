@@ -422,7 +422,6 @@ end;
 DetectDonate:
 	for (set .@i,0; .@i < (getarraysize(.DonorUpper)); set .@i,.@i+1) {
 		if (countitem(.DonorUpper[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorUpper[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;
@@ -430,7 +429,6 @@ DetectDonate:
 	}
 	for (set .@i,0; .@i < (getarraysize(.DonorLower)); set .@i,.@i+1) {
 		if	(countitem(.DonorLower[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorLower[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;
@@ -438,7 +436,6 @@ DetectDonate:
 	}
 	for (set .@i,0; .@i < (getarraysize(.DonorMiddle)); set .@i,.@i+1) {
 		if	(countitem(.DonorMiddle[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorMiddle[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;
@@ -446,7 +443,6 @@ DetectDonate:
 	}
 	for (set .@i,0; .@i < (getarraysize(.DonorArmor)); set .@i,.@i+1) {
 		if	(countitem(.DonorArmor[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorArmor[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;
@@ -454,7 +450,6 @@ DetectDonate:
 	}
 	for (set .@i,0; .@i < (getarraysize(.DonorWeapon)); set .@i,.@i+1) {
 		if	(countitem(.DonorWeapon[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorWeapon[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;
@@ -462,7 +457,6 @@ DetectDonate:
 	}
 	for (set .@i,0; .@i < (getarraysize(.DonorShield)); set .@i,.@i+1) {
 		if	(countitem(.DonorShield[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorShield[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;
@@ -470,7 +464,6 @@ DetectDonate:
 	}
 	for (set .@i,0; .@i < (getarraysize(.DonorGarment)); set .@i,.@i+1) {
 		if	(countitem(.DonorGarment[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorGarment[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;
@@ -478,7 +471,6 @@ DetectDonate:
 	}
 	for (set .@i,0; .@i < (getarraysize(.DonorShoes)); set .@i,.@i+1) {
 		if	(countitem(.DonorShoes[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorShoes[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;
@@ -486,7 +478,6 @@ DetectDonate:
 	}
 	for (set .@i,0; .@i < (getarraysize(.DonorAccessories)); set .@i,.@i+1) {
 		if	(countitem(.DonorAccessories[.@i]) >= 1) {
-			next;
 			mes "Sorry but donation items (^FF0000"+getitemname (.DonorAccessories[.@i]) +"^000000) are not allowed inside.";
 			mes "Please keep them in your storage.";
 			close;

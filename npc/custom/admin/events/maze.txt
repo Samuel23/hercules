@@ -1,0 +1,313 @@
+// Maze Game
+// First Public Release
+// Written by Euph
+
+// Game Runs Every 3 Hours Automatically
+// If you want to change this look for the "OnClock" events.
+
+prontera,155,94,0	script	mazeevent	45,2,2,{
+
+	if (getvariableofnpc(.mazeinit,"Maze#announcer")  == 0 ) {
+		disablenpc "mazeevent";
+		end;
+	}
+
+	for (set .@i,0; .@i < (getarraysize(getvariableofnpc(.disableditems,"Maze#announcer"))); set .@i,.@i+1) {
+		if	(countitem(getvariableofnpc(.disableditems[.@i],"Maze#announcer")) >= 1) {
+			mes "Sorry but items (^FF0000"+getitemname (getvariableofnpc(.disableditems[.@i],"Maze#announcer")) +"^000000) are not allowed inside.";
+			mes "Please keep them in your storage.";
+			close;
+		}
+	}
+
+	// Remove Peco / Cart
+	setcart 0;
+	setriding 0;
+
+
+	// Remove Any Speed Buffs
+	sc_end SC_INC_AGI;
+	sc_end SC_WINDWALK;
+	sc_end SC_CARTBOOST;
+	sc_end SC_CLOAKINGEXCEED;
+	sc_end SC_BERSERK;
+	sc_end SC_RUN;
+	sc_end SC_FOOD_BASICAVOIDANCE;
+
+	// Grant 5 Minute Walking Speed Increase
+	sc_start SC_INC_AGI,300000,1;
+
+
+	// Warp to Event
+	warp "force_1-3", 19, 189;
+
+
+}
+
+-	script	Maze#announcer	-1,{
+
+OnInit:
+        // Unload NPCs except this one at server start.
+	disablenpc "mazeevent";
+	disablenpc "mz_portal#1";
+	disablenpc "mz_portal#2";
+	disablenpc "mz_portal#3";
+	disablenpc "mz_portal#4";
+	disablenpc "mz_portal#5";
+	disablenpc "mz_portal#6";
+	disablenpc "mz_portal#7";
+	disablenpc "mz_portal#8";
+	disablenpc "mz_portal#9";
+	disablenpc "mz_portal#10";
+	disablenpc "mz_portal#11";
+	disablenpc "mz_portal#12";
+	disablenpc "mz_portal#13";
+	disablenpc "mz_portal#14";
+	disablenpc "mz_portal#15";
+	disablenpc "mz_portal#16";
+	disablenpc "mz_portal#17";
+	disablenpc "mz_portal#18";
+	disablenpc "mz_portal#19";
+	disablenpc "mz_portal#20";
+	disablenpc "mz_portal#21";
+	disablenpc "mz_portal#22";
+	disablenpc "mz_portal#23";
+	disablenpc "mz_portal#24";
+	disablenpc "Maze#asdf";
+	set .mazeinit,0;
+	setarray .disableditems[0],1363,1372,1373,2410,2515,4131,4210,5150,5203,5273,5274,5275,12622,662,12016,12028,12262;
+	end;
+
+OnStart:
+OnClock0135:
+OnClock0435:
+OnClock0735:
+OnClock1035:
+OnClock1335:
+OnClock1635:
+OnClock1935:
+OnClock2235:
+
+        announce "Maze: A maze event will begin in 2 minutes in Prontera 155 91.",0,0x99FFCC;
+        sleep 90000;
+        announce "Maze: Enter the Warp in Prontera 155 91 to join the Maze event.",0,0x99FFCC;
+
+        // Clear up the map.
+        areawarp "force_1-3",104,18,189,10,"prontera",155,175;
+
+        // Load NPCs + hide the Maze guy
+		set .mazeinit, 1;
+        enablenpc "mazeevent";
+        enablenpc "Maze#asdf";
+        hideonnpc "Maze#asdf";
+        initnpctimer;
+        end;
+
+OnTimer30000:
+        mapannounce "prontera","Maze: Last 30 seconds. If you want to join please enter the Warp Portal in Prontera 155 91",0,0x99FFCC;
+        sleep 5000;
+        mapannounce "prontera","Maze: If you want to join please enter the Warp Portal in Prontera 155 91.",0,0x99FFCC;
+        end;
+
+OnTimer50000:
+        mapannounce "prontera","Maze: Last 10 seconds.",0,0x99FFCC;
+        end;
+
+OnTimer60000:
+        mapannounce "prontera","Maze: Time's up.",0,0x99FFCC;
+        end;
+
+OnTimer61000:
+        disablenpc "mazeevent";
+        donpcevent "Maze#asdf::OnEnable";
+        stopnpctimer;
+        end;
+}
+
+force_1-3,100,187,4	script	Maze#asdf	702,{
+	mes "[Maze]";
+	mes "Here is your prize!";
+		/* Item Prize */
+		getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.dice,"Event Manager");
+		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
+		getexp rand(2000,20000),rand(1000,10000);
+		set .@AddZeny,rand(1000,50000);
+		set Zeny, Zeny + .@AddZeny;
+		dispbottom "You have gained "+.@AddZeny+"z.";
+		}
+L_EndIt:
+        warp "prontera",155,175;
+        // Hide the NPC
+        disablenpc "Maze#asdf";
+        end;
+
+
+OnEnable:
+        //if(getmapusers("force_1-3") == 1) goto L_NotEnough;
+        mapannounce "force_1-3","Maze: We are about to start the maze... here's how to play.",0,0x99FFCC;
+        sleep 7000;
+        mapannounce "force_1-3","Maze: Everybody must keep running through portals.",0,0x99FFCC;
+        sleep 7000;
+        mapannounce "force_1-3","Maze: Each portal will warp you to a random room.",0,0x99FFCC;
+        sleep 7000;
+        mapannounce "force_1-3","Maze: With some luck, somebody will find the finish!",0,0x99FFCC;
+        sleep 7000;
+        mapannounce "force_1-3","Maze: And then, they will win the event.",0,0x99FFCC;
+        sleep 7000;
+        mapannounce "force_1-3","Maze: Is everybody ready?! We're going to start!",0,0x99FFCC;
+        sleep 7000;
+        mapannounce "force_1-3","Maze: 3....",0,0x99FFCC;
+        sleep 3000;
+        mapannounce "force_1-3","Maze: 2...",0,0x99FFCC;
+        sleep 3000;
+        mapannounce "force_1-3","Maze: 1..",0,0x99FFCC;
+        sleep 3000;
+        mapannounce "force_1-3","Maze: GO!",0,0x99FFCC;
+		sleep 500;
+	enablenpc "mz_portal#1";
+	enablenpc "mz_portal#2";
+	enablenpc "mz_portal#3";
+	enablenpc "mz_portal#4";
+	enablenpc "mz_portal#5";
+	enablenpc "mz_portal#6";
+	enablenpc "mz_portal#7";
+	enablenpc "mz_portal#8";
+	enablenpc "mz_portal#9";
+	enablenpc "mz_portal#10";
+	enablenpc "mz_portal#11";
+	enablenpc "mz_portal#12";
+	enablenpc "mz_portal#13";
+	enablenpc "mz_portal#14";
+	enablenpc "mz_portal#15";
+	enablenpc "mz_portal#16";
+	enablenpc "mz_portal#17";
+	enablenpc "mz_portal#18";
+	enablenpc "mz_portal#19";
+	enablenpc "mz_portal#20";
+	enablenpc "mz_portal#21";
+	enablenpc "mz_portal#22";
+	enablenpc "mz_portal#23";
+	enablenpc "mz_portal#24";
+        end;
+
+L_NotEnough:
+        mapannounce "force_1-3","Maze: Not enough players.  Cancelling this round.",0,0x99FFCC;
+        areawarp "force_1-3",10,189,189,10,"prontera",155,175;
+        end;
+
+}
+
+-	script	maze_portal	-1,{
+	OnTouch:
+	set .@win_chance, (getmapusers("force_1-3")*23);
+	if ( rand(1,.@win_chance) == .@win_chance ) {
+		warp "force_1-3",100,184;
+		announce "Maze: "+strcharinfo(0)+" has solved the maze event!  Next round is in 3 hours.",0,0x99FFCC;
+		disablenpc "mz_portal#1";
+		disablenpc "mz_portal#2";
+		disablenpc "mz_portal#3";
+		disablenpc "mz_portal#4";
+		disablenpc "mz_portal#5";
+		disablenpc "mz_portal#6";
+		disablenpc "mz_portal#7";
+		disablenpc "mz_portal#8";
+		disablenpc "mz_portal#9";
+		disablenpc "mz_portal#10";
+		disablenpc "mz_portal#11";
+		disablenpc "mz_portal#12";
+		disablenpc "mz_portal#13";
+		disablenpc "mz_portal#14";
+		disablenpc "mz_portal#15";
+		disablenpc "mz_portal#16";
+		disablenpc "mz_portal#17";
+		disablenpc "mz_portal#18";
+		disablenpc "mz_portal#19";
+		disablenpc "mz_portal#20";
+		disablenpc "mz_portal#21";
+		disablenpc "mz_portal#22";
+		disablenpc "mz_portal#23";
+		disablenpc "mz_portal#24";
+		sleep 5000;
+                areawarp "force_1-3",10,189,29,170,"prontera",155,175;
+                areawarp "force_1-3",170,189,189,170,"prontera",155,175;
+                areawarp "force_1-3",10,147,189,11,"prontera",155,175;
+		mapannounce "force_1-3","Maze: Congratulations!  Talk to me for a prize.",0,0x99FFCC;
+		hideoffnpc "Maze#asdf";
+		end;
+	}
+	set .@this_entry, rand(1,15);
+	switch (.@this_entry) {
+		case 1:
+			warp "force_1-3",19,189;
+			end;
+		case 2:
+			warp "force_1-3",170,179;
+			end;
+		case 3:
+			warp "force_1-3",19,147;
+			end;
+		case 4:
+			warp "force_1-3",59,128;
+			end;
+		case 5:
+			warp "force_1-3",90,138;
+			end;
+		case 6:
+			warp "force_1-3",179,128;
+			end;
+		case 7:
+			warp "force_1-3",109,100;
+			end;
+		case 8:
+			warp "force_1-3",140,50;
+			end;
+		case 9:
+			warp "force_1-3",170,99;
+			end;
+		case 10:
+			warp "force_1-3",19,50;
+			end;
+		case 11:
+			warp "force_1-3",100,10;
+			end;
+		case 12:
+			warp "force_1-3",170,60;
+			end;
+		case 13:
+			warp "force_1-3",20,29;
+			end;
+		case 14:
+			warp "force_1-3",60,29;
+			end;
+		case 15:
+			warp "force_1-3",130,20;
+			end;
+	}
+}
+
+force_1-3,29,179,0	duplicate(maze_portal)	mz_portal#1	45,2,2
+force_1-3,180,170,0	duplicate(maze_portal)	mz_portal#2	45,2,2
+force_1-3,29,99,0	duplicate(maze_portal)	mz_portal#3	45,2,2
+force_1-3,69,138,0	duplicate(maze_portal)	mz_portal#4	45,2,2
+force_1-3,109,137,0	duplicate(maze_portal)	mz_portal#5	45,2,2
+force_1-3,140,147,0	duplicate(maze_portal)	mz_portal#6	45,2,2
+force_1-3,60,90,0	duplicate(maze_portal)	mz_portal#7	45,2,2
+force_1-3,130,100,0	duplicate(maze_portal)	mz_portal#8	45,2,2
+force_1-3,180,90,0	duplicate(maze_portal)	mz_portal#9	45,2,2
+force_1-3,69,59,0	duplicate(maze_portal)	mz_portal#10	45,2,2
+force_1-3,90,59,0	duplicate(maze_portal)	mz_portal#11	45,2,2
+force_1-3,179,50,0	duplicate(maze_portal)	mz_portal#12	45,2,2
+force_1-3,20,10,0	duplicate(maze_portal)	mz_portal#13	45,2,2
+force_1-3,69,19,0	duplicate(maze_portal)	mz_portal#14	45,2,2
+force_1-3,179,29,0	duplicate(maze_portal)	mz_portal#15	45,2,2
+force_1-3,139,109,0	duplicate(maze_portal)	mz_portal#16	45,2,2
+force_1-3,10,99,0	duplicate(maze_portal)	mz_portal#17	45,2,2
+force_1-3,130,137,0	duplicate(maze_portal)	mz_portal#18	45,2,2
+force_1-3,59,69,0	duplicate(maze_portal)	mz_portal#19	45,2,2
+force_1-3,109,59,0	duplicate(maze_portal)	mz_portal#20	45,2,2
+force_1-3,60,109,0	duplicate(maze_portal)	mz_portal#21	45,2,2
+force_1-3,100,147,0	duplicate(maze_portal)	mz_portal#22	45,2,2
+force_1-3,100,128,0	duplicate(maze_portal)	mz_portal#23	45,2,2
+force_1-3,180,109,0	duplicate(maze_portal)	mz_portal#24	45,2,2
+
+force_1-3	mapflag	zone	Maze

@@ -317,6 +317,7 @@ OnInit:
 		AddHunting("Into the Deep",1,150,0,0,0,0,200000,20000,2204,10,2203,10,2201,10); //Repeatable
 		AddHunting("Into the Deep 2",1,150,0,0,0,0,400000,30000,2204,20,2203,20,2201,20); //Repeatable
 		AddHunting("Into the Deep 3",1,150,0,0,0,0,600000,40000,2204,30,2203,30,2201,30); //Repeatable
+		AddHunting("Turtle Dungeon Assault",1,150,0,0,0,0,900000,70000,1314,50,1315,50,1318,50,1319,50); //Repeatable
 
 		end;
 		

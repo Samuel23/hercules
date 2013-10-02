@@ -166,11 +166,11 @@
 17561,VIP_Platinum_Scroll_4,VIP Platinum Scroll 4,2,,,10,,,, ,0xFFFFFFFF,63,2,,,,,,{ callfunc "VIP_PLATINUM",getcharid(3),30,17561; },{},{}
 
 // Valkyrie Set Duplicate (For G Package)
-17562,Valkyrie_Armor,Valkyrian Armor,5,0,,2800,,55,,1,0x000FDFFE,58,2,16,,0,1,0,{ bonus bAllStats,1; bonus bUnbreakableArmor,0; if(BaseClass==Job_Mage||BaseClass==Job_Archer||BaseClass==Job_Acolyte) bonus2 bResEff,Eff_Silence,5000; else if(BaseClass==Job_Swordman||BaseClass==Job_Merchant||BaseClass==Job_Thief) bonus2 bResEff,Eff_Stun,5000; },{},{}
-17563,Valkyrie_Manteau,Valkyrian Manteau,5,0,,500,,10,,1,0x000FDFFE,58,2,4,,0,1,0,{ bonus bUnbreakableGarment,0; if(BaseClass==Job_Mage||BaseClass==Job_Archer||BaseClass==Job_Acolyte) bonus bFlee2,5+(getequiprefinerycnt(EQI_GARMENT)*2); else if(BaseClass==Job_Swordman||BaseClass==Job_Merchant||BaseClass==Job_Thief) bonus bShortWeaponDamageReturn,5+(getequiprefinerycnt(EQI_GARMENT)*2); },{},{}
-17564,Valkyrie_Shoes,Valkyrian Shoes,5,0,,500,,13,,1,0x000FDFFE,58,2,64,,0,1,0,{ bonus bUnbreakableShoes,0; if(BaseClass==Job_Mage||BaseClass==Job_Archer||BaseClass==Job_Acolyte) bonus bMaxHP,(BaseLevel*5); else if(BaseClass==Job_Swordman||BaseClass==Job_Merchant||BaseClass==Job_Thief) bonus bMaxSP,(JobLevel*2); },{},{}
-17565,Valkyrie_Helm,Valkyrie Helm,5,100000,,1000,,10,,1,0x000FDFFE,58,2,256,,0,1,225,{ bonus bMdef,5; },{},{}
-17566,Valkyrja's_Shield,Valkyrja's Shield,5,30000,,500,,80,,1,0xFFFFFFFE,63,2,32,,65,1,4,{ bonus2 bSubEle,Ele_Water,20; bonus2 bSubEle,Ele_Fire,20; bonus2 bSubEle,Ele_Dark,20; bonus2 bSubEle,Ele_Undead,20; bonus bMdef,5; },{},{}
+17562,Valkyrie_Armor_2,Valkyrian Armor,5,0,,2800,,55,,1,0x000FDFFE,58,2,16,,0,1,0,{ bonus bAllStats,1; bonus bUnbreakableArmor,0; if(BaseClass==Job_Mage||BaseClass==Job_Archer||BaseClass==Job_Acolyte) bonus2 bResEff,Eff_Silence,5000; else if(BaseClass==Job_Swordman||BaseClass==Job_Merchant||BaseClass==Job_Thief) bonus2 bResEff,Eff_Stun,5000; },{},{}
+17563,Valkyrie_Manteau_2,Valkyrian Manteau,5,0,,500,,10,,1,0x000FDFFE,58,2,4,,0,1,0,{ bonus bUnbreakableGarment,0; if(BaseClass==Job_Mage||BaseClass==Job_Archer||BaseClass==Job_Acolyte) bonus bFlee2,5+(getequiprefinerycnt(EQI_GARMENT)*2); else if(BaseClass==Job_Swordman||BaseClass==Job_Merchant||BaseClass==Job_Thief) bonus bShortWeaponDamageReturn,5+(getequiprefinerycnt(EQI_GARMENT)*2); },{},{}
+17564,Valkyrie_Shoes_2,Valkyrian Shoes,5,0,,500,,13,,1,0x000FDFFE,58,2,64,,0,1,0,{ bonus bUnbreakableShoes,0; if(BaseClass==Job_Mage||BaseClass==Job_Archer||BaseClass==Job_Acolyte) bonus bMaxHP,(BaseLevel*5); else if(BaseClass==Job_Swordman||BaseClass==Job_Merchant||BaseClass==Job_Thief) bonus bMaxSP,(JobLevel*2); },{},{}
+17565,Valkyrie_Helm_2,Valkyrie Helm,5,100000,,1000,,10,,1,0x000FDFFE,58,2,256,,0,1,225,{ bonus bMdef,5; },{},{}
+17566,Valkyrja's_Shield_2,Valkyrja's Shield,5,30000,,500,,80,,1,0xFFFFFFFE,63,2,32,,65,1,4,{ bonus2 bSubEle,Ele_Water,20; bonus2 bSubEle,Ele_Fire,20; bonus2 bSubEle,Ele_Dark,20; bonus2 bSubEle,Ele_Undead,20; bonus bMdef,5; },{},{}
 
 // Custom Boxes
 17570,Lucky_Costume_Box,Lucky Costume Box,2,0,,200,,,,,0xFFFFFFFF,63,2,,,,,,{ packageitem(); },{},{}

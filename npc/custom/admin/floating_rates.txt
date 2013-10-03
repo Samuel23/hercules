@@ -19,9 +19,12 @@
 //add any other HOURS
 OnStart:
 OnHour00:
-OnHour06:
+OnHour04:
+OnHour08:
 OnHour12:
+OnHour16:
 OnHour18:
+OnHour20:
 //-------------------
 	set .@brate,(getbattleflag("base_exp_rate")*2);
 	set .@jrate,(getbattleflag("job_exp_rate")*2);

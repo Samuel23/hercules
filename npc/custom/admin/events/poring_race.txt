@@ -16,7 +16,9 @@
 
 Crystilia,0,0,0	script	PraceAnnouncer	-1,{
 
-OnHour18:
+OnClock0300:
+OnClock1200:
+OnClock2000:
 	initnpctimer "Race Manager#prace0";
 	announce "The Poringrace is now open! Go to Crystilia 105 75...",0;
 	donpcevent "PoringRace#control::OnReturnRace";
@@ -220,7 +222,14 @@ OnCheck:
             dispbottom "The winner is "+$prace_winner$+" and you bet on "+@prace_winner$+".";
             if (@prace_winner$ == $prace_winner$) {
 				dispbottom "You've won!";
-                getitem 674,2;	//Mithril Coin
+                /* Item Prize */
+				getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.poringrace,"Event Manager");
+				if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
+				getexp rand(1000,10000),rand(100,1000);
+				set .@AddZeny,rand(1000,50000);
+				set Zeny, Zeny + .@AddZeny;
+				dispbottom "You have gained "+.@AddZeny+"z.";
+				}
                 emotion 21,1;
             } else {
                 dispbottom "You've lost.";

@@ -6,7 +6,7 @@ OnWhisperGlobal:
 	mes "What do you want to do?";
 	switch (select("Start Events:Change Settings:Open Shop:Cancel")) {
 		case 1:
-			switch (select("Start Poring Catcher:Start Disguise:Start Monster Invasion:Start Dice:Start Poring Race:Start Jumper:Spawn Treasure Chests:Spawn Mushrooms:Start Floating Rates:Start Spawn Drop:Start Maze:Nothing")) {
+			switch (select("Start Poring Catcher:Start Disguise:Start Zombie Invasion:Start Dice:Start Poring Race:Start Jumper:Spawn Treasure Chests:Spawn Mushrooms:Start Floating Rates:Start Spawn Drop:Start Maze:Nothing")) {
 				case 1:
 					donpcevent "poring#announcer::OnStart";
 					close;
@@ -14,8 +14,7 @@ OnWhisperGlobal:
 					donpcevent "Disguise Event::OnStart";
 					close;
 				case 3:
-					//donpcevent "Monster Invasion Helper::OnEventStart";
-					mes "Sorry, currently disabled.";
+					donpcevent "Zombie Invasion::OnStart";
 					close;
 				case 4:
 					donpcevent "Dice#announcer::OnStart";
@@ -363,6 +362,7 @@ OnEnd:
 OnInit:
 	set .eventprize,7711;	// Item Id for Event Token
 	set .poringcatcher,10;	// Original Prize Amount for Poring Catcher
+	set .poringrace,10;	// Original Prize Amount for Poring Catcher
 	set .disguise,1;	// Original Prize Amount for Disguise
 	set .invasion,50;	// Original Prize Amount for Invasion
 	set .dice,10;	// Original Prize Amount for Dice
@@ -371,6 +371,7 @@ OnInit:
 	set .mushroom,1;	// Original Prize Amount for Mushroom
 	set .tbox,1;	// Original Prize Amount for Treasure Chest
 	set .maze,10;	// Original Prize Amount for Maze Event
+	set .zombieinvasion,2;	// Original Prize Amount for Zombie Invasion Event
 
 	set .AddPrize,1;	//enable Additional Prize
 }

@@ -26,18 +26,10 @@ OnInit:
 	hideonnpc "Dice#evnt1";
 	end;
 
-//Tuesday
-OnTue0030:
-OnTue0830:
-OnTue1630:
-//Thursday
-OnThu0030:
-OnThu0830:
-OnThu1630:
-//Saturday
-OnSat0030:
-OnSat0830:
-OnSat1630:
+OnClock0100:
+OnClock0800:
+OnClock1000:
+OnClock1800:
 OnStart:
 	announce "Dice: We are going to have a Dice event.",0;
 	sleep 10000;

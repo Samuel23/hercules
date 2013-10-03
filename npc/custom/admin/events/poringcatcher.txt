@@ -5,22 +5,10 @@ OnInit:
 	hideonnpc "Poring Catcher#evnt2";
 	end;
 
-//Monday
-OnMon0030:
-OnMon0830:
-OnMon1630:
-//Wednesday
-OnWed0030:
-OnWed0830:
-OnWed1630:
-//Friday
-OnFri0030:
-OnFri0830:
-OnFri1630:
-//Sunday
-OnSun0030:
-OnSun0830:
-OnSun1630:
+OnClock0200:
+OnClock0700:
+OnClock1100:
+OnClock1900:
 OnStart:
 	announce "Poring Catcher : It's time to play some Poring Catcher!",0;
 	killmonster "poring_w01","All";

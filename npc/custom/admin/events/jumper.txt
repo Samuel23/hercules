@@ -39,18 +39,9 @@ L_JumpAdmin:
 
 }// End Admin Manager...
 
-//Tuesday
-OnTue0430:
-OnTue1230:
-OnTue2030:
-//Thursday
-OnThu0430:
-OnThu1230:
-OnThu2030:
-//Saturday
-OnSat0430:
-OnSat1230:
-OnSat2030:
+OnClock0500:
+OnClock1400:
+OnClock2200:
 OnAdminStart:
 L_StartJmp:
 announce "Jumper Event : will begin in 20 seconds",bc_blue;

@@ -21,7 +21,9 @@ OnInit:
 	bindatcmd "checkmushroom",strnpcinfo(3)+"::OnAtcommand";
 	end;
 
-OnMinute00:	// Start time (every hour)
+OnClock0600:
+OnClock1400:
+OnClock2200:
 OnAdminStart:
 	if (mobcount(.Map$,strnpcinfo(0)+"::OnMushroomKilled") >= 25) { end; }
 	set .Spawn,rand(1,3);	// How many Mushrooms should spawn?

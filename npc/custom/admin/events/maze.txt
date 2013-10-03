@@ -2,7 +2,7 @@
 // First Public Release
 // Written by Euph
 
-// Game Runs Every 3 Hours Automatically
+// Game Runs Every 8 Hours Automatically
 // If you want to change this look for the "OnClock" events.
 
 prontera,155,94,0	script	mazeevent	45,2,2,{
@@ -79,14 +79,9 @@ OnInit:
 	end;
 
 OnStart:
-OnClock0135:
-OnClock0435:
-OnClock0735:
-OnClock1035:
-OnClock1335:
-OnClock1635:
-OnClock1935:
-OnClock2235:
+OnClock0600:
+OnClock1500:
+OnClock2300:
 
         announce "Maze: A maze event will begin in 2 minutes in Prontera 155 91.",0,0x99FFCC;
         sleep 90000;
@@ -202,7 +197,7 @@ L_NotEnough:
 	set .@win_chance, (getmapusers("force_1-3")*23);
 	if ( rand(1,.@win_chance) == .@win_chance ) {
 		warp "force_1-3",100,184;
-		announce "Maze: "+strcharinfo(0)+" has solved the maze event!  Next round is in 3 hours.",0,0x99FFCC;
+		announce "Maze: "+strcharinfo(0)+" has solved the maze event!  Next round is in 8 hours.",0,0x99FFCC;
 		disablenpc "mz_portal#1";
 		disablenpc "mz_portal#2";
 		disablenpc "mz_portal#3";

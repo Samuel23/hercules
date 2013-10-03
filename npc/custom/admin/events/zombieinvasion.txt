@@ -1,0 +1,87 @@
+-	script	Zombie Invasion	-1,{
+function Event;
+On5N:
+	set .5_mobNum[2], .5_mobNum[2]-1;
+	end;
+On5S:
+	set .5_mobNum[1], .5_mobNum[1]-1;
+	/*Item Prize*/
+		getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.zombieinvasion,"Event Manager");
+		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
+		getexp rand(1000,10000),rand(100,1000);
+		set .@AddZeny,rand(1000,50000);
+		set Zeny, Zeny + .@AddZeny;
+		dispbottom "You have gained "+.@AddZeny+"z.";
+		}
+	set .@str$, ((.5_mobNum[1])?" "+.5_mobNum[1]+" remain.":"");
+	mapannounce .5_map$,strcharinfo(0)+" has killed a special zombie!"+.@str$,16;
+	if (!.5_mobNum[1]) Event(5,0,0);
+	end;
+
+OnClock0400:
+OnClock1300:
+OnClock2100:
+OnStart:
+	if (!.Active) {
+		Event(5,1,0);
+	}
+	else {
+		Event(5,0,0);
+	}
+	end;
+
+OnTimer600000;	//After 10 Minutes
+	announce "10 minutes had already passed since Zombies invaded the town of Rachel!",0;
+	sleep 2000;
+	announce "Reinforcements are needed... Last 20 minutes...",0;
+	end;
+
+OnTimer1200000;	//After 20 Minutes
+	announce "20 minutes had already passed since Zombies invaded the town of Rachel!",0;
+	sleep 2000;
+	announce "Reinforcements are needed... Last 10 minutes...",0;
+	end;
+	
+OnTimer1800000:	//After 30 Minutes
+	Event(5,0,0);
+
+OnInit:
+		set .5_mobNum,30;	// Number of 'special' zombies.
+		set .5_points,1;	// Points per 'special' zombie kill.
+		setarray .5_mvp[0],0,	// Spawn MVPs by default? (0 or 1)
+		  1038,1112,1272,1389,	// List of MVPs to summon.
+		  1492,1734,1768,1708;
+		set .5_map$,"rachel";	// Event map (should be large).
+	end;
+
+function Event {
+	if (getarg(1)) {
+		set .Active,1;
+		setarray .@id[0],1015,1036,1298,1197,1864,1865,1403,1169,1870;
+		setarray .@num[0],400, 325, 100, 175,  75,  75, 150, 175,  25;
+		for(set .@k,0; .@k<9; set .@k,.@k+1)
+		monster .5_map$,0,0,getmonsterinfo(.@id[.@k],0),.@id[.@k],.@num[.@k],strnpcinfo(0)+"::On5N";
+		monster .5_map$,0,0,"Zombie",1015,.5_mobNum,strnpcinfo(0)+"::On5S";
+		if (.5_mvp[0]) for(set .@k,1; .@k<getarraysize(.5_mvp); set .@k,.@k+1)
+		monster .5_map$,0,0,getmonsterinfo(.5_mvp[.@k],0),.5_mvp[.@k],1,strnpcinfo(0)+"::On5S";
+		setarray .5_mobNum[1], .5_mobNum[0]+((.5_mvp[0])?getarraysize(.5_mvp)-1:0), 1500;
+		announce "The Zombie Invasion event has begun in "+.5_map$+"!",0;
+		sleep 2000;
+		announce "The Zombie Invasion event will only last for 30 minutes",0;
+		initnpctimer;
+	}
+	else {
+		killmonster .5_map$,"All";
+		maprespawnguildid .5_map$,0,3;
+		setarray .5_mobNum[1],0,0;
+		stopnpctimer;
+	}
+	if (!getarg(1)) {
+		announce "The Zombie Invasion event is now over!",0;
+		set .Active,0;
+	}
+	set .Active, ((getarg(1))?getarg(0):0);
+	return;
+}
+
+}

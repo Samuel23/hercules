@@ -30,13 +30,13 @@ OnStart:
 	}
 	end;
 
-OnTimer600000;	//After 10 Minutes
+OnTimer600000:	//After 10 Minutes
 	announce "10 minutes had already passed since Zombies invaded the town of Rachel!",0;
 	sleep 2000;
 	announce "Reinforcements are needed... Last 20 minutes...",0;
 	end;
 
-OnTimer1200000;	//After 20 Minutes
+OnTimer1200000:	//After 20 Minutes
 	announce "20 minutes had already passed since Zombies invaded the town of Rachel!",0;
 	sleep 2000;
 	announce "Reinforcements are needed... Last 10 minutes...",0;

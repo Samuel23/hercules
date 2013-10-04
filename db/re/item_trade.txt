@@ -1963,7 +1963,7 @@
 14524,15,99		// Fish Slice
 13550,15,99		// Fish Slice Box of 10
 30003,15,99		// Fish Slice Box of 50
-31050,31,99		// Vote Coin
+31050,479,99	// Vote Coin
 17562,479,99	// Valkyrie_Armor
 17563,479,99	// Valkyrie_Manteau
 17564,479,99	// Valkyrie_Shoes

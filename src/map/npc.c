@@ -2130,7 +2130,8 @@ const char* npc_parse_warp(char* w1, char* w2, char* w3, char* w4, const char* s
 const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const char* start, const char* buffer, const char* filepath)
 {
 	//TODO: could be rewritten to NOT need this temp array [ultramage]
-	#define MAX_SHOPITEM 100
+	//#define MAX_SHOPITEM 100
+	#define MAX_SHOPITEM 1000
 	struct npc_item_list items[MAX_SHOPITEM];
 	char *p;
 	int x, y, dir, m, i;

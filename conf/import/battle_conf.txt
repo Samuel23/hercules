@@ -127,6 +127,11 @@ disp_experience: yes
 // Will display zeny earned (from mobs, trades, etc) (Note 1)
 disp_zeny: yes
 
+/* feature.conf */
+// Banking (Note 1)
+// Requires: 2013-07-24aRagexe or later
+feature.banking: off
+
 /* gm.conf */
 
 // (@) @allstats/@str/@agi/@vit/@int/@dex/@luk

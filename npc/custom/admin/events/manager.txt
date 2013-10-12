@@ -47,7 +47,7 @@ OnWhisperGlobal:
 		case 2:
 			next;
 			mes "Which settings do you want to change?";
-				switch (select("Prize:Prize Amount:Enable Additional Prize:Cancel")) {
+				switch (select("Prize:Prize Amount:Enable Additional Prize:Enable Special Event:Cancel")) {
 					case 1:
 						next;
 						mes "Current Prize: ^00FFFF"+getitemname(.eventprize)+"^000000.";
@@ -160,6 +160,29 @@ OnWhisperGlobal:
 								close;
 							default:
 								close;
+						}
+					case 4:
+						next;
+						if (getgmlevel() >= 98) {
+							mes "What do you want to do?";
+							mes "1. Enable Monthsary Prize Sytem?";
+							mes "2. Disable Monthsary Prize System?";
+							switch(select("Enable:Disable")) {
+								case 1:
+									set .monthsary,1;
+									next;
+									mes "You have successfully enabled the monthsary prize system.";
+									close;
+								case 2:
+									set .monthsary,0;
+									next;
+									mes "You have successfully disabled the monthsary prize system.";
+									close;
+							}
+						}
+						else {
+							mes "Sorry, but only GMs with admin privileges can use this...";
+							close;
 						}
 					default:
 						close;
@@ -361,6 +384,8 @@ OnEnd:
 
 OnInit:
 	set .eventprize,7711;	// Item Id for Event Token
+
+	/* Prize Settings */
 	set .poringcatcher,10;	// Original Prize Amount for Poring Catcher
 	set .poringrace,10;	// Original Prize Amount for Poring Catcher
 	set .disguise,1;	// Original Prize Amount for Disguise
@@ -373,5 +398,6 @@ OnInit:
 	set .maze,10;	// Original Prize Amount for Maze Event
 	set .zombieinvasion,2;	// Original Prize Amount for Zombie Invasion Event
 
-	set .AddPrize,1;	//enable Additional Prize
+	set .AddPrize,1;	//Additional Prize (1:Enabled | 0:Disabled)
+	set .monthsary,0;	// Monthsary Event Prize System (1:Enabled | 0:Disabled)
 }

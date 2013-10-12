@@ -160,14 +160,21 @@ set $@RoundCount,$@RoundCount+1;
 deletepset 1;
 defpattern 1,"([^:]+):.*\\sOMFGBBQLEETSAUCEGMOCEANRULESHAI!!.*", "iFailCheater";
 activatepset 1;
-/* Item Prize*/
-	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.disguise,"Event Manager");
+	/* Item Prize*/
+	if (getvariableofnpc(.monthsary,"Event Manager")) {
+		set #CASHPOINTS, #CASHPOINTS + getvariableofnpc(.disguise,"Event Manager");
+		dispbottom "You have obtained "+getvariableofnpc(.disguise,"Event Manager")+" Cash points.";
+		dispbottom "Total Cashpoints: "+#CASHPOINTS+"";
+	}
+	else {
+		getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.disguise,"Event Manager");
 		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
-		getexp rand(1000,10000),rand(100,1000);
-		set .@AddZeny,rand(1000,50000);
-		set Zeny, Zeny + .@AddZeny;
-		dispbottom "You have gained "+.@AddZeny+"z.";
+			getexp rand(1000,10000),rand(100,1000);
+			set .@AddZeny,rand(1000,50000);
+			set Zeny, Zeny + .@AddZeny;
+			dispbottom "You have gained "+.@AddZeny+"z.";
 		}
+	}
 announce ""+strcharinfo(0)+" is correct! I was disguised as: "+$MonsterName$+"",bc_map | bc_blue;
 if ($@RoundCount>=$Rounds)
   {setnpcdisplay "Disguise Event",795;

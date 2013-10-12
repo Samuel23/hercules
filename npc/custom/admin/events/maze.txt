@@ -122,14 +122,21 @@ OnTimer61000:
 force_1-3,100,187,4	script	Maze#asdf	702,{
 	mes "[Maze]";
 	mes "Here is your prize!";
-		/* Item Prize */
-		getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.dice,"Event Manager");
+	/* Item Prize*/
+	if (getvariableofnpc(.monthsary,"Event Manager")) {
+		set #CASHPOINTS, #CASHPOINTS + getvariableofnpc(.maze,"Event Manager");
+		dispbottom "You have obtained "+getvariableofnpc(.maze,"Event Manager")+" Cash points.";
+		dispbottom "Total Cashpoints: "+#CASHPOINTS+"";
+	}
+	else {
+		getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.maze,"Event Manager");
 		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
-		getexp rand(2000,20000),rand(1000,10000);
-		set .@AddZeny,rand(1000,50000);
-		set Zeny, Zeny + .@AddZeny;
-		dispbottom "You have gained "+.@AddZeny+"z.";
+			getexp rand(1000,10000),rand(100,1000);
+			set .@AddZeny,rand(1000,50000);
+			set Zeny, Zeny + .@AddZeny;
+			dispbottom "You have gained "+.@AddZeny+"z.";
 		}
+	}
 L_EndIt:
         warp "prontera",155,175;
         // Hide the NPC

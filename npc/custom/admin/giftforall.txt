@@ -9,14 +9,14 @@ quiz_01,42,285,4,	script	Gift For All	717,{
 		end;
 	}
 	else if (.special == 1) {
-		if (#firstmonth == 0 ) {
+		if (#secondmonth == 0 ) {
 			for(set .@i,0;.@i<getarraysize(.specials);set .@i,.@i+2) {
 			getitem .specials[.@i],.specials[.@i+1];
 			}
 			set #CASHPOINTS, #CASHPOINTS + .bonuscash;
 			dispbottom "You have obtained "+.bonuscash+" Cash points.";
 			dispbottom "Total Cashpoints: "+#CASHPOINTS+"";
-			set #firstmonth,1;
+			set #secondmonth,1;
 			announce strcharinfo(0) + " has received his Free Gifts!",bc_all;
 			warp "prontera",155,170;
 			end;

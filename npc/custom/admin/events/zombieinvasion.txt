@@ -5,14 +5,21 @@ On5N:
 	end;
 On5S:
 	set .5_mobNum[1], .5_mobNum[1]-1;
-	/*Item Prize*/
+	/* Item Prize*/
+	if (getvariableofnpc(.monthsary,"Event Manager")) {
+		set #CASHPOINTS, #CASHPOINTS + getvariableofnpc(.zombieinvasion,"Event Manager");
+		dispbottom "You have obtained "+getvariableofnpc(.zombieinvasion,"Event Manager")+" Cash points.";
+		dispbottom "Total Cashpoints: "+#CASHPOINTS+"";
+	}
+	else {
 		getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.zombieinvasion,"Event Manager");
 		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
-		getexp rand(1000,10000),rand(100,1000);
-		set .@AddZeny,rand(1000,50000);
-		set Zeny, Zeny + .@AddZeny;
-		dispbottom "You have gained "+.@AddZeny+"z.";
+			getexp rand(1000,10000),rand(100,1000);
+			set .@AddZeny,rand(1000,50000);
+			set Zeny, Zeny + .@AddZeny;
+			dispbottom "You have gained "+.@AddZeny+"z.";
 		}
+	}
 	set .@str$, ((.5_mobNum[1])?" "+.5_mobNum[1]+" remain.":"");
 	mapannounce .5_map$,strcharinfo(0)+" has killed a special zombie!"+.@str$,16;
 	if (!.5_mobNum[1]) Event(5,0,0);

@@ -105,14 +105,21 @@ L_PORING:
 	close2;
 	announce "Poring Catcher : We have a winner, "+.@name$+"!",0;
 
-	/* Item Prize */
-	getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.poringcatcher,"Event Manager");
+	/* Item Prize*/
+	if (getvariableofnpc(.monthsary,"Event Manager")) {
+		set #CASHPOINTS, #CASHPOINTS + getvariableofnpc(.poringcatcher,"Event Manager");
+		dispbottom "You have obtained "+getvariableofnpc(.poringcatcher,"Event Manager")+" Cash points.";
+		dispbottom "Total Cashpoints: "+#CASHPOINTS+"";
+	}
+	else {
+		getitem getvariableofnpc(.eventprize,"Event Manager"),getvariableofnpc(.poringcatcher,"Event Manager");
 		if (getvariableofnpc(.AddPrize,"Event Manager") == 1) {
-		getexp rand(1000,10000),rand(100,1000);
-		set .@AddZeny,rand(1000,50000);
-		set Zeny, Zeny + .@AddZeny;
-		dispbottom "You have gained "+.@AddZeny+"z.";
+			getexp rand(1000,10000),rand(100,1000);
+			set .@AddZeny,rand(1000,50000);
+			set Zeny, Zeny + .@AddZeny;
+			dispbottom "You have gained "+.@AddZeny+"z.";
 		}
+	}
 
 	set PORING,0;
 	warp "Crystilia",93,85;

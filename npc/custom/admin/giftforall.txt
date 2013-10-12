@@ -17,6 +17,9 @@ quiz_01,42,285,4,	script	Gift For All	717,{
 			dispbottom "You have obtained "+.bonuscash+" Cash points.";
 			dispbottom "Total Cashpoints: "+#CASHPOINTS+"";
 			set #secondmonth,1;
+			set .@when$,callfunc("makeTimestamp");
+			set .val$,"#secondmonth";
+			query_sql "INSERT INTO `monthsary` (`account_id`,`char_id`,`char_name`,`ip_address`,`when`,`val1`) VALUES ('"+getcharid(3)+"', '"+getcharid(0)+"', '"+strcharinfo(0)+"', '"+getcharip()+"', '"+escape_sql(.@when$)+"', '"+.val$+"')";
 			announce strcharinfo(0) + " has received his Free Gifts!",bc_all;
 			warp "prontera",155,170;
 			end;

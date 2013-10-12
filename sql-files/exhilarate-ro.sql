@@ -860,3 +860,18 @@ CREATE TABLE IF NOT EXISTS `itemizer` (
   `collected` tinyint(1) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM ;
+
+--
+-- Monthsary Gifts
+--
+
+DROP TABLE IF EXISTS `monthsary`;
+CREATE TABLE IF NOT EXISTS `monthsary` (
+`account_id` int(7) unsigned NOT NULL,
+`char_id` int(11) NOT NULL,
+`char_name` varchar(255) NOT NULL,
+`ip_address` varchar(100) NOT NULL default '',
+`when` datetime NOT NULL,
+`val1` varchar(255) NOT NULL,
+PRIMARY KEY (`account_id`)
+) ENGINE=MyISAM ;

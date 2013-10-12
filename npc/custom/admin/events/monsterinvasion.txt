@@ -84,3 +84,4 @@ OnAtcommand:
 }
 
 poring_w01	mapflag	zone	Maze
+poring_w01	mapflag	noskill	off

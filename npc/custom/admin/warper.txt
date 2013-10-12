@@ -378,7 +378,7 @@ GvG:
 	Special:
 // --------------------------------------------------
 menu	"Mall/Vending",MV,"Auction Hall",S1, "Battlegrounds",S2, "Casino",S3, "Gonryun Arena",S4,
-	"Izlude Arena",S5, "Monster Race Arena",S6, "Turbo Track",S7;
+	"Izlude Arena",S5, "Monster Race Arena",S6, "Turbo Track",S7, "MVP Event",MVP;
 
 MV: Go("mall",99,117);
 S1: Go("auction_01",22,68);
@@ -388,6 +388,35 @@ S4: Go("gon_test",48,10);
 S5: Go("arena_room",100,88);
 S6: Go("p_track01",62,41);
 S7: Go("turbo_room",99,114);
+
+MVP:
+	mes "There is a 20,000z requirement to enter.";
+	mes "Do you still want to go?";
+	switch (select("Yes:No")) {
+		case 1:
+			if (getvariableofnpc(.Active,"MVP Invasion")) {
+				if (Zeny < 20000) {
+					next;
+					mes "Sorry, but you don't have enough zeny.";
+					mes "You need 20,000 zennies to enter.";
+					close;
+				}
+				else {
+					set Zeny, Zeny-20000;
+					warp "poring_w01",106,126;
+					close;
+				}
+			}
+			else {
+				next;
+				mes "Sorry, but MVP Invasion is currently disabled.";
+				close;
+			}
+		case 2:
+			close;
+		default:
+			close;
+	}
 
 Lsorry:
 mes "[Warper]";

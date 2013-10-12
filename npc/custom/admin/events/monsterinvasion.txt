@@ -49,7 +49,7 @@ OnTimer1800000:	//After 30 Minutes
 
 OnInit:
 	set .5_points,1;	// Points per 'special' MVP kill.
-	set .5_map$,"prontera";	// Event map (should be large).
+	set .5_map$,"poring_w01";	// Event map (should be large).
 	bindatcmd "mvp",strnpcinfo(3)+"::OnAtcommand";
 	end;
 
@@ -82,3 +82,5 @@ OnAtcommand:
 	dispbottom "There are now "+mobcount(.5_map$,strnpcinfo(0)+"::On5S")+" MVPs left in "+.5_map$+".";
 	end;
 }
+
+poring_w01	mapflag	zone	Maze

@@ -305,7 +305,7 @@ OnInit:
 	setarray .Modifier[0],	// Multipliers for Base Exp, Job Exp, and Zeny rewards.
 		getbattleflag("base_exp_rate")/100,getbattleflag("job_exp_rate")/100,60;
 	setarray .Shop[0],	// Reward items: <ID>,<point cost> (about 10~20 points per hunt).
-		13548,40,13549,40,17531,50,17532,75,17533,100,17534,125,17535,150,13550,300;
+		13548,40,13549,40,17531,50,17532,75,17533,100,17534,125,17535,150,13550,300,30017,500;
 	set .Blacklist$,	// Blacklisted mob IDs.
 		"1062,1088,1183,1186,1200,1212,1220,1221,1234,1235,"+
 		"1244,1245,1250,1268,1290,1293,1294,1296,1298,1299,"+

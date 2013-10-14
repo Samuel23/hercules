@@ -1,4 +1,5 @@
 -	shop	Event_Shop	-1,512:100
+
 Crystilia,43,79,5	script	Event Manager	109,{
 OnWhisperGlobal:
 	if (getgmlevel() >= 80) || (getgroupid() == 4) {

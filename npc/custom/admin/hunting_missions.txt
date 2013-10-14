@@ -18,6 +18,8 @@
 //= 1.3a Added mission reset options.
 //============================================================
 
+-	shop	mission_shop	-1,512:-1
+
 Crystilia,43,73,5	script	Hunting Missions	951,{
 function Chk; function Cm;
 	mes "[Hunting Missions]";
@@ -316,4 +318,3 @@ OnInit:
 		npcshopadditem "mission_shop", .Shop[.@i], .Shop[.@i+1];
 	end;
 }
--	shop	mission_shop	-1,512:-1

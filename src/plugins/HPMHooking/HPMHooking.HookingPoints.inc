@@ -34,6 +34,7 @@ struct HookingPointData HookingPoints[] = {
 	{ HP_POP(atcommand->cmd_db_clear_sub, HP_atcommand_cmd_db_clear_sub) },
 	{ HP_POP(atcommand->doload, HP_atcommand_doload) },
 	{ HP_POP(atcommand->base_commands, HP_atcommand_base_commands) },
+	{ HP_POP(atcommand->add, HP_atcommand_add) },
 /* battle */
 	{ HP_POP(battle->init, HP_battle_init) },
 	{ HP_POP(battle->final, HP_battle_final) },
@@ -1450,6 +1451,8 @@ struct HookingPointData HookingPoints[] = {
 	{ HP_POP(map->addblcell, HP_map_addblcell) },
 	{ HP_POP(map->delblcell, HP_map_delblcell) },
 	{ HP_POP(map->get_new_bonus_id, HP_map_get_new_bonus_id) },
+	{ HP_POP(map->add_questinfo, HP_map_add_questinfo) },
+	{ HP_POP(map->remove_questinfo, HP_map_remove_questinfo) },
 /* mapit */
 	{ HP_POP(mapit->alloc, HP_mapit_alloc) },
 	{ HP_POP(mapit->free, HP_mapit_free) },

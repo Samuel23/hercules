@@ -45,6 +45,7 @@
 #include "mapreg.h"
 #include "quest.h"
 #include "searchstore.h"
+#include "HPMmap.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -4259,7 +4260,8 @@ ACMD(servertime) {
 	} else if (battle_config.night_duration == 0) {
 		if (map->night_flag == 1) { // we start with night
 			timer_data = timer->get(pc->day_timer_tid);
-			sprintf(temp, msg_txt(233), txt_time(DIFF_TICK(timer_data->tick,timer->gettick())/1000)); // Game time: The game is actualy in night for %s.
+			sprintf(temp, msg_txt(233), // Game time: The game is actually in night for %s.
+			        txt_time((unsigned int)(DIFF_TICK(timer_data->tick,timer->gettick())/1000)));
 			clif->message(fd, temp);
 			clif->message(fd, msg_txt(234)); // Game time: After, the game will be in permanent daylight.
 		} else
@@ -4267,7 +4269,8 @@ ACMD(servertime) {
 	} else if (battle_config.day_duration == 0) {
 		if (map->night_flag == 0) { // we start with day
 			timer_data = timer->get(pc->night_timer_tid);
-			sprintf(temp, msg_txt(235), txt_time(DIFF_TICK(timer_data->tick,timer->gettick())/1000)); // Game time: The game is actualy in daylight for %s.
+			sprintf(temp, msg_txt(235), // Game time: The game is actualy in daylight for %s.
+			        txt_time((unsigned int)(DIFF_TICK(timer_data->tick,timer->gettick())/1000)));
 			clif->message(fd, temp);
 			clif->message(fd, msg_txt(236)); // Game time: After, the game will be in permanent night.
 		} else
@@ -4276,22 +4279,28 @@ ACMD(servertime) {
 		if (map->night_flag == 0) {
 			timer_data = timer->get(pc->night_timer_tid);
 			timer_data2 = timer->get(pc->day_timer_tid);
-			sprintf(temp, msg_txt(235), txt_time(DIFF_TICK(timer_data->tick,timer->gettick())/1000)); // Game time: The game is actualy in daylight for %s.
+			sprintf(temp, msg_txt(235), // Game time: The game is actualy in daylight for %s.
+			        txt_time((unsigned int)(DIFF_TICK(timer_data->tick,timer->gettick())/1000)));
 			clif->message(fd, temp);
 			if (DIFF_TICK(timer_data->tick, timer_data2->tick) > 0)
-				sprintf(temp, msg_txt(237), txt_time(DIFF_TICK(timer_data->interval,DIFF_TICK(timer_data->tick,timer_data2->tick)) / 1000)); // Game time: After, the game will be in night for %s.
+				sprintf(temp, msg_txt(237), // Game time: After, the game will be in night for %s.
+				        txt_time((unsigned int)(DIFF_TICK(timer_data->interval,DIFF_TICK(timer_data->tick,timer_data2->tick)) / 1000)));
 			else
-				sprintf(temp, msg_txt(237), txt_time(DIFF_TICK(timer_data2->tick,timer_data->tick)/1000)); // Game time: After, the game will be in night for %s.
+				sprintf(temp, msg_txt(237), // Game time: After, the game will be in night for %s.
+				        txt_time((unsigned int)(DIFF_TICK(timer_data2->tick,timer_data->tick)/1000)));
 			clif->message(fd, temp);
 		} else {
 			timer_data = timer->get(pc->day_timer_tid);
 			timer_data2 = timer->get(pc->night_timer_tid);
-			sprintf(temp, msg_txt(233), txt_time(DIFF_TICK(timer_data->tick,timer->gettick()) / 1000)); // Game time: The game is actualy in night for %s.
+			sprintf(temp, msg_txt(233), // Game time: The game is actualy in night for %s.
+			        txt_time((unsigned int)(DIFF_TICK(timer_data->tick,timer->gettick()) / 1000)));
 			clif->message(fd, temp);
 			if (DIFF_TICK(timer_data->tick,timer_data2->tick) > 0)
-				sprintf(temp, msg_txt(239), txt_time((timer_data->interval - DIFF_TICK(timer_data->tick, timer_data2->tick)) / 1000)); // Game time: After, the game will be in daylight for %s.
+				sprintf(temp, msg_txt(239), // Game time: After, the game will be in daylight for %s.
+				        txt_time((unsigned int)((timer_data->interval - DIFF_TICK(timer_data->tick, timer_data2->tick)) / 1000)));
 			else
-				sprintf(temp, msg_txt(239), txt_time(DIFF_TICK(timer_data2->tick, timer_data->tick) / 1000)); // Game time: After, the game will be in daylight for %s.
+				sprintf(temp, msg_txt(239), // Game time: After, the game will be in daylight for %s.
+				        txt_time((unsigned int)(DIFF_TICK(timer_data2->tick, timer_data->tick) / 1000)));
 			clif->message(fd, temp);
 		}
 		sprintf(temp, msg_txt(238), txt_time(timer_data->interval / 1000)); // Game time: A day cycle has a normal duration of %s.
@@ -5249,7 +5258,7 @@ ACMD(useskill) {
  *------------------------------------------*/
 ACMD(displayskill) {
 	struct status_data *st;
-	unsigned int tick;
+	int64 tick;
 	uint16 skill_id;
 	uint16 skill_lv = 1;
 	
@@ -6085,8 +6094,8 @@ ACMD(summon)
 	int mob_id = 0;
 	int duration = 0;
 	struct mob_data *md;
-	unsigned int tick=timer->gettick();
-		
+	int64 tick=timer->gettick();
+	
 	if (!message || !*message || sscanf(message, "%23s %d", name, &duration) < 1)
 	{
 		clif->message(fd, msg_txt(1225)); // Please enter a monster name (usage: @summon <monster name> {duration}).
@@ -7332,7 +7341,7 @@ ACMD(mapflag) {
 		CHECKFLAG(nojobexp);          CHECKFLAG(nomobloot);          CHECKFLAG(nomvploot);    CHECKFLAG(nightenabled);
 		CHECKFLAG(nodrop);            CHECKFLAG(novending);          CHECKFLAG(loadevent);
 		CHECKFLAG(nochat);            CHECKFLAG(partylock);          CHECKFLAG(guildlock);    CHECKFLAG(src4instance);
-		CHECKFLAG(notomb);
+		CHECKFLAG(notomb);            CHECKFLAG(nocashshop);
 		clif->message(sd->fd," ");
 		clif->message(sd->fd,msg_txt(1312)); // Usage: "@mapflag monster_noteleport 1" (0=Off | 1=On)
 		clif->message(sd->fd,msg_txt(1313)); // Type "@mapflag available" to list the available mapflags.
@@ -7369,7 +7378,7 @@ ACMD(mapflag) {
 	SETFLAG(nojobexp);          SETFLAG(nomobloot);          SETFLAG(nomvploot);    SETFLAG(nightenabled);
 	SETFLAG(nodrop);            SETFLAG(novending);          SETFLAG(loadevent);
 	SETFLAG(nochat);            SETFLAG(partylock);          SETFLAG(guildlock);    SETFLAG(src4instance);
-	SETFLAG(notomb);
+	SETFLAG(notomb);            SETFLAG(nocashshop);
 	
 	clif->message(sd->fd,msg_txt(1314)); // Invalid flag name or flag.
 	clif->message(sd->fd,msg_txt(1312)); // Usage: "@mapflag monster_noteleport 1" (0=Off | 1=On)
@@ -7381,7 +7390,7 @@ ACMD(mapflag) {
 	clif->message(sd->fd,"nozenypenalty, notrade, noskill, nowarp, nowarpto, noicewall, snow, clouds, clouds2,");
 	clif->message(sd->fd,"fog, fireworks, sakura, leaves, nobaseexp, nojobexp, nomobloot,");
 	clif->message(sd->fd,"nomvploot, nightenabled, nodrop, novending, loadevent, nochat, partylock,");
-	clif->message(sd->fd,"guildlock, src4instance, notomb");
+	clif->message(sd->fd,"guildlock, src4instance, notomb, nocashshop");
 	
 #undef CHECKFLAG
 #undef SETFLAG
@@ -7605,36 +7614,39 @@ ACMD(cash)
 		return false;
 	}
 	
-	if( !strcmpi(command+1,"cash") )
-	{
+	if( !strcmpi(command+1,"cash") ) {
 		if( value > 0 ) {
 			if( (ret=pc->getcash(sd, value, 0)) >= 0){
-			    sprintf(output, msg_txt(505), ret, sd->cashPoints);
-			    clif->disp_onlyself(sd, output, strlen(output));
-			}
-			else clif->message(fd, msg_txt(149)); // Unable to decrease the number/value.
+				// If this option is set, the message is already sent by pc function
+				if( !battle_config.cashshop_show_points ){
+					sprintf(output, msg_txt(505), ret, sd->cashPoints);
+					clif->disp_onlyself(sd, output, strlen(output));
+				}
+			} else
+				clif->message(fd, msg_txt(149)); // Unable to decrease the number/value.
 		} else {
 			if( (ret=pc->paycash(sd, -value, 0)) >= 0){
 			    sprintf(output, msg_txt(410), ret, sd->cashPoints);
 			    clif->disp_onlyself(sd, output, strlen(output));
-			}
-			else clif->message(fd, msg_txt(41)); // Unable to decrease the number/value.
+			} else
+				clif->message(fd, msg_txt(41)); // Unable to decrease the number/value.
 		}
-	}
-	else
-	{ // @points
+	} else { // @points
 		if( value > 0 ) {
-			if( (ret=pc->getcash(sd, 0, value)) >= 0){
-			    sprintf(output, msg_txt(506), ret, sd->kafraPoints);
-			    clif->disp_onlyself(sd, output, strlen(output));
-			}
-			else clif->message(fd, msg_txt(149)); // Unable to decrease the number/value.
+			if( (ret=pc->getcash(sd, 0, value)) >= 0) {
+				// If this option is set, the message is already sent by pc function
+				if( !battle_config.cashshop_show_points ){
+					sprintf(output, msg_txt(506), ret, sd->kafraPoints);
+					clif->disp_onlyself(sd, output, strlen(output));
+				}
+			} else
+				clif->message(fd, msg_txt(149)); // Unable to decrease the number/value.
 		} else {
 			if( (ret=pc->paycash(sd, -value, -value)) >= 0){
 			    sprintf(output, msg_txt(411), ret, sd->kafraPoints);
 			    clif->disp_onlyself(sd, output, strlen(output));
-			}
-			else clif->message(fd, msg_txt(41)); // Unable to decrease the number/value.
+			} else
+				clif->message(fd, msg_txt(41)); // Unable to decrease the number/value.
 		}
 	}
 	
@@ -9445,22 +9457,37 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(costume),
 		ACMD_DEF(skdebug),
 	};
-	AtCommandInfo* cmd;
 	int i;
 	
 	for( i = 0; i < ARRAYLENGTH(atcommand_base); i++ ) {
-		if(atcommand->exists(atcommand_base[i].command)) { // Should not happen if atcommand_base[] array is OK
+		if(!atcommand->add(atcommand_base[i].command,atcommand_base[i].func)) { // Should not happen if atcommand_base[] array is OK
 			ShowDebug("atcommand_basecommands: duplicate ACMD_DEF for '%s'.\n", atcommand_base[i].command);
 			continue;
 		}
-		CREATE(cmd, AtCommandInfo, 1);
-		safestrncpy(cmd->command, atcommand_base[i].command, sizeof(cmd->command));
-		cmd->func = atcommand_base[i].func;
-		cmd->help = NULL;/* start as null dear */
-		cmd->log = true;
-		strdb_put(atcommand->db, cmd->command, cmd);
 	}
+	
+	/* @commands from plugins */
+	HPM_map_atcommands();
+	
 	return;
+}
+
+bool atcommand_add(char *name,AtCommandFunc func) {
+	AtCommandInfo* cmd;
+
+	if(atcommand->exists(name)) //caller will handle/display on false
+		return false;
+	
+	CREATE(cmd, AtCommandInfo, 1);
+	
+	safestrncpy(cmd->command, name, sizeof(cmd->command));
+	cmd->func = func;
+	cmd->help = NULL;
+	cmd->log = true;
+	
+	strdb_put(atcommand->db, cmd->command, cmd);
+	
+	return true;
 }
 
 /*==========================================
@@ -9648,6 +9675,9 @@ bool is_atcommand(const int fd, struct map_session_data* sd, const char* message
 		sprintf(atcmd_msg, "%s", message);
 	}
 
+	if( battle_config.idletime_criteria & BCIDLE_ATCOMMAND )
+		sd->idletime = last_tick;
+	
 	//Clearing these to be used once more.
 	memset(command, '\0', sizeof(command));
 	memset(params, '\0', sizeof(params));
@@ -9971,30 +10001,14 @@ bool atcommand_can_use2(struct map_session_data *sd, const char *command, AtComm
 	return false;
 }
 bool atcommand_hp_add(char *name, AtCommandFunc func) {
-	AtCommandInfo* cmd;
-	
+	/* if commands are added after group permissions are thrown in, they end up with no permissions */
+	/* so we restrict commands to be linked in during boot */
 	if( runflag == MAPSERVER_ST_RUNNING ) {
 		ShowDebug("atcommand_hp_add: Commands can't be added after server is ready, skipping '%s'...\n",name);
 		return false;
 	}
 	
-	if( atcommand->db == NULL )
-		atcommand->db = stridb_alloc(DB_OPT_DUP_KEY|DB_OPT_RELEASE_DATA, ATCOMMAND_LENGTH);
-	
-	if( atcommand->exists(name) ) {
-		ShowDebug("atcommand_hp_add: duplicate command '%s', skipping...\n", name);
-		return false;
-	}
-	
-	CREATE(cmd, AtCommandInfo, 1);
-	
-	safestrncpy(cmd->command, name, sizeof(cmd->command));
-	cmd->func = func;
-	cmd->help = NULL;/* start as null dear */
-	cmd->log = true;
-
-	strdb_put(atcommand->db, cmd->command, cmd);
-	return true;
+	return HPM_map_add_atcommand(name,func);
 }
 
 /**
@@ -10080,4 +10094,5 @@ void atcommand_defaults(void) {
 	atcommand->cmd_db_clear_sub = atcommand_db_clear_sub;
 	atcommand->doload = atcommand_doload;
 	atcommand->base_commands = atcommand_basecommands;
+	atcommand->add = atcommand_add;
 }
